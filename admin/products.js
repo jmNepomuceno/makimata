@@ -313,9 +313,9 @@ class ProductManager {
     const form = document.getElementById("product-form");
     if (form) form.reset();
     const productIdInput = document.getElementById("product-id");
-    document.getElementById("image-preview").innerHTML = '';
-    document.getElementById("size-options-container").innerHTML = '';
-    document.getElementById("color-options-container").innerHTML = '';
+    // document.getElementById("image-preview").innerHTML = '';
+    // document.getElementById("size-options-container").innerHTML = '';
+    // document.getElementById("color-options-container").innerHTML = '';
     if (productIdInput) productIdInput.value = "";
   }
 
@@ -364,7 +364,69 @@ class ProductManager {
     };
 
     try {
-      // --- DATABASE INTEGRATION PLACEHOLDER ---
+      const formData = new FormData();
+
+      // Basic product info
+      formData.append('product_id', productId || '');
+      formData.append('name', form.querySelector("#product-name").value);
+      formData.append('description', form.querySelector("#product-description").value);
+      formData.append('price', parseFloat(form.querySelector("#base-price").value));
+      formData.append('category', form.querySelector("#category-id").value);
+      formData.append('stock', parseInt(form.querySelector("#stock-quantity").value));
+      formData.append('low_stock_threshold', parseInt(form.querySelector("#low-stock-threshold").value));
+
+      // Main product image
+      const imageFiles = form.querySelector("#product-images").files;
+      let mainImageName = "";
+      if (imageFiles.length > 0) {
+          mainImageName = imageFiles[0].name;
+          formData.append("main_image_file", imageFiles[0]); // ✅ send actual file
+      }
+      formData.append('main_image', mainImageName);
+
+      // Color/Finish images
+      const colorInputs = form.querySelectorAll('#color-options-container input[type="file"]');
+      let colorImages = { burly: "", coffee: "", rust_brown: "" };
+
+      colorInputs.forEach(input => {
+          const colorKey = input.name.match(/\[(.*)\]/)[1]; 
+          if (input.files.length > 0) {
+              colorImages[colorKey] = input.files[0].name;
+              formData.append(`color_image_files[${colorKey}]`, input.files[0]); // ✅ send actual file
+          }
+      });
+
+      // Final images object (only file names, not paths)
+      const imagesJson = {
+          dark: colorImages.burly || "",
+          default: mainImageName || "",
+          natural: colorImages.coffee || "",
+          premium: colorImages.rust_brown || ""
+      };
+      formData.append("images", JSON.stringify(imagesJson));
+
+      // Debug print
+      for (let [key, value] of formData.entries()) {
+          console.log(key, value);
+      }
+
+      $.ajax({
+          url: '../assets/php_admin/save_product.php',
+          type: 'POST',
+          data: formData,
+          contentType: false,
+          processData: false,
+          dataType: 'json',
+          success: function(response) {
+              console.log(response);
+          },
+          error: function(err) {
+              console.error('AJAX error:', err);
+          }
+      });
+
+
+
       let response;
       if (isNewProduct) {
         productData.id = Date.now();

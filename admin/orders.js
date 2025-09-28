@@ -126,7 +126,7 @@ class OrderManager {
             this.renderPagination();
             return;
         }
-
+        console.log(paginatedOrders)
         tableBody.innerHTML = paginatedOrders.map(order => {
             const orderDate = new Date(order.date);
             const totalItems = order.items.reduce((sum, item) => sum + item.qty, 0);
@@ -198,39 +198,104 @@ class OrderManager {
     }
 
     // --- MODAL AND ACTION FUNCTIONS ---
+    // viewOrderDetails(orderId) {
+    //     const modal = document.getElementById('order-detail-modal');
+    //     const order = this.orders.find(o => o.id === orderId);
+    //     if (!modal || !order) return;
+
+    //     // Populate modal
+    //     document.getElementById('modal-order-id').textContent = order.id;
+    //     document.getElementById('modal-customer-name').textContent = order.customer.name;
+    //     document.getElementById('modal-customer-email').textContent = order.customer.email;
+    //     document.getElementById('modal-customer-phone').textContent = order.customer.phone || 'N/A';
+    //     document.getElementById('modal-shipping-address').textContent = order.shippingAddress;
+
+    //     // Populate items
+    //     const itemsList = document.getElementById('modal-order-items-list');
+    //     const totalItems = order.items.reduce((sum, item) => sum + item.qty, 0);
+    //     document.getElementById('modal-item-count').textContent = totalItems;
+    //     console.log(order)
+
+    //     itemsList.innerHTML = order.items.map(item => `
+    //         <div class="order-item">
+    //             <img src="../placeholder.svg?height=60&width=60" alt="${item.name}" class="item-image">
+    //             <div class="item-details">
+    //                 <div class="item-name">${item.name}</div>
+    //                 <div class="item-price">₱${item.price.toFixed(2)} x ${item.qty}</div>
+    //             </div>
+    //             <div class="item-total">₱${(item.price * item.qty).toFixed(2)}</div>
+    //         </div>
+    //     `).join('');
+
+    //     // Populate totals
+    //     const shippingCost = 150.00; // Mock shipping
+    //     const grandTotal = order.total + shippingCost;
+    //     const totalsSummary = document.getElementById('modal-totals-summary');
+    //     totalsSummary.innerHTML = `
+    //         <div class="detail-row"><strong>Subtotal:</strong> <span>₱${order.total.toFixed(2)}</span></div>
+    //         <div class="detail-row"><strong>Shipping:</strong> <span>₱${shippingCost.toFixed(2)}</span></div>
+    //         <div class="detail-row total"><strong>Grand Total:</strong> <span>₱${grandTotal.toFixed(2)}</span></div>
+    //     `;
+
+    //     modal.style.display = 'flex';
+    // }
+
     viewOrderDetails(orderId) {
         const modal = document.getElementById('order-detail-modal');
         const order = this.orders.find(o => o.id === orderId);
         if (!modal || !order) return;
 
-        // Populate modal
+        // Populate modal basic info
         document.getElementById('modal-order-id').textContent = order.id;
         document.getElementById('modal-customer-name').textContent = order.customer.name;
-        document.getElementById('modal-customer-email').textContent = order.customer.email;
+        document.getElementById('modal-customer-email').textContent = order.customer.email || 'N/A';
         document.getElementById('modal-customer-phone').textContent = order.customer.phone || 'N/A';
         document.getElementById('modal-shipping-address').textContent = order.shippingAddress;
 
         // Populate items
         const itemsList = document.getElementById('modal-order-items-list');
-        const totalItems = order.items.reduce((sum, item) => sum + item.qty, 0);
+        const totalItems = order.items.reduce((sum, item) => sum + parseInt(item.qty), 0);
         document.getElementById('modal-item-count').textContent = totalItems;
-        itemsList.innerHTML = order.items.map(item => `
-            <div class="order-item">
-                <img src="../placeholder.svg?height=60&width=60" alt="${item.name}" class="item-image">
-                <div class="item-details">
-                    <div class="item-name">${item.name}</div>
-                    <div class="item-price">₱${item.price.toFixed(2)} x ${item.qty}</div>
+
+        console.log(order)
+
+        // itemsList.innerHTML = order.items.map(item => {
+        //     const price = parseFloat(item.price) / item.qty;
+        //     const total = price * parseInt(item.qty);
+        //     return `
+        //         <div class="order-item">
+        //             <img src="../placeholder.svg?height=60&width=60" alt="${item.name}" class="item-image">
+        //             <div class="item-details">
+        //                 <div class="item-name">${item.name}</div>
+        //                 <div class="item-price">₱${price.toFixed(2)} x ${item.qty}</div>
+        //             </div>
+        //             <div class="item-total">₱${total.toFixed(2)}</div>
+        //         </div>
+        //     `;
+        // }).join('');
+
+        itemsList.innerHTML = order.items.map(item => {
+            const price = parseFloat(item.price) / item.qty;
+            const total = price * parseInt(item.qty);
+            return `
+                <div class="order-item">
+                    <div class="item-details">
+                        <div class="item-name">${item.name}</div>
+                        <div class="item-price">₱${price.toFixed(2)} x ${item.qty}</div>
+                    </div>
+                    <div class="item-total">₱${total.toFixed(2)}</div>
                 </div>
-                <div class="item-total">₱${(item.price * item.qty).toFixed(2)}</div>
-            </div>
-        `).join('');
+            `;
+        }).join('');
 
         // Populate totals
-        const shippingCost = 150.00; // Mock shipping
-        const grandTotal = order.total + shippingCost;
+        const shippingCost = 50; // Set to 0 if shipping already included in total
+        const subtotal = order.items.reduce((sum, item) => sum + (parseFloat(item.price / item.qty) * parseInt(item.qty)), 0);
+        const grandTotal = subtotal + shippingCost;
+
         const totalsSummary = document.getElementById('modal-totals-summary');
         totalsSummary.innerHTML = `
-            <div class="detail-row"><strong>Subtotal:</strong> <span>₱${order.total.toFixed(2)}</span></div>
+            <div class="detail-row"><strong>Subtotal:</strong> <span>₱${subtotal.toFixed(2)}</span></div>
             <div class="detail-row"><strong>Shipping:</strong> <span>₱${shippingCost.toFixed(2)}</span></div>
             <div class="detail-row total"><strong>Grand Total:</strong> <span>₱${grandTotal.toFixed(2)}</span></div>
         `;
@@ -238,11 +303,11 @@ class OrderManager {
         modal.style.display = 'flex';
     }
 
+
     editOrder(orderId) {
         const modal = document.getElementById('order-edit-modal');
         const order = this.orders.find(o => o.id === orderId);
         if (!modal || !order) return;
-
 
         // Populate modal with basic info
         document.getElementById('edit-modal-order-id').textContent = order.id;
@@ -250,7 +315,7 @@ class OrderManager {
 
         // Populate timeline
         const timeline = document.getElementById('edit-modal-timeline');
-        const allStatuses = ['pending', 'processing', 'shipped', 'completed'];
+        const allStatuses = ['pending', 'processing', 'shipped', 'completed', 'cancelled'];
 
         timeline.innerHTML = allStatuses.map(status => {
             const historyEntry = order.history.find(h => h.status === status);
@@ -260,7 +325,8 @@ class OrderManager {
                 pending: 'fa-clock',
                 processing: 'fa-cog',
                 shipped: 'fa-truck',
-                completed: 'fa-check-circle'
+                completed: 'fa-check-circle',
+                cancelled: 'fa-times-circle'
             };
             const iconClass = `fas ${iconMap[status] || 'fa-question-circle'}`;
 
@@ -277,10 +343,42 @@ class OrderManager {
 
         // Set up update button
         const updateBtn = document.getElementById('edit-modal-update-status-btn');
-        updateBtn.onclick = () => this.updateOrderStatus(orderId);
+        updateBtn.onclick = () => {
+            const newStatus = document.getElementById('edit-modal-order-status').value;
+            if (!newStatus) return showToast('Please select a status.', 'warning');
+
+            $.ajax({
+                url: '../assets/php_admin/update_order_status.php',
+                type: 'POST',
+                dataType: 'json',
+                data: { ids: [order.id], status: newStatus },
+                success: (response) => {
+                    console.log(response)
+                    if (response.status === 'success') {
+                        // Update the local order object
+                        order.status = newStatus;
+                        order.history.push({ status: newStatus, date: new Date().toISOString() });
+
+                        // Refresh modal timeline
+                        this.editOrder(orderId);
+
+                        this.filterAndRender();
+                        this.updateStats();
+                        showToast('Order status updated.', 'success');
+                    } else {
+                        showToast(response.message || 'Failed to update status.', 'error');
+                    }
+                },
+                error: (xhr, status, error) => {
+                    console.error("Error updating order: " + error);
+                    showToast('Error updating order.', 'error');
+                }
+            });
+        };
 
         modal.style.display = 'flex';
     }
+
 
     async updateOrderStatus(orderId) {
         const newStatus = document.getElementById('edit-modal-order-status').value;
@@ -345,16 +443,30 @@ class OrderManager {
         if (selectedIds.length === 0) return showToast('Please select orders first.', 'warning');
 
         const newStatus = prompt('Enter new status (pending, processing, shipped, completed, cancelled):');
+        console.log('here')
         if (newStatus && ['pending', 'processing', 'shipped', 'completed', 'cancelled'].includes(newStatus)) {
-            // --- DATABASE INTEGRATION PLACEHOLDER ---
-            // await fetch('/api/orders/bulk-update', {
-            //     method: 'POST',
-            //     headers: { 'Content-Type': 'application/json' },
-            //     body: JSON.stringify({ ids: selectedIds, status: newStatus })
-            // });
-            this.filterAndRender();
-            this.updateStats();
-            showToast(`${selectedIds.length} orders updated to ${newStatus}.`, 'success');
+            console.log(selectedIds, newStatus)
+            $.ajax({
+                url: '../assets/php_admin/update_order_status.php',
+                type: 'POST',
+                dataType: 'json',
+                data: { ids: selectedIds, status: newStatus },
+                success: (response) => {
+                    console.table(response)
+                    // if (response.status === 'success') {
+                    //     this.filterAndRender();
+                    //     this.updateStats();
+                    //     showToast(`${selectedIds.length} orders updated to ${newStatus}.`, 'success');
+                    // } else {
+                    //     showToast(response.message || 'Failed to update orders.', 'error');
+                    // }
+                },
+                error: (xhr, status, error) => {
+                    console.error("Error updating orders: " + error);
+                    showToast('Error updating orders.', 'error');
+                }
+            });
+
         } else if (newStatus) {
             showToast('Invalid status entered.', 'error');
         }

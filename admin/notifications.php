@@ -7,6 +7,8 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
   <link rel="stylesheet" href="admin.css"/>
   <link rel="stylesheet" href="notifications.css"/>
+  <?php include("../scripts_links/header_links.php") ?>
+
   <style>
     body {
       zoom: 80%;
@@ -22,13 +24,13 @@
       </div>
       <nav class="sidebar-nav">
         <ul>
-          <li><a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
-          <li><a href="products.html"><i class="fas fa-cubes"></i> <span>Products</span></a></li>
-          <li><a href="orders.html"><i class="fas fa-shopping-cart"></i> <span>Orders</span></a></li>
+          <li><a href="dashboard.php"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
+          <li><a href="products.php"><i class="fas fa-cubes"></i> <span>Products</span></a></li>
+          <li><a href="orders.php"><i class="fas fa-shopping-cart"></i> <span>Orders</span></a></li>
           <li><a href="customers.html"><i class="fas fa-user-group"></i> <span>Users</span></a></li>
           <li><a href="tutorials.html"><i class="fas fa-book-open"></i> <span>Tutorials</span></a></li>
           <li><a href="reviews.html"><i class="fas fa-star"></i> <span>Reviews</span></a></li>
-          <li><a href="notifications.html" class="active"><i class="fas fa-bell"></i> <span>Notifications</span></a></li>
+          <li><a href="notifications.php" class="active"><i class="fas fa-bell"></i> <span>Notifications</span></a></li>
           <li><a href="activity-logs.html"><i class="fas fa-clipboard-list"></i> <span>Activity Logs</span></a></li>
         </ul>
         <div class="sidebar-bottom-nav">

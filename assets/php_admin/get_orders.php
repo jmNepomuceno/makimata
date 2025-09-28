@@ -17,7 +17,7 @@ try {
         // --- Fetch items ---
         $sqlItems = "SELECT product_code AS sku, name, attributes, quantity AS qty, price 
                      FROM order_items 
-                     WHERE order_code = :order_code";
+                     WHERE order_code = :order_code ORDER BY id DESC";
         $stmtItems = $pdo->prepare($sqlItems);
         $stmtItems->execute([':order_code' => $order_code]);
         $items = $stmtItems->fetchAll(PDO::FETCH_ASSOC);

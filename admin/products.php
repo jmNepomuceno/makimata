@@ -7,6 +7,8 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link rel="stylesheet" href="admin.css">
   <link rel="stylesheet" href="products.css">
+  <?php include("../scripts_links/header_links.php") ?>
+
   <style>
     body {
       zoom: 80%;
@@ -22,14 +24,14 @@
       </div>
       <nav class="sidebar-nav">
         <ul>
-          <li><a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
-          <li><a href="products.html" class="active"><i class="fas fa-cubes"></i> <span>Products</span></a></li>
-          <li><a href="orders.html"><i class="fas fa-shopping-cart"></i> <span>Orders</span></a></li>
-          <li><a href="customers.html"><i class="fas fa-user-group"></i> <span>Customers</span></a></li>
-          <li><a href="tutorials.html"><i class="fas fa-book-open"></i> <span>Tutorials</span></a></li>
-          <li><a href="reviews.html"><i class="fas fa-star"></i> <span>Reviews</span></a></li>
-          <li><a href="notifications.html"><i class="fas fa-bell"></i> <span>Notifications</span></a></li>
-          <li><a href="activity-logs.html"><i class="fas fa-clipboard-list"></i> <span>Activity Logs</span></a></li>
+          <li><a href="dashboard.php"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
+          <li><a href="products.php" class="active"><i class="fas fa-cubes"></i> <span>Products</span></a></li>
+          <li><a href="orders.php"><i class="fas fa-shopping-cart"></i> <span>Orders</span></a></li>
+          <li><a href="customers.php"><i class="fas fa-user-group"></i> <span>Customers</span></a></li>
+          <li><a href="tutorials.php"><i class="fas fa-book-open"></i> <span>Tutorials</span></a></li>
+          <li><a href="reviews.php"><i class="fas fa-star"></i> <span>Reviews</span></a></li>
+          <li><a href="notifications.php"><i class="fas fa-bell"></i> <span>Notifications</span></a></li>
+          <li><a href="activity-logs.php"><i class="fas fa-clipboard-list"></i> <span>Activity Logs</span></a></li>
         </ul>
         <div class="sidebar-bottom-nav">
           <ul>
@@ -176,6 +178,7 @@
         <button class="modal-close">&times;</button>
       </div>
       <div class="modal-body">
+
         <form id="product-form" class="product-form">
           <input type="hidden" id="product-id" name="product_id">
 
@@ -239,25 +242,30 @@
           <div class="form-section">
             <h4>Customization Options</h4>
 
-            <!-- Size Options -->
-            <div class="form-group">
-              <label class="form-label">Size Options</label>
-              <div id="size-options-container" class="options-container"></div>
-              <button type="button" class="btn btn-secondary btn-sm" id="add-size-option-btn">
-                <i class="fas fa-plus"></i> Add Size
-              </button>
-            </div>
-
             <!-- Finish/Color Options -->
             <div class="form-group">
               <label class="form-label">Finish/Color Options</label>
-              <div id="color-options-container" class="options-container"></div>
-              <button type="button" class="btn btn-secondary btn-sm" id="add-color-option-btn">
-                <i class="fas fa-plus"></i> Add Color/Finish
-              </button>
+              <div class="options-container" id="color-options-container">
+                <!-- Static color options -->
+                <div class="color-option">
+                  <label style="color:black;">Burly</label>
+                  <input type="file" name="color_images[burly]" style="color:black;" accept="image/*">
+                </div>
+                <div class="color-option">
+                  <label style="color:black;">Coffee</label>
+                  <input type="file" name="color_images[coffee]" style="color:black;" accept="image/*">
+                </div>
+                <div class="color-option">
+                  <label style="color:black;">Rust Brown</label>
+                  <input type="file" name="color_images[rust_brown]" style="color:black;" accept="image/*">
+                </div>
+              </div>
             </div>
           </div>
+
         </form>
+
+
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" id="cancel-btn">Cancel</button>

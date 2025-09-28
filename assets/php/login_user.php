@@ -33,7 +33,16 @@ try {
                 "email"     => $user['email']
             ];
 
+            $sqlNotif = "INSERT INTO notifications (type, icon, title, message, recipient, target_id)
+             VALUES ('user', 'fa-user', 'User Login', :message, 'Admin', :user_id)";
+            $stmtNotif = $pdo->prepare($sqlNotif);
+            $stmtNotif->execute([
+                ':message' => $user['firstname'] . ' ' . $user['lastname'] . ' logged in at ' . date('Y-m-d H:i:s'),
+                ':user_id' => $user['user_ID']
+            ]);
+
             echo json_encode(["status" => "success"]);
+            
         } else {
             echo json_encode(["status" => "error", "message" => "Invalid password"]);
         }

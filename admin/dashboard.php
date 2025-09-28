@@ -12,9 +12,36 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="stylesheet" href="admin.css">
+  <?php include("../scripts_links/header_links.php") ?>
+
   <style>
     body {
       zoom: 80%;
+
+      /* Unread notifications (sent) */
+      .notification-dropdown .notif-unread {
+          background-color: #f0f8ff; /* light blue */
+          font-weight: bold;
+      }
+
+      /* Read notifications (opened) */
+      .notification-dropdown .notif-read {
+          background-color: #fff;
+          color: #555;
+          font-weight: normal;
+      }
+
+      /* Hover effect for all items */
+      .notification-dropdown .dropdown-item:hover {
+          background-color: #e6f2ff;
+      }
+
+      /* Icon styling */
+      .notification-dropdown .dropdown-item .icon {
+          font-size: 1.2rem;
+          margin-right: 0.5rem;
+      }
+
     }
   </style>
 </head>
@@ -52,6 +79,7 @@
           <p id="current-date">Loading...</p>
           <p id="current-time"></p>
         </div>
+
         <div class="header-right-actions">
           <div class="header-icon-wrapper">
             <button class="header-icon-btn" title="Notifications" id="notification-icon-btn">
@@ -61,7 +89,7 @@
             <div class="notification-dropdown" id="notification-dropdown">
               <div class="dropdown-header">
                 <h3>Notifications</h3>
-                <a href="notifications.html">View All</a>
+                <a href="notifications.php">View All</a>
               </div>
               <ul class="dropdown-list">
                 <li><a href="#" class="dropdown-item">
@@ -89,6 +117,7 @@
             </div>
           </div>
         </div>
+
       </header>
 
       <!-- Dashboard Stats Overview -->

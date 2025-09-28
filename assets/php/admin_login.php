@@ -33,6 +33,14 @@
                 ];
 
                 echo json_encode(["status" => "success"]);
+
+                $sqlNotif = "INSERT INTO notifications (type, icon, title, message, recipient)
+                VALUES ('user', 'fa-sign-in-alt', 'Admin Login', :message, 'All Admins')";
+                $stmtNotif = $pdo->prepare($sqlNotif);
+                $stmtNotif->execute([
+                    ':message' => $admin['firstname'] . ' ' . $admin['lastname'] . ' logged in at ' . date('Y-m-d H:i:s')
+                ]);
+
             } else {
                 echo json_encode(["status" => "error", "message" => "Invalid password"]);
             }

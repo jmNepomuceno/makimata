@@ -39,8 +39,8 @@
 
         // Insert into orders table
         $sql = "INSERT INTO orders 
-                (order_code, user_name, mobile, barangay, city, province, house_no, payment_method, subtotal, shipping, total, created_at) 
-                VALUES (:order_code, :user_name, :mobile, :barangay, :city, :province, :house_no, :payment, :subtotal, :shipping, :total, NOW())";
+                (order_code, user_name, mobile, barangay, city, province, house_no, payment_method, subtotal, shipping, total, status, created_at) 
+                VALUES (:order_code, :user_name, :mobile, :barangay, :city, :province, :house_no, :payment, :subtotal, :shipping, :total, :status, NOW())";
 
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
@@ -54,7 +54,8 @@
             ':payment'    => $payment,
             ':subtotal'   => $totals['subtotal'],
             ':shipping'   => $totals['shipping'],
-            ':total'      => $totals['total']
+            ':total'      => $totals['total'],
+            ':status'     => 'pending'
         ]);
 
         // Insert each order item
@@ -94,6 +95,14 @@
                 "items"      => $items
             ]
         ]);
+
+        $sqlNotif = "INSERT INTO notifications (type, icon, title, message, recipient, target_id, link)
+             VALUES ('order', 'fa-shopping-cart', 'New Order Received', :message, 'Sales Team', :order_id, 'orders.html')";
+            $stmtNotif = $pdo->prepare($sqlNotif);
+            $stmtNotif->execute([
+                ':message' => 'New order #' . $order_code . ' from ' . $user['name'],
+                ':order_id' => $order_code
+            ]);
 
     } catch (Exception $e) {
         echo json_encode([

@@ -67,6 +67,14 @@
             ]
         ]);
 
+        $sqlNotif = "INSERT INTO notifications (type, icon, title, message, recipient, target_id, link)
+             VALUES ('user', 'fa-user-plus', 'New User Registration', :message, 'Admin', :user_id, 'customers.html')";
+        $stmtNotif = $pdo->prepare($sqlNotif);
+        $stmtNotif->execute([
+            ':message' => $firstname . ' ' . $lastname . ' registered as a new user at ' . date('Y-m-d H:i:s'),
+            ':user_id' => $user_id
+        ]);
+
     } catch (Exception $e) {
         echo json_encode([
             "status"  => "error",

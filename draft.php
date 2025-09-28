@@ -4,10 +4,10 @@
 
     $sql = "SELECT 
                 *
-            FROM orders WHERE 1=1";
+            FROM products";
     $stmt = $pdo->prepare($sql);
     $stmt->execute();
-    $data = $stmt->fetch(PDO::FETCH_ASSOC);
+    $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     echo "<pre>"; print_r($data); echo "</pre>";
 ?>

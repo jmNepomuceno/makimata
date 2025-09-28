@@ -1,53 +1,53 @@
-function generateMockNotifications() {
-    const users = ['Sarah Johnson', 'Mike Chen', 'David Lee', 'Emily White', 'Chris Green'];
-    const products = ['Premium Wireless Headphones', 'Smart Fitness Watch', 'Classic Bamboo Cup', 'Woven Bamboo Lampshade'];
-    const notificationTypes = [
-        { type: 'order', icon: 'fa-shopping-cart', title: 'New Order Received', message: 'New order #ORD-XXX from ' },
-        { type: 'user', icon: 'fa-user-plus', title: 'New User Registration', message: ' just registered an account.' },
-        { type: 'product', icon: 'fa-box-open', title: 'Inventory Alert', message: 'Product is low on stock: ' },
-        { type: 'review', icon: 'fa-star', title: 'New Review Submitted', message: 'A new 5-star review for ' },
-        { type: 'system', icon: 'fa-cog', title: 'System Maintenance', message: 'Scheduled maintenance will begin in 1 hour.' }
-    ];
+// function generateMockNotifications() {
+//     const users = ['Sarah Johnson', 'Mike Chen', 'David Lee', 'Emily White', 'Chris Green'];
+//     const products = ['Premium Wireless Headphones', 'Smart Fitness Watch', 'Classic Bamboo Cup', 'Woven Bamboo Lampshade'];
+//     const notificationTypes = [
+//         { type: 'order', icon: 'fa-shopping-cart', title: 'New Order Received', message: 'New order #ORD-XXX from ' },
+//         { type: 'user', icon: 'fa-user-plus', title: 'New User Registration', message: ' just registered an account.' },
+//         { type: 'product', icon: 'fa-box-open', title: 'Inventory Alert', message: 'Product is low on stock: ' },
+//         { type: 'review', icon: 'fa-star', title: 'New Review Submitted', message: 'A new 5-star review for ' },
+//         { type: 'system', icon: 'fa-cog', title: 'System Maintenance', message: 'Scheduled maintenance will begin in 1 hour.' }
+//     ];
 
-    return Array.from({ length: 50 }, (_, i) => {
-        const template = notificationTypes[i % notificationTypes.length];
-        let message = template.message;
-        let title = template.title;
-        let recipient = 'All Admins';
-        let link = '#';
-        let targetId = null;
+//     return Array.from({ length: 50 }, (_, i) => {
+//         const template = notificationTypes[i % notificationTypes.length];
+//         let message = template.message;
+//         let title = template.title;
+//         let recipient = 'All Admins';
+//         let link = '#';
+//         let targetId = null;
 
-        if (template.type === 'order') {
-            message += users[i % users.length];
-            recipient = 'Sales Team';
-            link = 'orders.html';
-            targetId = `ORD-${i + 1}`;
-        } else if (template.type === 'user') {
-            message = users[i % users.length] + message;
-            recipient = 'Admin';
-            link = 'customers.html';
-            targetId = 1025 + i;
-        } else if (template.type === 'product' || template.type === 'review') {
-            message += products[i % products.length];
-            recipient = 'Inventory Manager';
-            link = template.type === 'product' ? 'products.html' : 'reviews.html';
-            targetId = i + 1;
-        }
+//         if (template.type === 'order') {
+//             message += users[i % users.length];
+//             recipient = 'Sales Team';
+//             link = 'orders.html';
+//             targetId = `ORD-${i + 1}`;
+//         } else if (template.type === 'user') {
+//             message = users[i % users.length] + message;
+//             recipient = 'Admin';
+//             link = 'customers.html';
+//             targetId = 1025 + i;
+//         } else if (template.type === 'product' || template.type === 'review') {
+//             message += products[i % products.length];
+//             recipient = 'Inventory Manager';
+//             link = template.type === 'product' ? 'products.html' : 'reviews.html';
+//             targetId = i + 1;
+//         }
 
-        return {
-            id: `notif-${i + 1}`,
-            type: template.type,
-            icon: template.icon,
-            title: title,
-            message: message,
-            recipient: recipient,
-            date: new Date(Date.now() - i * 3 * 60 * 60 * 1000).toISOString(),
-            status: ['sent', 'delivered', 'opened', 'failed'][i % 4],
-            link: link,
-            targetId: targetId
-        };
-    });
-}
+//         return {
+//             id: `notif-${i + 1}`,
+//             type: template.type,
+//             icon: template.icon,
+//             title: title,
+//             message: message,
+//             recipient: recipient,
+//             date: new Date(Date.now() - i * 3 * 60 * 60 * 1000).toISOString(),
+//             status: ['sent', 'delivered', 'opened', 'failed'][i % 4],
+//             link: link,
+//             targetId: targetId
+//         };
+//     });
+// }
 
 class NotificationManager {
     constructor() {
@@ -64,22 +64,41 @@ class NotificationManager {
     }
 
     loadNotifications() {
-        try {
-            const savedNotifications = localStorage.getItem('mikamataNotifications');
-            if (savedNotifications && JSON.parse(savedNotifications).length > 0) {
-                this.notifications = JSON.parse(savedNotifications);
-            } else {
-                this.notifications = generateMockNotifications();
-                this.saveNotificationsToStorage(); // Save mock data on first run
+        $.ajax({
+            url: '../assets/php_admin/fetch_notifications.php',
+            method: 'GET',
+            dataType: 'json',
+            success: (response) => {
+                if (response.status === 'success') {
+                    // Map server data to frontend structure
+                    console.log(response.data);
+                    this.notifications = response.data.map(notif => ({
+                        id: notif.id,
+                        type: notif.type,
+                        icon: notif.icon,
+                        title: notif.title,
+                        message: notif.message,
+                        recipient: notif.recipient,
+                        date: notif.created_at,
+                        status: notif.status,
+                        link: notif.link,
+                        targetId: notif.target_id || null
+                    }));
+
+                    this.saveNotificationsToStorage(); // Save to localStorage
+                    this.filteredNotifications = [...this.notifications];
+                    this.renderNotifications();
+                    this.updateStats();
+                } else {
+                    console.error('Failed to fetch notifications:', response.message);
+                }
+            },
+            error: (xhr, status, error) => {
+                console.error('Error fetching notifications:', error);
             }
-        } catch (error) {
-            console.error("Error loading notifications from localStorage:", error);
-            this.notifications = generateMockNotifications();
-        }
-        this.filteredNotifications = [...this.notifications];
-        this.renderNotifications();
-        this.updateStats();
+        });
     }
+
 
     saveNotificationsToStorage() {
         localStorage.setItem('mikamataNotifications', JSON.stringify(this.notifications));
@@ -98,7 +117,8 @@ class NotificationManager {
             this.renderPagination();
             return;
         }
-
+        console.log(paginatedNotifications)
+        console.log(this.filteredNotifications)
         listContainer.innerHTML = paginatedNotifications.map(notif => `
             <div class="notification-item">
                 <div class="notification-icon ${notif.type}">
@@ -116,7 +136,7 @@ class NotificationManager {
                     </div>
                 </div>
                 <div class="notification-actions">
-                    <button class="btn btn-sm btn-outline" title="View Details" onclick="notificationManager.navigateTo('${notif.link}', '${notif.targetId}')"><i class="fas fa-eye"></i></button>
+                    <button class="btn btn-sm btn-outline" title="View Details" onclick="notificationManager.navigateTo('${notif.link}', '${notif.targetId}', '${notif.id}')"><i class="fas fa-eye"></i></button>
                     <button class="btn btn-sm btn-outline" title="Delete" onclick="notificationManager.deleteNotification('${notif.id}')"><i class="fas fa-trash"></i></button>
                 </div>
             </div>
@@ -187,11 +207,52 @@ class NotificationManager {
         this.renderNotifications();
     }
 
-    navigateTo(link, targetId) {
+    // navigateTo(link, targetId) {
+    //     console.log(link, targetId);
+    //     // if (link && link !== '#') {
+    //     //     window.location.href = `${link}?highlight=${targetId}`;
+    //     // }
+
+    //     if (link && link !== '#') {
+    //         window.location.href = link;
+    //     }
+    // }
+
+    navigateTo(link, targetId, notifId) {
+        console.log(link, notifId);
+        if (notifId) {
+            // Update notification status to "opened"
+            $.ajax({
+                url: '../assets/php_admin/update_notification_status.php',
+                method: 'POST',
+                data: { id: notifId, status: 'opened' },
+                dataType: 'json',
+                success: (response) => {
+                    if (response.status === 'success') {
+                        console.log('Notification status updated to opened');
+                        // Optionally update localStorage and UI
+                        const notif = this.notifications.find(n => n.id === notifId);
+                        if (notif) {
+                            notif.status = 'opened';
+                            this.saveNotificationsToStorage();
+                            this.renderNotifications();
+                        }
+                    } else {
+                        console.error('Failed to update notification status:', response.message);
+                    }
+                },
+                error: (xhr, status, error) => {
+                    console.error('Error updating notification status:', error);
+                }
+            });
+        }
+
+        // Redirect to the link if provided
         if (link && link !== '#') {
-            window.location.href = `${link}?highlight=${targetId}`;
+            window.location.href = link;
         }
     }
+
     
     deleteNotification(notificationId) {
         if (confirm('Are you sure you want to delete this notification?')) {

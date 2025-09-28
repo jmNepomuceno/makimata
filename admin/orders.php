@@ -320,7 +320,8 @@
     <div class="modal-content large">
       <div class="modal-header">
         <h3>Order Details #<span id="modal-order-id"></span></h3>
-        <span class="close" onclick="closeOrderDetailModal()">&times;</span>
+        <!-- <span class="close" onclick="closeOrderDetailModal()">&times;</span> -->
+        <span class="close">&times;</span>
       </div>
       <div class="modal-body">
         <div class="order-detail-layout">
