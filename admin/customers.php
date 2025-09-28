@@ -7,6 +7,8 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link rel="stylesheet" href="admin.css">
   <link rel="stylesheet" href="customers.css">
+  <?php include("../scripts_links/header_links.php") ?>
+
   <style>
     body {
       zoom: 80%;
@@ -22,14 +24,14 @@
       </div>
       <nav class="sidebar-nav">
         <ul>
-          <li><a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
-          <li><a href="products.html"><i class="fas fa-cubes"></i> <span>Products</span></a></li>
-          <li><a href="orders.html"><i class="fas fa-shopping-cart"></i> <span>Orders</span></a></li>
-          <li><a href="customers.html" class="active"><i class="fas fa-user-group"></i> <span>Customers</span></a></li>
-          <li><a href="tutorials.html"><i class="fas fa-book-open"></i> <span>Tutorials</span></a></li>
-          <li><a href="reviews.html"><i class="fas fa-star"></i> <span>Reviews</span></a></li>
-          <li><a href="notifications.html"><i class="fas fa-bell"></i> <span>Notifications</span></a></li>
-          <li><a href="activity-logs.html"><i class="fas fa-clipboard-list"></i> <span>Activity Logs</span></a></li>
+          <li><a href="dashboard.php"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
+          <li><a href="products.php"><i class="fas fa-cubes"></i> <span>Products</span></a></li>
+          <li><a href="orders.php"><i class="fas fa-shopping-cart"></i> <span>Orders</span></a></li>
+          <li><a href="customers.php" class="active"><i class="fas fa-user-group"></i> <span>Customers</span></a></li>
+          <li><a href="tutorials.php"><i class="fas fa-book-open"></i> <span>Tutorials</span></a></li>
+          <li><a href="reviews.php"><i class="fas fa-star"></i> <span>Reviews</span></a></li>
+          <li><a href="notifications.php"><i class="fas fa-bell"></i> <span>Notifications</span></a></li>
+          <li><a href="activity-logs.php"><i class="fas fa-clipboard-list"></i> <span>Activity Logs</span></a></li>
         </ul>
         <div class="sidebar-bottom-nav">
           <ul>
@@ -210,23 +212,23 @@
                 <div class="address-details-grid">
                   <div class="form-group full-width">
                     <label class="form-label">Street Address</label>
-                    <input type="text" class="form-input" value="123 Main Street, Barangay Centro" readonly>
+                    <input type="text" id="house-no-input" class="form-input" value="123 Main Street, Barangay Centro" readonly>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Barangay</label>
+                    <input type="text" id="barangay-input" class="form-input" value="Barangay Centro" readonly>
                   </div>
                   <div class="form-group">
                     <label class="form-label">City</label>
-                    <input type="text" class="form-input" value="Quezon City" readonly>
+                    <input type="text" id="city-input" class="form-input" value="Quezon City" readonly>
                   </div>
                   <div class="form-group">
                     <label class="form-label">Province</label>
-                    <input type="text" class="form-input" value="Metro Manila" readonly>
+                    <input type="text" id="province-input" class="form-input" value="Metro Manila" readonly>
                   </div>
                   <div class="form-group">
-                    <label class="form-label">Postal Code</label>
-                    <input type="text" class="form-input" value="1100" readonly>
-                  </div>
-                  <div class="form-group">
-                    <label class="form-label">Country</label>
-                    <input type="text" class="form-input" value="Philippines" readonly>
+                    <label class="form-label">Region</label>
+                    <input type="text" id="region-input" class="form-input" value="Philippines" readonly>
                   </div>
                 </div>
               </div>

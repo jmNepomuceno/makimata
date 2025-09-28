@@ -57,25 +57,35 @@ class ProductManager {
       }
   }
 
-  async loadProducts() {
-    try {
-      // --- DATABASE INTEGRATION PLACEHOLDER ---
-      const savedProducts = localStorage.getItem('mikamataProducts');
-      this.products = savedProducts ? JSON.parse(savedProducts) : [];
+  loadProducts() {
+    $.ajax({
+      url: "../assets/php/fetch_products.php", // <-- adjust path to your PHP
+      type: "GET",
+      dataType: "json",
+      success: (response) => {
+        console.table(response);
 
-      if (this.products.length === 0) {
-        console.warn("No products found. Using fallback mock data. Connect to your database.");
+        if (response.status === "success") {
+          this.products = response.data;
+        } else {
+          console.warn("Error loading products:", response.message);
+          this.products = [];
+        }
+
+        this.filteredProducts = [...this.products];
+        this.renderProducts();
+        this.updateProductStats();
+      },
+      error: (xhr, status, error) => {
+        console.error("AJAX error:", status, error);
+        this.products = [];
+        this.filteredProducts = [];
+        this.renderProducts();
+        this.updateProductStats();
       }
-
-    } catch (error) {
-      console.error("Error loading products from localStorage:", error);
-      this.products = [];
-    }
-
-    this.filteredProducts = [...this.products];
-    this.renderProducts();
-    this.updateProductStats();
+    });
   }
+
 
   async saveProductsToStorage() {
     // --- DATABASE INTEGRATION PLACEHOLDER ---

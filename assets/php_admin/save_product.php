@@ -65,9 +65,24 @@ try {
     $productCode = 'PROD' . str_pad($nextId, 4, '0', STR_PAD_LEFT);
 
     if ($productId) {
+        // $stmt = $pdo->prepare("
+        //     UPDATE products 
+        //     SET name=:name, description=:desc, price=:price, category=:cat, stock=:stock, images=:images 
+        //     WHERE product_ID=:id
+        // ");
+        // $stmt->execute([
+        //     ':name'   => $name,
+        //     ':desc'   => $description,
+        //     ':price'  => $price,
+        //     ':cat'    => $category,
+        //     ':stock'  => $stock,
+        //     ':images' => $imagesJson,
+        //     ':id'     => $productId
+        // ]);
+
         $stmt = $pdo->prepare("
             UPDATE products 
-            SET name=:name, description=:desc, price=:price, category=:cat, stock=:stock, images=:images 
+            SET name=:name, description=:desc, price=:price, category=:cat, stock=:stock
             WHERE product_ID=:id
         ");
         $stmt->execute([
@@ -76,9 +91,9 @@ try {
             ':price'  => $price,
             ':cat'    => $category,
             ':stock'  => $stock,
-            ':images' => $imagesJson,
             ':id'     => $productId
         ]);
+
         $message = "Product updated successfully";
     } else {
         $stmt = $pdo->prepare("

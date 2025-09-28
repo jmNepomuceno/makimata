@@ -4,38 +4,45 @@
  * @returns {Array} An array of customer objects.
  */
 function generateMockCustomers() {
-    const firstNames = ['Maria', 'Juan', 'Anna', 'Jose', 'Lito', 'Elena', 'Carlos', 'Sofia', 'Miguel', 'Isabella'];
-    const lastNames = ['Santos', 'Dela Cruz', 'Reyes', 'Garcia', 'Mendoza', 'Lim', 'Torres', 'Gonzales', 'Villanueva', 'Ramos'];
-    const middleInitials = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M'];
+console.log('here')
+  return new Promise((resolve, reject) => {
+    $.ajax({
+      url: "../assets/php_admin/get_users.php   ", // <-- adjust path
+      type: "GET",
+      dataType: "json",
+      success: function (response) {
+        console.table(response.data)
+        if (response.status === "success") {
+          // Map DB fields to the same structure you used before
+          const customers = response.data.map(user => ({
+            id: user.id,
+            firstName: user.firstname,
+            lastName: user.lastname,
+            middleInitial: user.middleInitial || "", // optional if you don’t have it in DB
+            email: user.email,
+            phone: user.mobile_number,
+            totalSpent: 0, // you can calculate or keep placeholder
+            registrationDate: user.created_at,
+            lastLogin: user.last_login,
+            region: user.region,
+            province: user.province,
+            city: user.city,
+            barangay: user.barangay,
+            houseNo: user.house_no
+          }));
 
-    return Array.from({ length: 2847 }, (_, i) => {
-        const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
-        const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
-        const middleInitial = middleInitials[Math.floor(Math.random() * middleInitials.length)];
-        
-        // Make some customers recent
-        const today = new Date();
-        let registrationDate;
-        if (i % 10 === 0) { // Make every 10th customer recent
-            const pastDays = Math.floor(Math.random() * today.getDate());
-            registrationDate = new Date(today.getFullYear(), today.getMonth(), today.getDate() - pastDays);
+          resolve(customers);
         } else {
-            registrationDate = new Date(2023, Math.floor(Math.random() * 12), Math.floor(Math.random() * 28) + 1);
+          reject("Error: " + response.message);
         }
-
-        return {
-            id: 1025 + i,
-            firstName: firstName,
-            lastName: lastName,
-            middleInitial: middleInitial,
-            email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}${i}@example.com`,
-            phone: `+63 917 ${String(Math.floor(1000000 + Math.random() * 9000000)).substring(0, 7)}`,
-            totalSpent: Math.floor(Math.random() * 50000),
-            registrationDate: registrationDate.toISOString(),
-            lastLogin: new Date(new Date(2024, 0, 1).getTime() + Math.random() * (new Date().getTime() - new Date(2024, 0, 1).getTime())).toISOString(),
-        };
+      },
+      error: function (xhr, status, error) {
+        reject("AJAX error: " + error);
+      }
     });
+  });
 }
+
 
 class CustomerManager {
     constructor() {
@@ -58,9 +65,8 @@ class CustomerManager {
             // Example: const response = await fetch('/api/customers');
             // this.customers = await response.json();
 
-            const savedCustomers = localStorage.getItem('mikamataCustomers');
-            this.customers = savedCustomers ? JSON.parse(savedCustomers) : generateMockCustomers();
-            this.saveCustomers(); // Save mock data if it was just generated
+            this.customers = await generateMockCustomers();
+            console.log(this.customers)
         } catch (error) {
             console.error("Error loading customers:", error);
             this.customers = [];
@@ -107,7 +113,7 @@ class CustomerManager {
                 <td><div class="customer-name">${customer.lastName}</div></td>
                 <td><div class="customer-email">${customer.email}</div></td>
                 <td><div class="customer-phone">${customer.phone || 'N/A'}</div></td>
-                <td>${new Date(customer.registrationDate).toLocaleDateString()}</td>
+                <td>${customer.registrationDate}</td>
                 <td>
                     <div class="action-buttons">
                         <button class="btn btn-view" onclick="customerManager.viewCustomer(${customer.id})">View Details</button>
@@ -252,7 +258,7 @@ class CustomerManager {
         if (customerId) {
             const customer = this.customers.find(c => c.id === customerId);
             if (!customer) return;
-
+            console.log(customer)
             title.textContent = isViewOnly ? 'Customer Details' : 'Edit Customer';
             this.populateForm(customer);
         } else {
@@ -286,6 +292,12 @@ class CustomerManager {
         const loginDate = new Date(customer.lastLogin).toLocaleString('en-US', { dateStyle: 'long', timeStyle: 'short' });
         document.getElementById('registration-date').textContent = regDate;
         document.getElementById('last-login-date').textContent = loginDate;
+
+        $('#house-no-input').val(customer.houseNo || '');
+        $('#barangay-input').val(customer.barangay || '');
+        $('#city-input').val(customer.city || '');
+        $('#province-input').val(customer.province || '');
+        $('#region-input').val(customer.region || '');
     }
 
     closeCustomerModal() {
@@ -361,6 +373,7 @@ class CustomerManager {
     }
 
     switchTab(event) {
+        console.log('tab switch')
         const tabButton = event.currentTarget;
         const tabId = tabButton.dataset.tab;
 
