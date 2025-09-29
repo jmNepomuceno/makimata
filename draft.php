@@ -4,7 +4,7 @@
 
     $sql = "SELECT 
                 *
-            FROM users";
+            FROM notifications";
     $stmt = $pdo->prepare($sql);
     $stmt->execute();
     $data = $stmt->fetchAll(PDO::FETCH_ASSOC);

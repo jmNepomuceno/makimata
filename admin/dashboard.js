@@ -31,6 +31,64 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // --- CHART RENDERING FUNCTIONS ---
+    // function renderSalesChart() {
+    //     if (salesChartInstance) {
+    //         salesChartInstance.destroy();
+    //     }
+
+    //     const salesChartCanvas = document.getElementById('salesChart');
+    //     if (!salesChartCanvas) return;
+
+    //     const ctx = salesChartCanvas.getContext('2d');
+    //     const primaryHighlight = getCssVar('--highlight-primary');
+    //     const textColor = getCssVar('--text-color') + 'b3'; // Add 70% opacity
+    //     const gridColor = getCssVar('--text-color') + '1a'; // Add 10% opacity
+
+    //     const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+    //     gradient.addColorStop(0, primaryHighlight + '80'); // Add 50% opacity
+    //     gradient.addColorStop(1, primaryHighlight + '00'); // Transparent
+
+    //     salesChartInstance = new Chart(ctx, {
+    //         type: 'line',
+    //         data: {
+    //             labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+    //             datasets: [{
+    //                 label: 'Monthly Sales',
+    //                 data: [8100, 10400, 9500, 12000], // Placeholder data for 4 weeks
+    //                 backgroundColor: gradient,
+    //                 borderColor: primaryHighlight,
+    //                 borderWidth: 4, // Made the line slightly thicker
+    //                 pointBackgroundColor: getCssVar('--card-bg'), // Match the card background
+    //                 pointBorderColor: primaryHighlight,
+    //                 pointBorderWidth: 2,
+    //                 pointRadius: 6, // Made the points slightly larger
+    //                 pointHoverRadius: 8,
+    //                 tension: 0.4,
+    //                 fill: true,
+    //             }]
+    //         },
+    //         options: {
+    //             responsive: true,
+    //             maintainAspectRatio: false,
+    //             scales: {
+    //                 y: { ticks: { color: textColor }, grid: { color: gridColor } },
+    //                 x: { ticks: { color: textColor }, grid: { color: gridColor } }
+    //             },
+    //             plugins: { 
+    //                 legend: { display: false },
+    //                 tooltip: {
+    //                     backgroundColor: getCssVar('--card-bg'),
+    //                     titleColor: getCssVar('--highlight-secondary'),
+    //                     bodyColor: textColor,
+    //                     borderColor: getCssVar('--border-color'),
+    //                     borderWidth: 1,
+    //                     padding: 10,
+    //                     cornerRadius: 8,
+    //                 }
+    //             }
+    //         }
+    //     });
+    // }
     function renderSalesChart() {
         if (salesChartInstance) {
             salesChartInstance.destroy();
@@ -39,56 +97,71 @@ document.addEventListener('DOMContentLoaded', function () {
         const salesChartCanvas = document.getElementById('salesChart');
         if (!salesChartCanvas) return;
 
-        const ctx = salesChartCanvas.getContext('2d');
-        const primaryHighlight = getCssVar('--highlight-primary');
-        const textColor = getCssVar('--text-color') + 'b3'; // Add 70% opacity
-        const gridColor = getCssVar('--text-color') + '1a'; // Add 10% opacity
+        $.ajax({
+            url: "../assets/php_admin/fetch_sales_chart.php",
+            type: "POST",
+            dataType: "json",
+            success: function(response) {
+                if (response.status === "success") {
+                    const ctx = salesChartCanvas.getContext('2d');
+                    const primaryHighlight = getCssVar('--highlight-primary');
+                    const textColor = getCssVar('--text-color') + 'b3';
+                    const gridColor = getCssVar('--text-color') + '1a';
 
-        const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-        gradient.addColorStop(0, primaryHighlight + '80'); // Add 50% opacity
-        gradient.addColorStop(1, primaryHighlight + '00'); // Transparent
+                    const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+                    gradient.addColorStop(0, primaryHighlight + '80');
+                    gradient.addColorStop(1, primaryHighlight + '00');
 
-        salesChartInstance = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
-                datasets: [{
-                    label: 'Monthly Sales',
-                    data: [8100, 10400, 9500, 12000], // Placeholder data for 4 weeks
-                    backgroundColor: gradient,
-                    borderColor: primaryHighlight,
-                    borderWidth: 4, // Made the line slightly thicker
-                    pointBackgroundColor: getCssVar('--card-bg'), // Match the card background
-                    pointBorderColor: primaryHighlight,
-                    pointBorderWidth: 2,
-                    pointRadius: 6, // Made the points slightly larger
-                    pointHoverRadius: 8,
-                    tension: 0.4,
-                    fill: true,
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: { ticks: { color: textColor }, grid: { color: gridColor } },
-                    x: { ticks: { color: textColor }, grid: { color: gridColor } }
-                },
-                plugins: { 
-                    legend: { display: false },
-                    tooltip: {
-                        backgroundColor: getCssVar('--card-bg'),
-                        titleColor: getCssVar('--highlight-secondary'),
-                        bodyColor: textColor,
-                        borderColor: getCssVar('--border-color'),
-                        borderWidth: 1,
-                        padding: 10,
-                        cornerRadius: 8,
-                    }
+                    salesChartInstance = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: response.chart.labels,
+                            datasets: [{
+                                label: 'Monthly Sales',
+                                data: response.chart.data,
+                                backgroundColor: gradient,
+                                borderColor: primaryHighlight,
+                                borderWidth: 4,
+                                pointBackgroundColor: getCssVar('--card-bg'),
+                                pointBorderColor: primaryHighlight,
+                                pointBorderWidth: 2,
+                                pointRadius: 6,
+                                pointHoverRadius: 8,
+                                tension: 0.4,
+                                fill: true,
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: { ticks: { color: textColor }, grid: { color: gridColor } },
+                                x: { ticks: { color: textColor }, grid: { color: gridColor } }
+                            },
+                            plugins: { 
+                                legend: { display: false },
+                                tooltip: {
+                                    backgroundColor: getCssVar('--card-bg'),
+                                    titleColor: getCssVar('--highlight-secondary'),
+                                    bodyColor: textColor,
+                                    borderColor: getCssVar('--border-color'),
+                                    borderWidth: 1,
+                                    padding: 10,
+                                    cornerRadius: 8,
+                                }
+                            }
+                        }
+                    });
+                } else {
+                    console.error("Error fetching sales chart:", response.message);
                 }
+            },
+            error: function(xhr, status, error) {
+                console.error("AJAX error:", error);
             }
         });
     }
+
 
     function renderTopCategoriesChart() {
         if (categoriesChartInstance) {
@@ -159,6 +232,61 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    // function renderMostSellingProductsChart() {
+    //     if (mostSellingProductsChartInstance) {
+    //         mostSellingProductsChartInstance.destroy();
+    //     }
+
+    //     const canvas = document.getElementById('mostSellingProductsChart');
+    //     if (!canvas) return;
+
+    //     const ctx = canvas.getContext('2d');
+    //     const primaryHighlight = getCssVar('--highlight-primary');
+    //     const textColor = getCssVar('--text-color') + 'b3'; // 70% opacity
+    //     const gridColor = getCssVar('--text-color') + '1a'; // 10% opacity
+
+    //     mostSellingProductsChartInstance = new Chart(ctx, {
+    //         type: 'bar',
+    //         data: {
+    //             labels: ['Bamboo Dome Shade', 'Classic Bamboo Cup', 'Serving Tray', 'Utensil Holder', 'Amber Glow Shade'],
+    //             datasets: [{
+    //                 label: 'Units Sold',
+    //                 data: [85, 68, 55, 42, 30], // Placeholder data
+    //                 backgroundColor: primaryHighlight + 'b3', // 70% opacity
+    //                 borderColor: primaryHighlight,
+    //                 borderWidth: 1
+    //             }]
+    //         },
+    //         options: {
+    //             indexAxis: 'y', // This makes the bar chart horizontal
+    //             responsive: true,
+    //             maintainAspectRatio: false,
+    //             scales: {
+    //                 y: { 
+    //                     ticks: { color: textColor }, 
+    //                     grid: { display: false } // Hide y-axis grid lines for a cleaner look
+    //                 },
+    //                 x: { 
+    //                     ticks: { color: textColor }, 
+    //                     grid: { color: gridColor } 
+    //                 }
+    //             },
+    //             plugins: {
+    //                 legend: { display: false },
+    //                 tooltip: {
+    //                     backgroundColor: getCssVar('--card-bg'),
+    //                     titleColor: getCssVar('--highlight-secondary'),
+    //                     bodyColor: textColor,
+    //                     borderColor: getCssVar('--border-color'),
+    //                     borderWidth: 1,
+    //                     padding: 10,
+    //                     cornerRadius: 8,
+    //                 }
+    //             }
+    //         }
+    //     });
+    // }
+
     function renderMostSellingProductsChart() {
         if (mostSellingProductsChartInstance) {
             mostSellingProductsChartInstance.destroy();
@@ -167,49 +295,63 @@ document.addEventListener('DOMContentLoaded', function () {
         const canvas = document.getElementById('mostSellingProductsChart');
         if (!canvas) return;
 
-        const ctx = canvas.getContext('2d');
-        const primaryHighlight = getCssVar('--highlight-primary');
-        const textColor = getCssVar('--text-color') + 'b3'; // 70% opacity
-        const gridColor = getCssVar('--text-color') + '1a'; // 10% opacity
+        $.ajax({
+            url: "../assets/php_admin/fetch_most_selling_products.php",
+            type: "POST",
+            dataType: "json",
+            success: function(response) {
+                if (response.status === "success") {
+                    const ctx = canvas.getContext('2d');
+                    const primaryHighlight = getCssVar('--highlight-primary');
+                    const textColor = getCssVar('--text-color') + 'b3';
+                    const gridColor = getCssVar('--text-color') + '1a';
 
-        mostSellingProductsChartInstance = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: ['Bamboo Dome Shade', 'Classic Bamboo Cup', 'Serving Tray', 'Utensil Holder', 'Amber Glow Shade'],
-                datasets: [{
-                    label: 'Units Sold',
-                    data: [85, 68, 55, 42, 30], // Placeholder data
-                    backgroundColor: primaryHighlight + 'b3', // 70% opacity
-                    borderColor: primaryHighlight,
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                indexAxis: 'y', // This makes the bar chart horizontal
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: { 
-                        ticks: { color: textColor }, 
-                        grid: { display: false } // Hide y-axis grid lines for a cleaner look
-                    },
-                    x: { 
-                        ticks: { color: textColor }, 
-                        grid: { color: gridColor } 
-                    }
-                },
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        backgroundColor: getCssVar('--card-bg'),
-                        titleColor: getCssVar('--highlight-secondary'),
-                        bodyColor: textColor,
-                        borderColor: getCssVar('--border-color'),
-                        borderWidth: 1,
-                        padding: 10,
-                        cornerRadius: 8,
-                    }
+                    mostSellingProductsChartInstance = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: response.chart.labels,
+                            datasets: [{
+                                label: 'Units Sold',
+                                data: response.chart.data,
+                                backgroundColor: primaryHighlight + 'b3',
+                                borderColor: primaryHighlight,
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            indexAxis: 'y',
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: { 
+                                    ticks: { color: textColor }, 
+                                    grid: { display: false } 
+                                },
+                                x: { 
+                                    ticks: { color: textColor }, 
+                                    grid: { color: gridColor } 
+                                }
+                            },
+                            plugins: {
+                                legend: { display: false },
+                                tooltip: {
+                                    backgroundColor: getCssVar('--card-bg'),
+                                    titleColor: getCssVar('--highlight-secondary'),
+                                    bodyColor: textColor,
+                                    borderColor: getCssVar('--border-color'),
+                                    borderWidth: 1,
+                                    padding: 10,
+                                    cornerRadius: 8,
+                                }
+                            }
+                        }
+                    });
+                } else {
+                    console.error("Error fetching most selling products:", response.message);
                 }
+            },
+            error: function(xhr, status, error) {
+                console.error("AJAX error:", error);
             }
         });
     }
@@ -287,21 +429,99 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // --- DATA & UI UPDATE FUNCTIONS ---
-    function updateDashboardStats() {
-        // In a real app, you would fetch this data from an API
-        const stats = {
-            'sales-today': '₱15,420.00',
-            'orders-week': 127,
-            'new-users-month': 89,
-            'total-products': (typeof PRODUCTS !== 'undefined' && Array.isArray(PRODUCTS)) ? PRODUCTS.length : 245,
-        };
+    // function updateDashboardStats() {
+    //     // In a real app, you would fetch this data from an API
+    //     const stats = {
+    //         'sales-today': '₱15,420.00',
+    //         'orders-week': 127,
+    //         'new-users-month': 89,
+    //         'total-products': (typeof PRODUCTS !== 'undefined' && Array.isArray(PRODUCTS)) ? PRODUCTS.length : 245,
+    //     };
 
-        for (const key in stats) {
-            const element = document.querySelector(`[data-stat="${key}"]`);
-            if (element) {
-                element.textContent = stats[key];
+    //     for (const key in stats) {
+    //         const element = document.querySelector(`[data-stat="${key}"]`);
+    //         if (element) {
+    //             element.textContent = stats[key];
+    //         }
+    //     }
+    // }
+
+    function fetchRecentActivities() {
+        $.ajax({
+            url: '../assets/php_admin/fetch_recent_activities.php',
+            type: 'GET',
+            dataType: 'json',
+            success: function(response) {
+                if (response.status === "success") {
+                    const list = document.querySelector('.recent-list');
+                    list.innerHTML = ""; // clear old items
+
+                    if (response.notifications.length === 0) {
+                        list.innerHTML = "<li>No recent activities</li>";
+                        return;
+                    }
+
+                    response.notifications.forEach(notif => {
+                        const li = document.createElement('li');
+                        li.innerHTML = `
+                            <div>
+                                <strong><i class="fas ${notif.icon}"></i> ${notif.title}</strong>
+                                <p>${notif.message}</p>
+                            </div>
+                            <span>${timeAgo(notif.created_at)}</span>
+                        `;
+                        list.appendChild(li);
+                    });
+                } else {
+                    console.error("Error fetching activities:", response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("AJAX error:", error);
             }
-        }
+        });
+    }
+
+// Helper to convert timestamps into "x minutes ago"
+function timeAgo(dateString) {
+    const now = new Date();
+    const past = new Date(dateString);
+    const seconds = Math.floor((now - past) / 1000);
+
+    let interval = Math.floor(seconds / 31536000);
+    if (interval >= 1) return interval + " year(s) ago";
+    interval = Math.floor(seconds / 2592000);
+    if (interval >= 1) return interval + " month(s) ago";
+    interval = Math.floor(seconds / 86400);
+    if (interval >= 1) return interval + " day(s) ago";
+    interval = Math.floor(seconds / 3600);
+    if (interval >= 1) return interval + " hour(s) ago";
+    interval = Math.floor(seconds / 60);
+    if (interval >= 1) return interval + " minute(s) ago";
+    return "Just now";
+}
+
+    function updateDashboardStats() {
+        $.ajax({
+            url: "../assets/php_admin/fetch_dashboard_stats.php",
+            type: "POST",
+            dataType: "json",
+            success: function(response) {
+                if (response.status === "success") {
+                    for (const key in response.stats) {
+                        const element = document.querySelector(`[data-stat="${key}"]`);
+                        if (element) {
+                            element.textContent = response.stats[key];
+                        }
+                    }
+                } else if (response.status === "error") {
+                    console.error("Error fetching dashboard stats:", response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("AJAX error:", error);
+            }
+        });
     }
 
     // --- SIDEBAR & NAVIGATION LOGIC ---
@@ -413,6 +633,7 @@ document.addEventListener('DOMContentLoaded', function () {
     renderSalesChart();
     renderTopCategoriesChart();
     renderMostSellingProductsChart();
+    fetchRecentActivities();
     // renderReviewsChart(); // This chart seems out of place on the main dashboard, commenting out.
     loadHeaderNotifications();
 });

@@ -32,7 +32,7 @@
           <li><a href="dashboard.php"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
           <li><a href="products.php"><i class="fas fa-cubes"></i> <span>Products</span></a></li>
           <li><a href="orders.php" class="active"><i class="fas fa-shopping-cart"></i> <span>Orders</span></a></li>
-          <li><a href="customers.php"><i class="fas fa-user-group"></i> <span>Users</span></a></li>
+          <li><a href="customers.php"><i class="fas fa-user-group"></i> <span>Customers</span></a></li>
           <li><a href="tutorials.php"><i class="fas fa-book-open"></i> <span>Tutorials</span></a></li>
           <li><a href="reviews.php"><i class="fas fa-star"></i> <span>Reviews</span></a></li>
           <li><a href="notifications.php"><i class="fas fa-bell"></i> <span>Notifications</span></a></li>
