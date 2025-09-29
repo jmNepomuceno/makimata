@@ -32,11 +32,11 @@
           <li><a href="dashboard.php"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
           <li><a href="products.php"><i class="fas fa-cubes"></i> <span>Products</span></a></li>
           <li><a href="orders.php" class="active"><i class="fas fa-shopping-cart"></i> <span>Orders</span></a></li>
-          <li><a href="customers.html"><i class="fas fa-user-group"></i> <span>Users</span></a></li>
-          <li><a href="tutorials.html"><i class="fas fa-book-open"></i> <span>Tutorials</span></a></li>
-          <li><a href="reviews.html"><i class="fas fa-star"></i> <span>Reviews</span></a></li>
-          <li><a href="notifications.html"><i class="fas fa-bell"></i> <span>Notifications</span></a></li>
-          <li><a href="activity-logs.html"><i class="fas fa-clipboard-list"></i> <span>Activity Logs</span></a></li>
+          <li><a href="customers.php"><i class="fas fa-user-group"></i> <span>Users</span></a></li>
+          <li><a href="tutorials.php"><i class="fas fa-book-open"></i> <span>Tutorials</span></a></li>
+          <li><a href="reviews.php"><i class="fas fa-star"></i> <span>Reviews</span></a></li>
+          <li><a href="notifications.php"><i class="fas fa-bell"></i> <span>Notifications</span></a></li>
+          <li><a href="activity-logs.php"><i class="fas fa-clipboard-list"></i> <span>Activity Logs</span></a></li>
         </ul>
         <div class="sidebar-bottom-nav">
           <ul>

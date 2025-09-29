@@ -238,21 +238,19 @@
 
         <!-- Orders Tab -->
         <div class="tab-content" id="orders-tab">
-            <div class="customer-orders-list">
-                <table class="orders-table">
-                    <thead>
-                        <tr>
-                            <th>Order ID</th>
-                            <th>Date</th>
-                            <th>Total</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody id="customer-orders-tbody"> 
-                    </tbody>
-                </table>
+          <div class="customer-orders-list">
+            <div class="orders-header">
+              <span>Order ID</span>
+              <span>Date</span>
+              <span>Total</span>
+              <span>Status</span>
             </div>
+            <div id="customer-orders-list" class="orders-body">
+              <!-- Orders will be injected here -->
+            </div>
+          </div>
         </div>
+
       </div>
     </div>
   </div>

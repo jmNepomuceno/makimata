@@ -304,6 +304,7 @@ class CustomerManager {
         // document.getElementById("customer-orders-tbody").innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 1rem;">Loading orders...</td></tr>`;
         // const ordersTbody = document.getElementById('customer-orders-tbody');
         // console.log("Rendered into:", ordersTbody);
+        this.renderCustomerOrders(customer.id, `${customer.firstName} ${customer.lastName}`);
     }
 
     closeCustomerModal() {
@@ -383,6 +384,8 @@ class CustomerManager {
         const tabButton = event.currentTarget;
         const tabId = tabButton.dataset.tab;
 
+        console.log(tabButton, tabId)
+
         // Deactivate all tabs and content
         document.querySelectorAll('.customer-profile-tabs .tab-btn').forEach(btn => btn.classList.remove('active'));
         document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
@@ -435,56 +438,50 @@ class CustomerManager {
     // --- BULK ACTION METHODS ---
     
     renderCustomerOrders(customerId, customerName) {
-        const ordersTbody = document.getElementById("customer-orders-tbody");
-        ordersTbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 1rem;">Loading orders...</td></tr>`;
-        
-        // if (!ordersTbody) return;
-        // console.log(customerId)
+        const ordersContainer = document.getElementById("customer-orders-list");
+        if (!ordersContainer) return;
+        console.log("Customer ID:", customerId);
 
-        // $.ajax({
-        //     url: "../assets/php_admin/get_orders_by_customer.php",
-        //     type: "GET",
-        //     data: { customerId: customerId },
-        //     dataType: "json",
-        //     success: function (response) {
-        //         console.log(response)
-        //         if (response.status === "success" && response.data.length > 0) {
-        //             ordersTbody.innerHTML = response.data
-        //             .map(order => {
-        //                 const orderDate = new Date(order.date);
-
-        //                 return `
-        //                 <tr>
-        //                     <td><span class="order-id">#${order.id}</span></td>
-        //                     <td>${orderDate.toLocaleDateString()}</td>
-        //                     <td>₱${parseFloat(order.total).toFixed(2)}</td>
-        //                     <td>
-        //                     <span class="order-status ${order.status}">${order.status}</span>
-        //                     </td>
-        //                 </tr>
-        //                 `;
-        //             })
-        //             .join("");
-        //         } else {
-        //             ordersTbody.innerHTML = `
-        //             <tr>
-        //                 <td colspan="4" style="text-align:center; padding: 1rem;">
-        //                 No order history found for ${customerName}.
-        //                 </td>
-        //             </tr>`;
-        //         }
-        //     },
-        //     error: function (xhr, status, error) {
-        //     console.error("AJAX Error:", error);
-        //     ordersTbody.innerHTML = `
-        //         <tr>
-        //         <td colspan="4" style="text-align:center; padding: 1rem; color:red;">
-        //             Failed to load orders.
-        //         </td>
-        //         </tr>`;
-        //     }
-        // });
+        $.ajax({
+            url: "../assets/php_admin/get_orders_by_customer.php",
+            type: "GET",
+            data: { customerId: customerId },
+            dataType: "json",
+            success: function (response) {
+                console.log("Orders Response:", response);
+                if (response.status === "success" && response.data.length > 0) {
+                    ordersContainer.innerHTML = response.data
+                        .map(order => {
+                            const orderDate = new Date(order.date);
+                            return `
+                                <div class="order-row">
+                                    <div class="order-id">#${order.id}</div>
+                                    <div class="order-date">${orderDate.toLocaleDateString()}</div>
+                                    <div class="order-total">₱${parseFloat(order.total).toFixed(2)}</div>
+                                    <div class="order-status ${order.status}">${order.status}</div>
+                                </div>
+                            `;
+                        })
+                        .join("");
+                } else {
+                    ordersContainer.innerHTML = `
+                        <div class="no-orders">
+                            No order history found for ${customerName}.
+                        </div>
+                    `;
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error("AJAX Error:", error);
+                ordersContainer.innerHTML = `
+                    <div class="no-orders error">
+                        Failed to load orders.
+                    </div>
+                `;
+            }
+        });
     }
+
 
     
     toggleAllCheckboxes(checked) {

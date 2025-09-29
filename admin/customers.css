@@ -365,7 +365,6 @@
 
 #customer-modal .tab-content {
   width: 100% !important;
-  border:1px solid red;
 }
 
 /* Form Section Styling */
@@ -491,4 +490,89 @@
   .action-buttons .btn-sm span {
     display: none; /* Hide "View Details" text on small screens */
   }
+}
+
+.customer-orders-list {
+  width: 100%;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  overflow: hidden;
+  font-family: "Segoe UI", Tahoma, sans-serif;
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+.orders-header {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1fr 1fr;
+  padding: 1rem;
+  background: #f8f9fa;
+  font-weight: 600;
+  font-size: 14px;
+  color: #333;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.order-row {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1fr 1fr;
+  padding: 0.9rem 1rem;
+  font-size: 14px;
+  color: #444;
+  align-items: center;
+  transition: background 0.2s ease;
+}
+
+.order-row:nth-child(even) {
+  background: #fcfcfc;
+}
+
+.order-row:hover {
+  background: #f1f9ff;
+  cursor: pointer;
+}
+
+.order-id {
+  font-weight: 600;
+  color: #007bff;
+}
+
+.order-total {
+  font-weight: bold;
+  color: #2e7d32;
+}
+
+.order-status {
+  padding: 0.35rem 0.75rem;
+  border-radius: 20px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.order-status.pending {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.order-status.completed {
+  background: #d4edda;
+  color: #155724;
+}
+
+.order-status.cancelled {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.no-orders {
+  padding: 1.5rem;
+  text-align: center;
+  color: #777;
+  font-size: 14px;
+}
+.no-orders.error {
+  color: red;
+  font-weight: 600;
 }

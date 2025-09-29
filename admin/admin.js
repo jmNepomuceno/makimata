@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 showToast('Logging out...', 'info');
                 setTimeout(() => {
                     // Redirect to the login page in the same directory
-                    window.location.href = 'login.html'; 
+                    window.location.href = 'http://10.10.90.14:8020/'; 
                 }, 1500);
             });
         }
