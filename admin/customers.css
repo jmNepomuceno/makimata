@@ -320,8 +320,10 @@
 
 /* Add more comfortable padding to the modal body */
 #customer-modal .modal-body {
-  padding: 1.5rem; /* Reduced padding from 2rem */
+  padding:0;
+  margin:0;
 }
+
 
 /* Modern Tabs Styling */
 #customer-modal .customer-profile-tabs {
@@ -359,6 +361,11 @@
   right: 0;
   height: 2px;
   background-color: var(--highlight-primary);
+}
+
+#customer-modal .tab-content {
+  width: 100% !important;
+  border:1px solid red;
 }
 
 /* Form Section Styling */

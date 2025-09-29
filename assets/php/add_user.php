@@ -32,8 +32,8 @@
 
         // Insert new user
         $sql = "INSERT INTO users 
-                (firstname, lastname, email, mobile_number, region, province, city, barangay, house_no, password) 
-                VALUES (:firstname, :lastname, :email, :mobile, :region, :province, :city, :barangay, :house_no, :password)";
+                (firstname, lastname, email, mobile_number, region, province, city, barangay, house_no, password, created_at) 
+                VALUES (:firstname, :lastname, :email, :mobile, :region, :province, :city, :barangay, :house_no, :password, :created_at)";
 
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
@@ -46,7 +46,8 @@
             ':city'      => $city,
             ':barangay'  => $barangay,
             ':house_no'  => $house_no,
-            ':password'  => $password
+            ':password'  => $password,
+            ':created_at' => date('Y-m-d H:i:s')
         ]);
 
         $user_id = $pdo->lastInsertId();

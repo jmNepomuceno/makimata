@@ -4,7 +4,7 @@
 
     $sql = "SELECT 
                 *
-            FROM products";
+            FROM users";
     $stmt = $pdo->prepare($sql);
     $stmt->execute();
     $data = $stmt->fetchAll(PDO::FETCH_ASSOC);

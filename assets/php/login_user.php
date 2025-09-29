@@ -33,6 +33,10 @@ try {
                 "email"     => $user['email']
             ];
 
+                $sql = "UPDATE users SET last_login = :last_login WHERE email = :email";
+                $stmt = $pdo->prepare($sql);
+                $stmt->execute([':last_login' => date('Y-m-d H:i:s'), ':email' => $email]);
+
             $sqlNotif = "INSERT INTO notifications (type, icon, title, message, recipient, target_id)
              VALUES ('user', 'fa-user', 'User Login', :message, 'Admin', :user_id)";
             $stmtNotif = $pdo->prepare($sqlNotif);

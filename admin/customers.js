@@ -298,6 +298,12 @@ class CustomerManager {
         $('#city-input').val(customer.city || '');
         $('#province-input').val(customer.province || '');
         $('#region-input').val(customer.region || '');
+
+
+
+        // document.getElementById("customer-orders-tbody").innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 1rem;">Loading orders...</td></tr>`;
+        // const ordersTbody = document.getElementById('customer-orders-tbody');
+        // console.log("Rendered into:", ordersTbody);
     }
 
     closeCustomerModal() {
@@ -386,47 +392,101 @@ class CustomerManager {
         document.getElementById(`${tabId}-tab`).classList.add('active');
     }
 
-    async renderCustomerOrders(customerId, customerName) {
-        const ordersTbody = document.getElementById('customer-orders-tbody');
-        if (!ordersTbody) return;
+    // renderCustomerOrders(customerId, customerName) {
+    //     const ordersTbody = document.getElementById('customer-orders-tbody');
+    //     if (!ordersTbody) return;
 
-        let allOrders = [];
-        try {
-            // --- DATABASE INTEGRATION PLACEHOLDER ---
-            // const response = await fetch(`/api/customers/${customerId}/orders`);
-            // const customerOrders = await response.json();
+    //     let allOrders = [];
+    //     try {
+    //         // --- DATABASE INTEGRATION PLACEHOLDER ---
+    //         // const response = await fetch(`/api/customers/${customerId}/orders`);
+    //         // const customerOrders = await response.json();
 
-            // Fallback to localStorage for demo
-            const savedOrders = localStorage.getItem('mikamataOrders');
-            allOrders = savedOrders ? JSON.parse(savedOrders) : [];
-        } catch (e) {
-            console.error("Could not load or parse orders from localStorage", e);
-        }
+    //         // Fallback to localStorage for demo
+    //         const savedOrders = localStorage.getItem('mikamataOrders');
+    //         allOrders = savedOrders ? JSON.parse(savedOrders) : [];
+    //     } catch (e) {
+    //         console.error("Could not load or parse orders from localStorage", e);
+    //     }
 
-        const customerOrders = allOrders.filter(order => order.customer.name === customerName);
+    //     const customerOrders = allOrders.filter(order => order.customer.name === customerName);
 
-        if (customerOrders.length === 0) {
-            ordersTbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 1rem;">No order history found for this customer.</td></tr>`;
-            return;
-        }
+    //     if (customerOrders.length === 0) {
+    //         ordersTbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 1rem;">No order history found for this customer.</td></tr>`;
+    //         return;
+    //     }
 
-        ordersTbody.innerHTML = customerOrders.map(order => {
-            const orderDate = new Date(order.date);
-            return `
-                <tr>
-                    <td><span class="order-id">#${order.id}</span></td>
-                    <td>${orderDate.toLocaleDateString()}</td>
-                    <td>₱${order.total.toFixed(2)}</td>
-                    <td>
-                        <span class="order-status ${order.status}">${order.status}</span>
-                    </td>
-                </tr>
-            `;
-        }).join('');
-    }
+    //     ordersTbody.innerHTML = customerOrders.map(order => {
+    //         const orderDate = new Date(order.date);
+    //         return `
+    //             <tr>
+    //                 <td><span class="order-id">#${order.id}</span></td>
+    //                 <td>${orderDate.toLocaleDateString()}</td>
+    //                 <td>₱${order.total.toFixed(2)}</td>
+    //                 <td>
+    //                     <span class="order-status ${order.status}">${order.status}</span>
+    //                 </td>
+    //             </tr>
+    //         `;
+    //     }).join('');
+    // }
 
 
     // --- BULK ACTION METHODS ---
+    
+    renderCustomerOrders(customerId, customerName) {
+        const ordersTbody = document.getElementById("customer-orders-tbody");
+        ordersTbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 1rem;">Loading orders...</td></tr>`;
+        
+        // if (!ordersTbody) return;
+        // console.log(customerId)
+
+        // $.ajax({
+        //     url: "../assets/php_admin/get_orders_by_customer.php",
+        //     type: "GET",
+        //     data: { customerId: customerId },
+        //     dataType: "json",
+        //     success: function (response) {
+        //         console.log(response)
+        //         if (response.status === "success" && response.data.length > 0) {
+        //             ordersTbody.innerHTML = response.data
+        //             .map(order => {
+        //                 const orderDate = new Date(order.date);
+
+        //                 return `
+        //                 <tr>
+        //                     <td><span class="order-id">#${order.id}</span></td>
+        //                     <td>${orderDate.toLocaleDateString()}</td>
+        //                     <td>₱${parseFloat(order.total).toFixed(2)}</td>
+        //                     <td>
+        //                     <span class="order-status ${order.status}">${order.status}</span>
+        //                     </td>
+        //                 </tr>
+        //                 `;
+        //             })
+        //             .join("");
+        //         } else {
+        //             ordersTbody.innerHTML = `
+        //             <tr>
+        //                 <td colspan="4" style="text-align:center; padding: 1rem;">
+        //                 No order history found for ${customerName}.
+        //                 </td>
+        //             </tr>`;
+        //         }
+        //     },
+        //     error: function (xhr, status, error) {
+        //     console.error("AJAX Error:", error);
+        //     ordersTbody.innerHTML = `
+        //         <tr>
+        //         <td colspan="4" style="text-align:center; padding: 1rem; color:red;">
+        //             Failed to load orders.
+        //         </td>
+        //         </tr>`;
+        //     }
+        // });
+    }
+
+    
     toggleAllCheckboxes(checked) {
         document.querySelectorAll('.customer-checkbox').forEach(checkbox => {
             checkbox.checked = checked;

@@ -4,13 +4,14 @@ class ProductManager {
     this.filteredProducts = []
     this.sortKey = 'id';
     this.sortDirection = 'asc';
+    this.currentPage = 1;
+    this.pageSize = 10
     this.init()
   }
 
   init() {
     this.loadProducts()
     this.setupEventListeners()
-    this.initializeFilters()
     this.updateSortIcons();
   }
 
@@ -75,6 +76,8 @@ class ProductManager {
         this.filteredProducts = [...this.products];
         this.renderProducts();
         this.updateProductStats();
+        this.initializeFilters()
+
       },
       error: (xhr, status, error) => {
         console.error("AJAX error:", status, error);
@@ -198,6 +201,8 @@ class ProductManager {
     const minPrice = parseFloat(document.getElementById("min-price")?.value) || 0;
     const maxPrice = parseFloat(document.getElementById("max-price")?.value) || Infinity;
 
+    console.log(searchQuery, categoryFilter, minPrice, maxPrice);
+
     this.filteredProducts = this.products.filter(
       (product) => {
         const matchesSearch = product.name.toLowerCase().includes(searchQuery) ||
@@ -258,43 +263,139 @@ class ProductManager {
     this.renderTableView()
   }
 
+  // renderTableView() {
+  //   const tableBody = document.getElementById("products-table-body");
+  //   if (!tableBody) return;
+  //   tableBody.innerHTML = this.filteredProducts
+  //   .map(
+  //     (product) => `
+  //     <tr>
+  //         <td><input type="checkbox" class="product-checkbox" data-id="${product.id}" onchange="productManager.updateBulkActionsVisibility()"></td>
+  //         <td>#${product.id}</td>
+  //         <td class="product-info-cell">
+  //             <img src="${ 
+  //               (product.image && product.image.startsWith('data:image'))
+  //                 ? product.image
+  //                 : (product.image || 'mik/products/placeholder.png')
+  //             }" alt="${product.name}" class="product-thumbnail">
+  //             <span>${product.name}</span>
+  //         </td>
+  //         <td><span class="category-badge ${product.category}">${product.category}</span></td>
+  //         <td>₱${product.price.toLocaleString()}</td>
+  //         <td><span class="stock-badge ${product.stock > 10 ? 'normal' : (product.stock > 0 ? 'low' : 'out')}">${product.stock}</span></td>
+  //         <td>${product.dateAdded || 'N/A'}</td>
+  //         <td>
+  //             <div class="action-buttons">
+  //                 <button class="btn-icon edit-btn" data-id="${product.id}" title="Edit">
+  //                     <i class="fas fa-edit"></i>
+  //                 </button>
+  //                 <button class="btn-icon delete-btn" data-id="${product.id}" title="Delete">
+  //                     <i class="fas fa-trash"></i>
+  //                 </button>
+  //             </div>
+  //         </td>
+  //     </tr>
+  //   `,
+  //   )
+  //   .join("");
+
+  // }
+
   renderTableView() {
     const tableBody = document.getElementById("products-table-body");
     if (!tableBody) return;
-    tableBody.innerHTML = this.filteredProducts
-                          .map(
-                            (product) => `
-                            <tr>
-                                <td><input type="checkbox" class="product-checkbox" data-id="${product.id}" onchange="productManager.updateBulkActionsVisibility()"></td>
-                                <td>#${product.id}</td>
-                                <td class="product-info-cell">
-                                    <img src="${ 
-                                      (product.image && product.image.startsWith('data:image'))
-                                        ? product.image
-                                        : (product.image || 'mik/products/placeholder.png')
-                                    }" alt="${product.name}" class="product-thumbnail">
-                                    <span>${product.name}</span>
-                                </td>
-                                <td><span class="category-badge ${product.category}">${product.category}</span></td>
-                                <td>₱${product.price.toLocaleString()}</td>
-                                <td><span class="stock-badge ${product.stock > 10 ? 'normal' : (product.stock > 0 ? 'low' : 'out')}">${product.stock}</span></td>
-                                <td>${product.dateAdded || 'N/A'}</td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button class="btn-icon edit-btn" data-id="${product.id}" title="Edit">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="btn-icon delete-btn" data-id="${product.id}" title="Delete">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        `,
-                          )
-                          .join("");
 
+    const start = (this.currentPage - 1) * this.pageSize;
+    const end = start + this.pageSize;
+    const pageProducts = this.filteredProducts.slice(start, end);
+
+    tableBody.innerHTML = pageProducts
+      .map(
+        (product) => `
+          <tr>
+            <td><input type="checkbox" class="product-checkbox" data-id="${product.id}" onchange="productManager.updateBulkActionsVisibility()"></td>
+            <td>#${product.id}</td>
+            <td class="product-info-cell">
+                <img src="${ 
+                  (product.image && product.image.startsWith('data:image'))
+                    ? product.image
+                    : (product.image || 'mik/products/placeholder.png')
+                }" alt="${product.name}" class="product-thumbnail">
+                <span>${product.name}</span>
+            </td>
+            <td><span class="category-badge ${product.category}">${product.category}</span></td>
+            <td>₱${product.price.toLocaleString()}</td>
+            <td><span class="stock-badge ${product.stock > 10 ? 'normal' : (product.stock > 0 ? 'low' : 'out')}">${product.stock}</span></td>
+            <td>${product.dateAdded || 'N/A'}</td>
+            <td>
+                <div class="action-buttons">
+                    <button class="btn-icon edit-btn" data-id="${product.id}" title="Edit">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn-icon delete-btn" data-id="${product.id}" title="Delete">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </td>
+          </tr>
+        `
+      )
+      .join("");
+
+    this.renderPagination();
   }
+
+  renderPagination() {
+    
+    const totalProducts = this.filteredProducts.length;
+    const totalPages = Math.ceil(totalProducts / this.pageSize);
+
+    const paginationWrapper = document.querySelector(".pagination");
+    const paginationInfo = document.querySelector(".pagination-info");
+
+    if (!paginationWrapper || !paginationInfo) return;
+
+    // Update info text
+    const start = (this.currentPage - 1) * this.pageSize + 1;
+    const end = Math.min(this.currentPage * this.pageSize, totalProducts);
+    paginationInfo.textContent = `Showing ${start}-${end} of ${totalProducts} products`;
+
+    // Generate pagination buttons
+    let buttons = `
+      <button class="pagination-btn" ${this.currentPage === 1 ? "disabled" : ""} data-page="${this.currentPage - 1}">
+        <i class="fas fa-chevron-left"></i>
+      </button>
+    `;
+
+    for (let i = 1; i <= totalPages; i++) {
+      buttons += `
+        <button class="pagination-btn ${i === this.currentPage ? "active" : ""}" data-page="${i}">
+          ${i}
+        </button>
+      `;
+    }
+
+    buttons += `
+      <button class="pagination-btn" ${this.currentPage === totalPages ? "disabled" : ""} data-page="${this.currentPage + 1}">
+        <i class="fas fa-chevron-right"></i>
+      </button>
+    `;
+
+    paginationWrapper.innerHTML = buttons;
+
+    // Re-bind click events
+    paginationWrapper.querySelectorAll(".pagination-btn").forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        const page = parseInt(e.currentTarget.getAttribute("data-page"));
+        if (!isNaN(page) && page >= 1 && page <= totalPages) {
+          this.currentPage = page;
+          this.renderTableView();
+        }
+      });
+    });
+  }
+
+
 
   openProductModal(productId = null) {
     const modal = document.querySelector("#product-modal")
@@ -302,6 +403,7 @@ class ProductManager {
     if (modal) {
       if (productId) {
         const product = this.products.find((p) => p.id === productId)
+        console.log(product)
         if (product) this.populateProductForm(product);
       } else {
         this.clearProductForm()
@@ -491,7 +593,7 @@ class ProductManager {
     if (totalProductsEl) totalProductsEl.textContent = this.products.length;
 
     const lowStockCountEl = document.getElementById('low-stock-count');
-    if (lowStockCountEl) lowStockCountEl.textContent = this.products.filter(p => p.stock > 0 && p.stock < 10).length;
+    if (lowStockCountEl) lowStockCountEl.textContent = this.products.filter(p => p.stock >= 0 && p.stock <= 10).length;
 
     const totalCategoriesEl = document.getElementById('total-categories');
     if (totalCategoriesEl) totalCategoriesEl.textContent = [...new Set(this.products.map(p => p.category))].length;
@@ -506,6 +608,8 @@ class ProductManager {
   initializeFilters() {
     const categories = [...new Set(this.products.map((p) => p.category))]
     const categoryFilter = document.querySelector("#category-filter")
+    
+    console.log(categories)
 
     if (categoryFilter) {
       const currentValue = categoryFilter.value;

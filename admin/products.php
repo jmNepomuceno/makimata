@@ -230,9 +230,9 @@
                   <option value="">Select Category</option>
                   <option value="lampshades">Lampshades</option>
                   <option value="mugs">Mugs</option>
-                  <option value="baskets">Baskets</option>
+                  <option value="basket">Baskets</option>
                   <option value="kitchenware">Kitchenware</option>
-                  <option value="furniture">Furniture</option>
+                  <option value="furnitures">Furniture</option>
                 </select>
               </div>
             </div>
