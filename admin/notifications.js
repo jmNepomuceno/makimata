@@ -107,7 +107,7 @@ class NotificationManager {
     renderNotifications() {
         const listContainer = document.getElementById('notifications-list-container');
         if (!listContainer) return;
-
+ 
         const startIndex = (this.currentPage - 1) * this.itemsPerPage;
         const endIndex = startIndex + this.itemsPerPage;
         const paginatedNotifications = this.filteredNotifications.slice(startIndex, endIndex);
@@ -117,12 +117,13 @@ class NotificationManager {
             this.renderPagination();
             return;
         }
+
         console.log(paginatedNotifications)
-        console.log(this.filteredNotifications)
+        // console.log(this.filteredNotifications)
         listContainer.innerHTML = paginatedNotifications.map(notif => `
             <div class="notification-item">
                 <div class="notification-icon ${notif.type}">
-                    <i class="fas ${notif.icon}"></i>
+                    <i class="${notif.icon}"></i>
                 </div>
                 <div class="notification-content">
                     <div class="notification-header">

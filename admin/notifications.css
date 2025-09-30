@@ -207,7 +207,7 @@
 .notification-icon.order {
   background: linear-gradient(135deg, #3b82f6, #1d4ed8);
 }
-.notification-icon.promotional {
+.notification-icon.user {
   background: linear-gradient(135deg, #f59e0b, #d97706);
 }
 .notification-icon.system {

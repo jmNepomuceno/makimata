@@ -57,6 +57,8 @@
         </div>
     </div>
 
+    <div id="toast-container"></div>
+
     <script src="./index.js"></script>
 </body>
 </html>

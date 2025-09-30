@@ -439,8 +439,13 @@
                         <i class="fas fa-heart"></i>
                         <span class="wishlist-count" id="wishlistCount">0</span>
                     </button>
-                    <!-- <button class="login-btn">Login</button> -->
-                    <i class="fa-regular fa-user" id="user-icon"></i>
+                    <button class="icon-btn" id="notificationBtn" title="Notifications">
+                        <i class="fa-solid fa-bell" id="notification-icon"></i>
+                    </button>
+                    <!-- New Submodules Button -->
+                    <button class="icon-btn" id="submodulesBtn" title="Modules">
+                        <i class="fa-solid fa-th-large"></i>
+                    </button>
                 </div>
             </div>
         </header>
@@ -506,6 +511,81 @@
                 <button class="close-btn" id="closeWishlist">&times;</button>
             </div>
             <div class="modal-body" id="wishlistItems"></div>
+        </div>
+    </div>
+
+    <div class="modal" id="orderStatusModal">
+        <div class="modal-content orderStatusModal-content">
+            <div class="modal-header">
+            <h2>My Orders</h2>
+            <button class="close-btn" id="closeOrderStatus">&times;</button>
+            </div>
+
+            <!-- FILTERS -->
+            <div class="modal-filters">
+            <label>
+                From: <input type="date" id="filterStartDate">
+            </label>
+            <label>
+                To: <input type="date" id="filterEndDate">
+            </label>
+            <label>
+                Status:
+                <select id="filterStatus">
+                <option value="">All</option>
+                <option value="pending">Pending</option>
+                <option value="processing">Processing</option>
+                <option value="shipped">Shipped</option>
+                <option value="completed">Completed</option>
+                <option value="cancelled">Cancelled</option>
+                </select>
+            </label>
+            <button id="applyFilters">Apply</button>
+            </div>
+
+            <div class="modal-body"></div>
+        </div>
+    </div>
+
+    <div class="modal" id="completeOrdersModal">
+        <div class="modal-content complete-orders-content">
+            <div class="modal-header">
+                <h2>Completed Orders</h2>
+                <button class="close-btn" id="closeCompleteOrders">&times;</button>
+            </div>
+
+            <!-- Filter Section -->
+            <div class="modal-filters">
+            <label>Start Date: <input type="date" id="completedStartDate"></label>
+            <label>End Date: <input type="date" id="completedEndDate"></label>
+            <button id="applyCompletedFilters" class="filter-btn">Apply Filters</button>
+            </div>
+
+            <!-- Orders List -->
+            <div class="modal-body complete-orders-body" id="completedOrdersList">
+            <!-- Orders will be injected here -->
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class="modal" id="submodulesModal">
+        <div class="modal-content submodules-content">
+        <div class="modal-header">
+            <h2>Modules</h2>
+            <button class="close-btn" id="closeSubmodules">&times;</button>
+        </div>
+        <div class="modal-body submodules-body">
+            <button class="module-btn" id="viewOrderStatus">
+                <i class="fa-solid fa-truck-fast"></i>
+                <span>View Order Status</span>
+            </button>
+            <button class="module-btn" id="viewCompleteOrder">
+                <i class="fa-solid fa-box-open"></i>
+                <span>View Complete Order</span>
+            </button>
+        </div>
         </div>
     </div>
 

@@ -64,10 +64,17 @@ const PRODUCTS = [
     const wishlistBtn = document.getElementById('wishlistBtn');
     const cartModal = document.getElementById('cartModal');
     const wishlistModal = document.getElementById('wishlistModal');
+    const orderStatusModal = document.getElementById('orderStatusModal');
     const closeCartBtn = document.getElementById('closeCart');
     const closeWishlistBtn = document.getElementById('closeWishlist');
     const cartCountSpan = document.getElementById('cartCount');
     const wishlistCountSpan = document.getElementById('wishlistCount');
+
+    const submodulesBtn = document.getElementById('submodulesBtn');
+    const submodulesModal = document.getElementById('submodulesModal'); // create this modal in HTML
+    const closeSubmodules = document.getElementById('closeSubmodules');
+
+    const viewOrderStatusBtn = document.getElementById('viewOrderStatus');
 
     function updateCounts() {
       // Update cart and wishlist counts on both home and products page buttons
@@ -193,6 +200,91 @@ const PRODUCTS = [
       }).join('');
     }
 
+
+    function fetchOrders() {
+      $.ajax({
+          url: "../assets/php/fetch_user_orders.php", // your PHP file
+          type: "POST",
+          dataType: "json",
+          success: function(response) {
+              console.log(response)
+              const modalBody = $("#orderStatusModal .modal-body");
+              modalBody.empty();
+
+              if (response.status === "success") {
+                  const orders = response.orders;
+
+                  if (orders.length === 0) {
+                      modalBody.html('<div class="no-orders">No orders found.</div>');
+                      return;
+                  }
+
+                  orders.forEach(order => {
+                      const timelineSteps = ['pending', 'processing', 'shipped', 'completed'];
+                      let timelineHtml = '<div class="order-timeline">';
+
+                      timelineSteps.forEach(step => {
+                          let stepClass = '';
+                          if (step === order.status) stepClass = 'active';
+                          else if (timelineSteps.indexOf(step) < timelineSteps.indexOf(order.status)) stepClass = 'completed';
+
+                          let icon = '';
+                          switch(step) {
+                              case 'pending': icon = '<i class="fa fa-clock"></i>'; break;
+                              case 'processing': icon = '<i class="fa fa-cogs"></i>'; break;
+                              case 'shipped': icon = '<i class="fa fa-truck"></i>'; break;
+                              case 'completed': icon = '<i class="fa fa-box"></i>'; break;
+                          }
+
+                          timelineHtml += `
+                              <div class="step ${stepClass}">
+                                  <div class="icon">${icon}</div>
+                                  <p>${step.charAt(0).toUpperCase() + step.slice(1)}</p>
+                              </div>
+                          `;
+                      });
+
+                      timelineHtml += '</div>';
+
+                      // Items list
+                      let itemsHtml = '<ul class="order-items">';
+                      order.items.forEach(item => {
+                          itemsHtml += `<li>${item.name} (${item.attributes}) - Qty: ${item.qty} - ₱${parseFloat(item.price).toFixed(2)}</li>`;
+                      });
+                      itemsHtml += '</ul>';
+
+                     // Assuming 'orders' is an array of orders for the current user
+                      orders.forEach((order, index) => {
+                          // index starts from 0, so +1 to make it human-friendly
+                          const orderNumber = index + 1;
+
+                          modalBody.append(`
+                              <div class="orders-list">
+                                  <h4>Order #${orderNumber}</h4>
+                                  <p><strong>Customer:</strong> ${order.customer.name}</p>
+                                  <p><strong>Address:</strong> ${order.shippingAddress}</p>
+                                  <p><strong>Phone:</strong> ${order.customer.phone}</p>
+                                  <p><strong>Payment:</strong> ${order.paymentMethod.toUpperCase()}</p>
+                                  <p><strong>Total:</strong> ₱${parseFloat(order.total).toFixed(2)}</p>
+                                  <p><strong>Status:</strong> ${order.status.charAt(0).toUpperCase() + order.status.slice(1)}</p>
+                                  ${itemsHtml}
+                                  ${timelineHtml}
+                                  <hr>
+                              </div>
+                          `);
+                      });
+
+                  });
+              } else {
+                  modalBody.html(`<div class="error-message">Error: ${response.message}</div>`);
+              }
+          },
+          error: function() {
+              $("#orderStatusModal .modal-body").html('<div class="error-message">Something went wrong. Please try again.</div>');
+          }
+      });
+    }
+
     cartBtn.addEventListener('click', () => {
       renderCartItems();
       cartModal.style.display = 'block';
@@ -203,12 +295,42 @@ const PRODUCTS = [
       wishlistModal.style.display = 'block';
     });
 
+    userBtn.addEventListener('click', () => {
+      fetchOrders();
+      orderStatusModal.style.display = 'block';
+    });
+
     closeCartBtn.addEventListener('click', () => {
       cartModal.style.display = 'none';
     });
 
     closeWishlistBtn.addEventListener('click', () => {
       wishlistModal.style.display = 'none';
+    });
+
+    closeOrderStatus.addEventListener('click', () => {
+      orderStatusModal.style.display = 'none';
+    });
+
+    submodulesBtn.addEventListener('click', () => {
+        submodulesModal.style.display = 'block';
+    });
+
+    closeSubmodules.addEventListener('click', () => {
+        submodulesModal.style.display = 'none';
+    });
+
+    viewOrderStatusBtn.addEventListener('click', () => {
+      submodulesModal.style.display = 'none'; // close modules modal
+      fetchOrders();
+      orderStatusModal.style.display = 'block';
+  });
+
+    // Optional: click outside modal to close
+    window.addEventListener('click', (e) => {
+        if(e.target == submodulesModal){
+            submodulesModal.style.display = 'none';
+        }
     });
 
     window.addEventListener('click', (event) => {

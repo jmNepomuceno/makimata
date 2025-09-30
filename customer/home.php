@@ -11,6 +11,7 @@
   <title>MIKAMATA — Home</title>
   <link rel="stylesheet" href="home.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <?php include("../scripts_links/header_links.php") ?>
 </head>
 <body>
 
@@ -31,19 +32,12 @@
       <div class="header-actions">
         <div class="search">
           <i class="fa-solid fa-magnifying-glass"></i>
- <input type="text" placeholder="Search">
+          <input type="text" placeholder="Search">
         </div>
-        <button class="icon-btn" id="cartBtn" title="Shopping Cart">
-            <i class="fas fa-shopping-cart"></i>
-            <span class="cart-count" id="cartCount">0</span>
+  
+        <button class="icon-btn" id="userBtn" title="User">
+          <i class="fa-regular fa-user" id="user-icon"></i>
         </button>
-        <button class="icon-btn" id="wishlistBtn" title="Wishlist">
-            <i class="fas fa-heart"></i>
-            <span class="wishlist-count" id="wishlistCount">0</span>
-        </button>
-        <!-- <button class="btn login" onclick="location.href='login.html'">Login</button> -->
-        <!-- <span><?php echo $_SESSION['user']['firstname'] . ' ' . $_SESSION['user']['lastname'] ?></span> -->
-         <i class="fa-regular fa-user" id="user-icon"></i>
       </div>
     </div>
   </header>
@@ -302,32 +296,84 @@
     </div>
   </footer>
 
-  <div class="modal" id="cartModal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);">
-    <div class="modal-content" style="background-color: #fefefe; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 500px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
-      <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 15px;">
-        <h2 style="margin: 0;">Shopping Cart</h2>
-        <button class="close-btn" id="closeCart" style="background: none; border: none; font-size: 1.5em; cursor: pointer;">&times;</button>
+  <!-- Cart Modal -->
+  <div class="modal" id="cartModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Shopping Cart</h2>
+        <button class="close-btn" id="closeCart">&times;</button>
       </div>
-      <div class="modal-body" id="cartItems" style="max-height: 300px; overflow-y: auto;">
+      <div class="modal-body" id="cartItems">
         <!-- Cart items will be loaded here -->
+        <div class="empty-state">
+          <i class="fa fa-shopping-cart"></i>
+          <p>Your cart is empty</p>
+          <button class="primary-btn">Continue Shopping</button>
+        </div>
       </div>
-      <div class="modal-footer" id="cartFooter" style="border-top: 1px solid #eee; padding-top: 15px; margin-top: 15px; text-align: right;">
-        <!-- Cart total and checkout button -->
+      <div class="modal-footer" id="cartFooter"></div>
+    </div>
+  </div>
+
+  <!-- Wishlist Modal -->
+  <div class="modal" id="wishlistModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Wishlist</h2>
+        <button class="close-btn" id="closeWishlist">&times;</button>
+      </div>
+      <div class="modal-body" id="wishlistItems">
+        <div class="empty-state">
+          <i class="fa fa-heart"></i>
+          <p>Your wishlist is empty</p>
+          <button class="primary-btn">Browse Products</button>
+        </div>
       </div>
     </div>
   </div>
 
-  <div class="modal" id="wishlistModal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);">
-    <div class="modal-content" style="background-color: #fefefe; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 500px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
-      <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 15px;">
-        <h2 style="margin: 0;">Wishlist</h2>
-        <button class="close-btn" id="closeWishlist" style="background: none; border: none; font-size: 1.5em; cursor: pointer;">&times;</button>
+  <!-- Order Status Modal -->
+  <div class="modal" id="orderStatusModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>My Orders</h2>
+        <button class="close-btn" id="closeOrderStatus">&times;</button>
       </div>
-      <div class="modal-body" id="wishlistItems" style="max-height: 300px; overflow-y: auto;">
-        <!-- Wishlist items will be loaded here -->
+      <div class="modal-body">
+        <div class="order-timeline">
+          <div class="step completed"><div class="icon"><i class="fa fa-clock"></i></div><p>Pending</p></div>
+          <div class="step active"><div class="icon"><i class="fa fa-cogs"></i></div><p>Processing</p></div>
+          <div class="step"><div class="icon"><i class="fa fa-truck"></i></div><p>Shipped</p></div>
+          <div class="step"><div class="icon"><i class="fa fa-box"></i></div><p>Completed</p></div>
+        </div>
+        <div class="orders-list">
+          <h4>Order #12345</h4>
+          <p><strong>Item:</strong> Wireless Mouse</p>
+          <p><strong>Status:</strong> Processing</p>
+        </div>
       </div>
     </div>
   </div>
+
+  <div class="modal" id="submodulesModal">
+    <div class="modal-content submodules-content">
+      <div class="modal-header">
+        <h2>Modules</h2>
+        <button class="close-btn" id="closeSubmodules">&times;</button>
+      </div>
+      <div class="modal-body submodules-body">
+        <button class="module-btn" id="viewOrderStatus">
+          <i class="fa-solid fa-truck-fast"></i>
+          <span>View Order Status</span>
+        </button>
+        <button class="module-btn" id="viewCompleteOrder">
+          <i class="fa-solid fa-box-open"></i>
+          <span>View Complete Order</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
 
 
   <style>

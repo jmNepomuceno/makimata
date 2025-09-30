@@ -1,4 +1,19 @@
 $(document).ready(function () {
+    function showToast(message, type = "info") {
+        const container = document.getElementById("toast-container");
+
+        const toast = document.createElement("div");
+        toast.className = `toast ${type}`;
+        toast.innerText = message;
+
+        container.appendChild(toast);
+
+        // Remove after animation ends (4s total)
+        setTimeout(() => {
+            toast.remove();
+        }, 4000);
+    }
+
     $("#signupForm").on("submit", function (e) {
         e.preventDefault();
 
@@ -34,10 +49,10 @@ $(document).ready(function () {
             success: function (response) {
                 console.table(response);
                 if (response.status === "success") {
-                    alert("Account created successfully!");
+                    showToast("✅ Account created successfully!", "success");
                     $("#signupForm")[0].reset();
                 } else {
-                    alert("Error: " + response.message);
+                    showToast("⚠️ Error: " + response.message, "error");
                 }
             },
             error: function () {

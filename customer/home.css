@@ -1011,3 +1011,324 @@ body {
   opacity: 1;
   transform: translateY(0);
 }
+
+.order-timeline {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  margin: 20px 0;
+}
+.order-timeline::before {
+  content: "";
+  position: absolute;
+  top: 25px;
+  left: 10%;
+  width: 80%;
+  height: 3px;
+  background: #ddd;
+  z-index: 1;
+}
+.step {
+  text-align: center;
+  position: relative;
+  z-index: 2;
+  flex: 1;
+}
+.step .icon {
+  width: 50px;
+  height: 50px;
+  margin: 0 auto 10px;
+  border-radius: 50%;
+  background: #ddd;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 18px;
+}
+.step.completed .icon {
+  background: #28a745;
+  color: white;
+}
+.step.active .icon {
+  background: #ffc107;
+  color: white;
+}
+
+/* * */
+/* General modal overlay */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.4);
+  overflow-y: auto;
+}
+
+/* Modal content */
+.modal-content {
+  background: #fff;
+  margin: 5% auto;
+  padding: 0;
+  border-radius: 10px;
+  width: 80%;
+  max-width: 600px;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+  overflow: hidden;
+}
+
+/* Header */
+.modal-header {
+  background: linear-gradient(135deg, #2d572c, #3c763d);
+  color: #fff;
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+/* Body */
+.modal-body {
+  padding: 20px;
+  text-align: center;
+}
+
+/* Footer */
+.modal-footer {
+  padding: 15px 20px;
+  border-top: 1px solid #eee;
+  text-align: right;
+  background: #fafafa;
+}
+
+/* Empty states */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #666;
+}
+
+.empty-state i {
+  font-size: 3rem;
+  margin-bottom: 10px;
+  color: #ddd;
+}
+
+.empty-state p {
+  margin: 5px 0 15px;
+  font-size: 1rem;
+}
+
+/* Buttons */
+.primary-btn {
+  background: #1b4d1b;
+  color: #fff;
+  padding: 8px 18px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+.primary-btn:hover {
+  background: #145014;
+}
+
+/* Timeline (order modal only) */
+.order-timeline {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  margin: 20px 0;
+}
+.order-timeline::before {
+  content: "";
+  position: absolute;
+  top: 25px;
+  left: 10%;
+  width: 80%;
+  height: 3px;
+  background: #ddd;
+}
+.step {
+  flex: 1;
+  text-align: center;
+  position: relative;
+  z-index: 2;
+}
+.step .icon {
+  width: 50px;
+  height: 50px;
+  margin: 0 auto 8px;
+  border-radius: 50%;
+  background: #ddd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.step.completed .icon {
+  background: #28a745;
+  color: #fff;
+}
+.step.active .icon {
+  background: #ffc107;
+  color: #fff;
+}
+
+#orderStatusModal .orders-list{
+  color:black;
+}
+
+
+/* Orders List Card */
+.orders-list {
+    background: #fdfdfd;
+    border: 1px solid #eee;
+    border-radius: 10px;
+    padding: 1rem 1.2rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+    transition: transform 0.2s;
+}
+
+.orders-list:hover {
+    transform: translateY(-3px);
+}
+
+.orders-list h4 {
+    font-size: 1.2rem;
+    color: #222;
+    margin-bottom: 0.5rem;
+}
+
+.orders-list p {
+    font-size: 0.9rem;
+    color: #555;
+    margin: 0.2rem 0;
+}
+
+.orders-list ul.order-items {
+    margin-top: 0.5rem;
+    padding-left: 1.2rem;
+}
+
+.orders-list ul.order-items li {
+    font-size: 0.88rem;
+    color: #444;
+    margin: 0.2rem 0;
+}
+
+/* Order Timeline */
+.order-timeline {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1rem;
+    position: relative;
+}
+
+.order-timeline::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 5%;
+    right: 5%;
+    height: 3px;
+    background: #eee;
+    z-index: 0;
+    transform: translateY(-50%);
+}
+
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 25%;
+    position: relative;
+    z-index: 1;
+    color: #aaa;
+    text-align: center;
+}
+
+.step .icon {
+    background: #eee;
+    color: #fff;
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 0.3rem;
+    transition: all 0.3s;
+}
+
+.step.completed .icon {
+    background: #4CAF50;
+    color: #fff;
+}
+
+.step.active .icon {
+    background: #2196F3;
+    color: #fff;
+    transform: scale(1.2);
+}
+
+.step p {
+    font-size: 0.78rem;
+    margin: 0;
+    font-weight: 500;
+}
+
+/* Scrollbar for modal */
+#orderStatusModal::-webkit-scrollbar {
+    width: 8px;
+}
+#orderStatusModal::-webkit-scrollbar-thumb {
+    background-color: rgba(0,0,0,0.2);
+    border-radius: 4px;
+}
+
+
+#submodulesModal{
+}
+
+#submodulesModal .module-btn {
+  padding: 0.7rem 1rem;
+  border-radius: 10px;
+  border: none;
+  background: #f0f0f0;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+#submodulesModal .module-btn i {
+  font-size: 1.25rem;
+  color: #2196F3;
+}
+
+/* Hover Effect */
+#submodulesModal .module-btn:hover {
+  background: #2196F3;
+  color: #fff;
+}
+
+#submodulesModal .module-btn:hover i {
+  color: #fff;
+}

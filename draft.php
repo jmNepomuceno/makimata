@@ -4,7 +4,7 @@
 
     $sql = "SELECT 
                 *
-            FROM notifications";
+            FROM order_history";
     $stmt = $pdo->prepare($sql);
     $stmt->execute();
     $data = $stmt->fetchAll(PDO::FETCH_ASSOC);

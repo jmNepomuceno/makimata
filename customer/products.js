@@ -502,6 +502,12 @@
         const customizationModal = document.getElementById('customizationModal');
         const billingModal = document.getElementById('billingModal');
 
+        const submodulesBtn = document.getElementById('submodulesBtn');
+        const submodulesModal = document.getElementById('submodulesModal'); // create this modal in HTML
+        const closeSubmodules = document.getElementById('closeSubmodules');
+
+        const viewOrderStatusBtn = document.getElementById('viewOrderStatus');
+
         /**
          * Injects custom CSS for animations into the document head.
          * This makes the "Add to Cart" notification more dynamic.
@@ -908,6 +914,8 @@
             document.head.appendChild(style);
         }
 
+
+
         // Initialize app
         function init() {
             // Make loading from localStorage robust to prevent parsing errors from stopping script execution.
@@ -945,6 +953,262 @@
             setupEventListeners();
             updateCounts();
             updateActiveCategoryUI(); // Update UI on initial load
+        }
+
+        $(document).on("click", ".cancel-order-btn", function() {
+            const orderId = $(this).data("order");
+            if (!confirm("Are you sure you want to cancel this order?")) return;
+
+            $.ajax({
+                url: "../assets/php/cancel_order.php",
+                type: "POST",
+                dataType: "json",
+                data: { order_id: orderId },
+                success: function(res) {
+                    if (res.status === "success") {
+                        alert("Order cancelled successfully.");
+                        fetchOrders(); // refresh list
+                    } else {
+                        alert("Error: " + res.message);
+                    }
+                },
+                error: function() {
+                    alert("Something went wrong while cancelling order.");
+                }
+            });
+        });
+
+
+        // Open modal
+        $("#viewCompleteOrder").on("click", function () {
+            $("#submodulesModal").hide();
+            $("#completeOrdersModal").show();
+            fetchCompletedOrders();
+        });
+
+        // Close modal
+        $("#closeCompleteOrders").on("click", function () {
+            $("#completeOrdersModal").hide();
+        });
+
+        // Apply filters
+        $("#applyCompletedFilters").on("click", function () {
+            const filters = {
+                startDate: $("#completedStartDate").val(),
+                endDate: $("#completedEndDate").val()
+            };
+            fetchCompletedOrders(filters);
+        });
+
+        // Fetch completed orders
+        function fetchCompletedOrders(filters = {}) {
+            $.ajax({
+                url: "../assets/php/fetch_completed_orders.php",
+                type: "POST",
+                data: filters,
+                dataType: "json",
+                success: function (response) {
+                    if (response.status === "success") {
+                        renderCompletedOrders(response.orders);
+                    } else {
+                        $("#completedOrdersList").html(
+                            `<p class="error">${response.message}</p>`
+                        );
+                    }
+                },
+                error: function () {
+                    $("#completedOrdersList").html(
+                        `<p class="error">Failed to load completed orders.</p>`
+                    );
+                }
+            });
+        }
+
+        // Render orders
+        function renderCompletedOrders(orders) {
+            if (!orders.length) {
+                $("#completedOrdersList").html(`<p>No completed orders found.</p>`);
+                return;
+            }
+
+            let html = "";
+            orders.forEach(order => {
+                let itemsHtml = order.items.map(item => `
+                    <div class="order-item">
+                        <span>${item.name} (${item.qty}x)</span>
+                        <span>₱${item.price}</span>
+                    </div>
+                `).join("");
+
+                let reviewHtml = "";
+                if (order.review) {
+                    // Already reviewed → show static review
+                    const starsHtml = [...Array(5)].map((_, i) => `
+                        <i class="fa-star ${i < order.review.rating ? "fas" : "far"}"></i>
+                    `).join("");
+
+                    reviewHtml = `
+                        <div class="review-display">
+                            <div class="stars">${starsHtml}</div>
+                            <p class="review-comment-text">${order.review.comment || "(No comment provided)"}</p>
+                            <small class="review-date">Reviewed on ${order.review.created_at}</small>
+                        </div>
+                    `;
+                } else {
+                    // Not yet reviewed → show form
+                    reviewHtml = `
+                        <div class="review-section" data-order="${order.id}">
+                            <div class="stars">
+                                ${[1,2,3,4,5].map(star => `
+                                    <i class="fa-star far" data-star="${star}"></i>
+                                `).join("")}
+                            </div>
+                            <textarea class="review-comment" placeholder="Write your comment (optional)..."></textarea>
+                            <button class="submit-review">Submit Review</button>
+                        </div>
+                    `;
+                }
+
+                html += `
+                    <div class="completed-order-card">
+                        <div class="order-header">
+                            <h3>Order #${order.id}</h3>
+                            <span>${order.date}</span>
+                        </div>
+                        <div class="order-items">${itemsHtml}</div>
+                        <div class="order-total">Total: ₱${order.total}</div>
+                        ${reviewHtml}
+                    </div>
+                `;
+            });
+
+            $("#completedOrdersList").html(html);
+
+            // Handle star selection
+            $(".stars i").on("click", function () {
+                let starValue = $(this).data("star");
+                $(this).parent().find("i").removeClass("fas").addClass("far");
+                $(this).parent().find("i").each(function () {
+                    if ($(this).data("star") <= starValue) {
+                        $(this).removeClass("far").addClass("fas");
+                    }
+                });
+                $(this).parent().attr("data-selected", starValue);
+            });
+
+            // Handle submit review
+            $(".submit-review").on("click", function () {
+                const parent = $(this).closest(".review-section");
+                const orderId = parent.data("order");
+                const stars = parent.find(".stars").attr("data-selected") || 0;
+                const comment = parent.find(".review-comment").val();
+
+                $.ajax({
+                    url: "../assets/php/submit_review.php",
+                    type: "POST",
+                    data: { orderId, stars, comment },
+                    dataType: "json",
+                    success: function (res) {
+                        if (res.status === "success") {
+                            alert("Review submitted!");
+                            fetchCompletedOrders(); // Refresh list
+                        } else {
+                            alert(res.message);
+                        }
+                    },
+                    error: function () {
+                        alert("Failed to submit review.");
+                    }
+                });
+            });
+        }
+
+
+
+
+        function fetchOrders(filters = {}) {
+            $.ajax({
+                url: "../assets/php/fetch_user_orders.php",
+                type: "POST",
+                dataType: "json",
+                data: filters, // pass filters
+                success: function(response) {
+                    const modalBody = $("#orderStatusModal .modal-body");
+                    modalBody.empty();
+
+                    if (response.status === "success") {
+                        const orders = response.orders;
+
+                        if (orders.length === 0) {
+                            modalBody.html('<div class="no-orders">No orders found.</div>');
+                            return;
+                        }
+
+                        orders.forEach((order, index) => {
+                            const orderNumber = index + 1;
+
+                            // Timeline (same as before) ...
+                            const timelineSteps = ['pending','processing','shipped','completed'];
+                            let timelineHtml = '<div class="order-timeline">';
+                            timelineSteps.forEach(step => {
+                                let stepClass = '';
+                                if (step === order.status) stepClass = 'active';
+                                else if (timelineSteps.indexOf(step) < timelineSteps.indexOf(order.status)) stepClass = 'completed';
+
+                                let icon = '';
+                                switch(step) {
+                                    case 'pending': icon = '<i class="fa fa-clock"></i>'; break;
+                                    case 'processing': icon = '<i class="fa fa-cogs"></i>'; break;
+                                    case 'shipped': icon = '<i class="fa fa-truck"></i>'; break;
+                                    case 'completed': icon = '<i class="fa fa-box"></i>'; break;
+                                }
+
+                                timelineHtml += `
+                                    <div class="step ${stepClass}">
+                                        <div class="icon">${icon}</div>
+                                        <p>${step.charAt(0).toUpperCase() + step.slice(1)}</p>
+                                    </div>
+                                `;
+                            });
+                            timelineHtml += '</div>';
+
+                            // Items
+                            let itemsHtml = '<ul class="order-items">';
+                            order.items.forEach(item => {
+                                itemsHtml += `<li>${item.name} (${item.attributes}) - Qty: ${item.qty} - ₱${parseFloat(item.price).toFixed(2)}</li>`;
+                            });
+                            itemsHtml += '</ul>';
+
+                            // Cancel button if pending
+                            let cancelBtn = '';
+                            if (order.status === "pending") {
+                                cancelBtn = `<button class="cancel-order-btn" data-order="${order.id}">Cancel Order</button>`;
+                            }
+
+                            modalBody.append(`
+                                <div class="orders-list">
+                                    <h4>Order #${orderNumber}</h4>
+                                    <p><strong>Customer:</strong> ${order.customer.name}</p>
+                                    <p><strong>Address:</strong> ${order.shippingAddress}</p>
+                                    <p><strong>Phone:</strong> ${order.customer.phone}</p>
+                                    <p><strong>Payment:</strong> ${order.paymentMethod.toUpperCase()}</p>
+                                    <p><strong>Total:</strong> ₱${parseFloat(order.total).toFixed(2)}</p>
+                                    <p><strong>Status:</strong> ${order.status.charAt(0).toUpperCase() + order.status.slice(1)}</p>
+                                    ${itemsHtml}
+                                    ${timelineHtml}
+                                    ${cancelBtn}
+                                    <hr>
+                                </div>
+                            `);
+                        });
+                    } else {
+                        modalBody.html(`<div class="error-message">Error: ${response.message}</div>`);
+                    }
+                },
+                error: function() {
+                    $("#orderStatusModal .modal-body").html('<div class="error-message">Something went wrong. Please try again.</div>');
+                }
+            });
         }
 
         // Event listeners
@@ -1012,6 +1276,45 @@
             // to handle different "back" actions (e.g., back to cart vs. back to customization).
             const placeOrderBtn = document.getElementById('placeOrderBtn');
             if (placeOrderBtn) placeOrderBtn.addEventListener('click', handlePlaceOrder);
+       
+       
+            submodulesBtn.addEventListener('click', () => {
+                submodulesModal.style.display = 'block';
+            });
+
+            closeSubmodules.addEventListener('click', () => {
+                submodulesModal.style.display = 'none';
+            });
+
+            closeOrderStatus.addEventListener('click', () => {
+                orderStatusModal.style.display = 'none';
+            });
+
+            viewOrderStatusBtn.addEventListener('click', () => {
+                submodulesModal.style.display = 'none'; // close modules modal
+                fetchOrders();
+                orderStatusModal.style.display = 'block';
+            });
+
+            // Optional: click outside modal to close
+            window.addEventListener('click', (e) => {
+                if(e.target == submodulesModal){
+                    submodulesModal.style.display = 'none';
+                }
+            });
+
+            
+            // Filter button click
+            $("#applyFilters").on("click", function() {
+                console.log('here')
+                const filters = {
+                    startDate: $("#filterStartDate").val(),
+                    endDate: $("#filterEndDate").val(),
+                    status: $("#filterStatus").val()
+                };
+                fetchOrders(filters);
+            });
+
         }
 
         function updateActiveCategoryUI() {

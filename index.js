@@ -13,7 +13,7 @@ $(document).ready(function () {
             dataType: "json",
             success: function (response) {
                 if (response.status === "success") {
-                    alert("Login successful!");
+                    // alert("Login successful!");
                     // Redirect to dashboard or homepage
                     window.location.href = "./customer/home.php";
                 } else {
