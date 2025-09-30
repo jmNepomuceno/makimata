@@ -1,4 +1,18 @@
 $(document).ready(function () {
+    // Show modal
+    function showOtpModal(mobile) {
+        document.getElementById("otpMobile").innerText = mobile;
+        document.getElementById("otpModal").style.display = "flex";
+    }
+
+
+    // Hide modal
+    function hideOtpModal() {
+    document.getElementById("otpModal").style.display = "none";
+    }
+
+    document.getElementById("closeOtpBtn").addEventListener("click", hideOtpModal);
+
     function showToast(message, type = "info") {
         const container = document.getElementById("toast-container");
 
@@ -48,13 +62,27 @@ $(document).ready(function () {
             dataType: "json",
             success: function (response) {
                 console.table(response);
-                if (response.status === "success") {
+
+                if (response.status === "pending") {
+                    // 1. Show toast
+                    showToast("✅ Account created! OTP sent to your mobile.", "success");
+
+                    // 2. Show OTP modal
+                    showOtpModal(response.mobile);
+
+                    // 3. Store mobile (or user id if backend returns it later) for verification
+                    $("#hiddenMobile").val(response.mobile);
+
+                } else if (response.status === "success") {
+                    // If ever you auto-verify (not the case now, but keep fallback)
                     showToast("✅ Account created successfully!", "success");
                     $("#signupForm")[0].reset();
+
                 } else {
                     showToast("⚠️ Error: " + response.message, "error");
                 }
             },
+
             error: function () {
                 alert("Something went wrong. Please try again.");
             }

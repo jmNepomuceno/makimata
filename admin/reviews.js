@@ -57,35 +57,31 @@ class ReviewManager {
 
   async loadReviews() {
     try {
-        const savedReviews = localStorage.getItem("mikamataReviews");
-        this.reviews = savedReviews ? JSON.parse(savedReviews) : this.generateMockReviews();
-        this.saveReviewsToStorage();
+      const response = await $.ajax({
+        url: "../assets/php_admin/fetch_reviews.php",
+        type: "GET",
+        dataType: "json"
+      });
+      console.log(response.reviews)
+      if (response.status === "success") {
+        this.reviews = response.reviews;
+      } else {
+        console.error(response.message);
+        this.reviews = [];
+      }
+
+      this.filteredReviews = [...this.reviews];
+      this.renderReviews();
 
     } catch (error) {
-      console.error("Error loading reviews from localStorage:", error)
-      this.reviews = this.generateMockReviews();
+      console.error("Error fetching reviews:", error);
+      this.reviews = [];
+      this.filteredReviews = [];
+      this.renderReviews();
     }
-    this.filteredReviews = [...this.reviews]
-    this.renderReviews()
   }
 
-  generateMockReviews() {
-    const users = ["Sarah Johnson", "Mike Chen", "David Lee", "Emily White"];
-    const products = ["Wireless Headphones", "Smart Watch", "Bamboo Cup", "Lampshade"];
-    const comments = ["Excellent!", "Good product.", "It's okay.", "Not what I expected."];
 
-    return Array.from({ length: 30 }, (_, i) => ({
-        id: i + 1,
-        customerName: users[i % users.length],
-        customerAvatar: `../mik/users/user-${i % 7}.jpg`,
-        productName: products[i % products.length],
-        productImage: `../mik/products/product-${(i % 5) + 1}.jpg`,
-        rating: parseFloat((Math.random() * 2 + 3).toFixed(1)),
-        comment: comments[i % comments.length],
-        date: new Date(Date.now() - i * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
-        status: ["approved", "pending", "rejected"][i % 3],
-    }));
-  }
 
   saveReviewsToStorage() {
     try {
@@ -120,7 +116,7 @@ class ReviewManager {
                         <div class="customer-info">
                             <div>
                                 <div class="customer-name">${review.customerName}</div>
-                                <div class="review-date">${new Date(review.date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</div>
+                                <div class="review-date">${new Date(review.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</div>
                             </div>
                         </div>
                         <div class="review-status ${review.status}">${review.status}</div>
@@ -296,16 +292,33 @@ class ReviewManager {
 
   async updateStatus(reviewId, newStatus) {
     try {
+      const response = await $.ajax({
+        url: "../assets/php_admin/update_review_status.php",
+        type: "POST",
+        data: {
+          reviewId: reviewId,
+          status: newStatus
+        },
+        dataType: "json"
+      });
+
+      if (response.status === "success") {
+        // Update local data so UI refreshes immediately
         const review = this.reviews.find((r) => r.id === reviewId);
         if (review) review.status = newStatus;
-        this.saveReviewsToStorage();
+
         this.filterAndRender();
-        showToast(`Review status updated to ${newStatus}.`, 'success');
+        showToast(`Review status updated to ${newStatus}.`, "success");
+      } else {
+        showToast(response.message, "error");
+      }
+
     } catch (error) {
-        console.error('Failed to update review status:', error);
-        showToast('Could not update status.', 'error');
+      console.error("Failed to update review status:", error);
+      showToast("Could not update status.", "error");
     }
   }
+
 }
 
 document.addEventListener("DOMContentLoaded", () => {

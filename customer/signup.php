@@ -124,6 +124,21 @@
         </div>
     </div>
 
+
+    <div id="toast-container"></div>
+
+        <div id="otpModal" class="custom-modal">
+        <div class="custom-modal-content">
+            <h2>Verify Your Account</h2>
+            <p>Enter the OTP sent to <span id="otpMobile"></span></p>
+            <input type="hidden" id="hiddenMobile">
+            <input type="text" id="otpCode" maxlength="6" placeholder="Enter OTP">
+            <div class="modal-actions">
+            <button id="verifyOtpBtn">Verify</button>
+            <button id="closeOtpBtn">Cancel</button>
+            </div>
+        </div>
+    </div>
     <!-- <script src="address.js"></script> -->
 
     <script src="../assets/js/signup.js"></script>
