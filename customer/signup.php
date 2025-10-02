@@ -127,18 +127,26 @@
 
     <div id="toast-container"></div>
 
-        <div id="otpModal" class="custom-modal">
+    <div id="otpModal" class="custom-modal">
         <div class="custom-modal-content">
             <h2>Verify Your Account</h2>
             <p>Enter the OTP sent to <span id="otpMobile"></span></p>
             <input type="hidden" id="hiddenMobile">
             <input type="text" id="otpCode" maxlength="6" placeholder="Enter OTP">
+            
+            <!-- Timer display -->
+            <p id="otpTimer" style="font-weight:bold; color:#d9534f; margin-top:10px;"></p>
+
             <div class="modal-actions">
-            <button id="verifyOtpBtn">Verify</button>
-            <button id="closeOtpBtn">Cancel</button>
+                <button id="verifyOtpBtn">Verify</button>
+                <button id="closeOtpBtn">Cancel</button>
+                <button id="resendOtpBtn" style="display:none;">Resend OTP</button>
             </div>
+            <div id="result"></div>
         </div>
     </div>
+
+
     <!-- <script src="address.js"></script> -->
 
     <script src="../assets/js/signup.js"></script>

@@ -108,7 +108,7 @@ const PRODUCTS = [
       } else {
         cartItems.push({ id: productId, quantity: 1 });
       }
-      updateCounts();
+      // updateCounts();
       showNotification(`${product.name} added to cart!`);
       saveCartAndWishlist();
     }
@@ -171,7 +171,7 @@ const PRODUCTS = [
  
     function removeFromCart(productId) {
       cartItems = cartItems.filter(item => item.id !== productId);
-      updateCounts();
+      // updateCounts();
       renderCartItems();
       saveCartAndWishlist();
     }
@@ -285,46 +285,46 @@ const PRODUCTS = [
       });
     }
 
-    cartBtn.addEventListener('click', () => {
-      renderCartItems();
-      cartModal.style.display = 'block';
-    });
+    // cartBtn.addEventListener('click', () => {
+    //   renderCartItems();
+    //   cartModal.style.display = 'block';
+    // });
 
-    wishlistBtn.addEventListener('click', () => {
-      renderWishlistItems();
-      wishlistModal.style.display = 'block';
-    });
+    // wishlistBtn.addEventListener('click', () => {
+    //   renderWishlistItems();
+    //   wishlistModal.style.display = 'block';
+    // });
 
-    userBtn.addEventListener('click', () => {
-      fetchOrders();
-      orderStatusModal.style.display = 'block';
-    });
+    // userBtn.addEventListener('click', () => {
+    //   fetchOrders();
+    //   orderStatusModal.style.display = 'block';
+    // });
 
-    closeCartBtn.addEventListener('click', () => {
-      cartModal.style.display = 'none';
-    });
+    // closeCartBtn.addEventListener('click', () => {
+    //   cartModal.style.display = 'none';
+    // });
 
-    closeWishlistBtn.addEventListener('click', () => {
-      wishlistModal.style.display = 'none';
-    });
+    // closeWishlistBtn.addEventListener('click', () => {
+    //   wishlistModal.style.display = 'none';
+    // });
 
-    closeOrderStatus.addEventListener('click', () => {
-      orderStatusModal.style.display = 'none';
-    });
+    // closeOrderStatus.addEventListener('click', () => {
+    //   orderStatusModal.style.display = 'none';
+    // });
 
-    submodulesBtn.addEventListener('click', () => {
-        submodulesModal.style.display = 'block';
-    });
+  //   submodulesBtn.addEventListener('click', () => {
+  //       submodulesModal.style.display = 'block';
+  //   });
 
-    closeSubmodules.addEventListener('click', () => {
-        submodulesModal.style.display = 'none';
-    });
+  //   closeSubmodules.addEventListener('click', () => {
+  //       submodulesModal.style.display = 'none';
+  //   });
 
-    viewOrderStatusBtn.addEventListener('click', () => {
-      submodulesModal.style.display = 'none'; // close modules modal
-      fetchOrders();
-      orderStatusModal.style.display = 'block';
-  });
+  //   viewOrderStatusBtn.addEventListener('click', () => {
+  //     submodulesModal.style.display = 'none'; // close modules modal
+  //     fetchOrders();
+  //     orderStatusModal.style.display = 'block';
+  // });
 
     // Optional: click outside modal to close
     window.addEventListener('click', (e) => {
@@ -400,7 +400,7 @@ const PRODUCTS = [
         const productsGrid = document.getElementById('productsGrid');
 
         loadCartAndWishlist();
-        updateCounts();
+        // updateCounts();
 
         const initialCategory = categoryFilters?.querySelector('.category-btn.active')?.dataset.category || 'lampshades';
         displayProducts(initialCategory);

@@ -1,0 +1,4 @@
+2025-10-01 11:35:54 - Exception: SQLSTATE[22001]: String data, right truncated: 1406 Data too long for column 'house_no' at row 1
+2025-10-01 11:36:03 - SMS Response: {"messages":[{"messageId":"4592897648607951436598","status":{"description":"Message sent to next instance","groupId":1,"groupName":"PENDING","id":26,"name":"PENDING_ACCEPTED"},"to":"+639196044820"}]}
+2025-10-01 16:28:17 - Exception: SQLSTATE[22001]: String data, right truncated: 1406 Data too long for column 'password' at row 1
+2025-10-01 16:32:03 - SMS Response: {"apikey":["The selected apikey is invalid."]}
