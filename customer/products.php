@@ -1,5 +1,6 @@
 <?php 
     session_start();
+    // echo "<pre>"; print_r($_SESSION); echo "</pre>";
 ?>
 
 <!DOCTYPE html>
@@ -423,8 +424,8 @@
                 <nav class="nav">
                     <a href="home.php">Home</a>
                     <a href="products.php" class="active">Products</a>
-                    <a href="aboutus.html">About Us</a>
-                    <a href="contactus.html">Contact Us</a>
+                    <a href="aboutus.php">About Us</a>
+                    <a href="contactus.php">Contact Us</a>
                 </nav>
                 <div class="header-actions">
                     <div class="search-box">
@@ -446,6 +447,13 @@
                     <button class="icon-btn" id="submodulesBtn" title="Modules">
                         <i class="fa-solid fa-th-large"></i>
                     </button>
+
+                    <button class="icon-btn" id="userBtn" title="User">
+                        <i class="fa-regular fa-user" id="user-icon"></i>
+                    </button>
+
+
+                    <i class="fa-solid fa-right-from-bracket" id="logout-btn"></i>
                 </div>
             </div>
         </header>
@@ -826,21 +834,55 @@
         
     <!-- Success Notification -->
     <div id="successNotification" class="success-notification">
-    <div class="notification-header">
-        <i class="fas fa-check-circle"></i>
-        <span>Added to Cart</span>
+        <div class="notification-header">
+            <i class="fas fa-check-circle"></i>
+            <span>Added to Cart</span>
+        </div>
+        <div class="notification-body">
+            <img id="notificationImage" src="" alt="Product Image">
+            <div class="notification-details">
+                <strong id="notificationName">Product Name</strong>
+                <small id="notificationSize">Size: Medium</small>
+                <small id="notificationFinish">Finish: Natural</small>
+                <small id="notificationQuantity">Quantity: 1</small>
+            </div>
+        </div>
+        <div class="notification-progress"></div>
     </div>
-    <div class="notification-body">
-        <img id="notificationImage" src="" alt="Product Image">
-        <div class="notification-details">
-            <strong id="notificationName">Product Name</strong>
-            <small id="notificationSize">Size: Medium</small>
-            <small id="notificationFinish">Finish: Natural</small>
-            <small id="notificationQuantity">Quantity: 1</small>
+
+      <!-- Profile Modal -->
+    <div id="profileModal" class="modal">
+        <div class="modal-content">
+        <span class="close">&times;</span>
+        <span id="title-modal">User Information</span>
+
+        <div class="profile-info">
+            <label>First Name:</label>
+            <input type="text" id="firstName" readonly>
+
+            <label>Last Name:</label>
+            <input type="text" id="lastName" readonly>
+
+            <label>Mobile:</label>
+            <input type="text" id="mobile" readonly>
+
+            <label>Email:</label>
+            <input type="text" id="email" readonly>
+
+            <hr>
+            <h3>Change Password</h3>
+            <label>New Password:</label>
+            <input type="password" id="newPassword">
+            
+            <label>Confirm Password:</label>
+            <input type="password" id="confirmPassword">
+
+            <button id="updatePasswordBtn">Update Password</button>
+        </div>
         </div>
     </div>
-    <div class="notification-progress"></div>
-</div>
+
+    <div id="toast-container"></div>
 
     <script src="products.js"></script>
 </body>

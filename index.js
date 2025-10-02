@@ -1,4 +1,11 @@
 $(document).ready(function () {
+    function showToast(message, type = "info") {
+        const container = $("#toast-container");
+        const toast = $("<div>").addClass(`toast ${type}`).text(message);
+        container.append(toast);
+        setTimeout(() => toast.remove(), 4000);
+    }
+
     $("#loginForm").on("submit", function (e) {
         e.preventDefault();
 
@@ -17,7 +24,7 @@ $(document).ready(function () {
                     // Redirect to dashboard or homepage
                     window.location.href = "./customer/home.php";
                 } else {
-                    alert("Error: " + response.message);
+                    showToast("⚠️ " + response.message, "error");
                 }
             },
             error: function () {

@@ -26,8 +26,8 @@
       <nav class="nav">
         <a href="home.php" class="active">Home</a>
         <a href="products.php">Products</a>
-        <a href="aboutus.html">About Us</a>
-        <a href="contactus.html">Contact Us</a>
+        <a href="aboutus.php">About Us</a>
+        <a href="contactus.php">Contact Us</a>
       </nav>
       <div class="header-actions">
         <div class="search">
@@ -38,6 +38,9 @@
         <button class="icon-btn" id="userBtn" title="User">
           <i class="fa-regular fa-user" id="user-icon"></i>
         </button>
+
+
+        <i class="fa-solid fa-right-from-bracket" id="logout-btn"></i>
       </div>
     </div>
   </header>
@@ -374,6 +377,40 @@
     </div>
   </div>
 
+
+  <!-- Profile Modal -->
+  <div id="profileModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <span id="title-modal">User Information</span>
+
+      <div class="profile-info">
+        <label>First Name:</label>
+        <input type="text" id="firstName" readonly>
+
+        <label>Last Name:</label>
+        <input type="text" id="lastName" readonly>
+
+        <label>Mobile:</label>
+        <input type="text" id="mobile" readonly>
+
+        <label>Email:</label>
+        <input type="text" id="email" readonly>
+
+        <hr>
+        <h3>Change Password</h3>
+        <label>New Password:</label>
+        <input type="password" id="newPassword">
+        
+        <label>Confirm Password:</label>
+        <input type="password" id="confirmPassword">
+
+        <button id="updatePasswordBtn">Update Password</button>
+      </div>
+    </div>
+  </div>
+
+    <div id="toast-container"></div>
 
 
   <style>

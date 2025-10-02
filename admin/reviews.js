@@ -55,31 +55,33 @@ class ReviewManager {
     this.setupEventListeners()
   }
 
-  async loadReviews() {
-    try {
-      const response = await $.ajax({
-        url: "../assets/php_admin/fetch_reviews.php",
-        type: "GET",
-        dataType: "json"
-      });
-      console.log(response.reviews)
-      if (response.status === "success") {
-        this.reviews = response.reviews;
-      } else {
-        console.error(response.message);
+  loadReviews() {
+    $.ajax({
+      url: "../assets/php_admin/fetch_reviews.php",
+      type: "GET",
+      dataType: "json",
+      success: (response) => {
+        console.log(response.reviews);
+
+        if (response.status === "success") {
+          this.reviews = response.reviews;
+        } else {
+          console.error(response.message);
+          this.reviews = [];
+        }
+
+        this.filteredReviews = [...this.reviews];
+        this.renderReviews();
+      },
+      error: (xhr, status, error) => {
+        console.error("Error fetching reviews:", error);
         this.reviews = [];
+        this.filteredReviews = [];
+        this.renderReviews();
       }
-
-      this.filteredReviews = [...this.reviews];
-      this.renderReviews();
-
-    } catch (error) {
-      console.error("Error fetching reviews:", error);
-      this.reviews = [];
-      this.filteredReviews = [];
-      this.renderReviews();
-    }
+    });
   }
+
 
 
 

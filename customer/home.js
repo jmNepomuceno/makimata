@@ -426,4 +426,90 @@ const PRODUCTS = [
                 if (event.target.closest('.wishlist-btn')) toggleWishlist(productId);
             });
         }
-    });
+
+        function showToast(message, type = "info") {
+          const container = $("#toast-container");
+          const toast = $("<div>").addClass(`toast ${type}`).text(message);
+          container.append(toast);
+          setTimeout(() => toast.remove(), 4000);
+        }
+
+
+        $('#logout-btn').click(() => {
+            $.ajax({
+                url: "../assets/php/logout.php",
+                type: "POST",
+                dataType: "json",
+                success: function(res) {
+                  console.log(res)
+                    if (res.status === "success") {
+                        // Optionally clear local storage/session storage
+                        sessionStorage.clear();
+                        localStorage.clear();
+
+                        // Redirect to landing page
+                        window.location.href = "../index.php"; 
+                    } else {
+                        showToast("⚠️ Logout failed: " + res.message);
+                    }
+                },
+                error: function() {
+                    showToast("❌ Something went wrong during logout");
+                }
+            });
+        });
+
+        // Open modal on user button click
+        $('#userBtn').click(() => {
+             $("#profileModal").show();
+            $.ajax({
+                url: "../assets/php/get_user_info.php",
+                type: "POST",
+                dataType: "json",
+                success: function(res) {
+                    console.log(res)
+                    if (res.status === "success") {
+                        $("#firstName").val(res.data.firstname);
+                        $("#lastName").val(res.data.lastname);
+                        $("#mobile").val(res.data.mobile);
+                        $("#email").val(res.data.email);
+                        $("#profileModal").show();
+                    } else {
+                        showToast("⚠️ " + res.message);
+                    }
+                },
+                error: function() {
+                    showToast("❌ Something went wrong during logout");
+                }
+            });
+        });
+
+        $('#updatePasswordBtn').click(() => {
+            const newPassword = $("#newPassword").val().trim();
+            const confirmPassword = $("#confirmPassword").val().trim();
+
+            $.ajax({
+                url: "../assets/php/update_password.php",
+                type: "POST",
+                data: { newPassword, confirmPassword },
+                dataType: "json",
+                success: function(res) {
+                    if (res.status === "success") {
+                        showToast("✅ " + res.message);
+                        $("#newPassword, #confirmPassword").val(""); // clear fields
+                        $("#profileModal").hide();
+                    } else {
+                        showToast("⚠️ " + res.message);
+                    }
+                }
+            });
+        });
+
+
+        // Close modal
+        $(".close").click(() => {
+            $("#profileModal").hide();
+        });
+
+        
+  });

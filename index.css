@@ -197,3 +197,45 @@ input:focus {
         height: 200px;
     }
 }
+
+/* Toast Container */
+#toast-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+
+/* Toast */
+.toast {
+  min-width: 260px;
+  max-width: 350px;
+  padding: 1rem 1.25rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  opacity: 0;
+  transform: translateY(-10px);
+  animation: fadeInUp 0.3s forwards, fadeOut 0.3s ease 3.5s forwards;
+}
+
+/* Toast Types */
+.toast.success { background: #28a745; }   /* Green */
+.toast.error   { background: #dc3545; }   /* Red */
+.toast.info    { background: #007bff; }   /* Blue */
+
+/* Animations */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(-10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeOut {
+  to { opacity: 0; transform: translateY(-10px); }
+}

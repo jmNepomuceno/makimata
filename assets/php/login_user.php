@@ -1,5 +1,4 @@
 <?php
-
 include("../connection/connection.php");
 date_default_timezone_set('Asia/Manila');
 header('Content-Type: application/json; charset=utf-8');
@@ -14,7 +13,7 @@ try {
         exit;
     }
 
-    $sql = "SELECT user_ID, firstname, lastname, email, password 
+    $sql = "SELECT user_ID, firstname, lastname, email, password, is_verified 
             FROM users 
             WHERE email = :email 
             LIMIT 1";
@@ -23,7 +22,16 @@ try {
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($user) {
-        // Verify password
+        // ✅ Check verification first
+        if ((int)$user['is_verified'] === 0) {
+            echo json_encode([
+                "status" => "error", 
+                "message" => "Your account is not yet verified. Please verify before logging in."
+            ]);
+            exit;
+        }
+
+        // ✅ Verify password (currently plain text, should be hashed ideally)
         if ($password === $user['password']) {
             // Store user info in session
             $_SESSION['user'] = [
@@ -33,12 +41,17 @@ try {
                 "email"     => $user['email']
             ];
 
-                $sql = "UPDATE users SET last_login = :last_login WHERE email = :email";
-                $stmt = $pdo->prepare($sql);
-                $stmt->execute([':last_login' => date('Y-m-d H:i:s'), ':email' => $email]);
+            // Update last login
+            $sql = "UPDATE users SET last_login = :last_login WHERE email = :email";
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute([
+                ':last_login' => date('Y-m-d H:i:s'), 
+                ':email'      => $email
+            ]);
 
+            // Insert notification
             $sqlNotif = "INSERT INTO notifications (type, icon, title, message, recipient, target_id)
-             VALUES ('user', 'fa-user', 'User Login', :message, 'Admin', :user_id)";
+                         VALUES ('user', 'fa-user', 'User Login', :message, 'Admin', :user_id)";
             $stmtNotif = $pdo->prepare($sqlNotif);
             $stmtNotif->execute([
                 ':message' => $user['firstname'] . ' ' . $user['lastname'] . ' logged in at ' . date('Y-m-d H:i:s'),
@@ -46,7 +59,6 @@ try {
             ]);
 
             echo json_encode(["status" => "success"]);
-            
         } else {
             echo json_encode(["status" => "error", "message" => "Invalid password"]);
         }
@@ -57,3 +69,5 @@ try {
 } catch (Exception $e) {
     echo json_encode(["status" => "error", "message" => $e->getMessage()]);
 }
+
+?>
