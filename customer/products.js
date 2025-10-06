@@ -1422,6 +1422,49 @@ function setupEventListeners() {
     });
 
 
+    $("#notificationBtn").on("click", function() {
+        $("#notificationModal").fadeIn(200);
+        $("#notificationList").html('<p class="loading-text">Loading notifications...</p>');
+
+        $.ajax({
+        url: "../assets/php/fetch_notification.php",
+        type: "POST",
+        dataType: "json",
+        success: function(response) {
+            console.log(response)
+            if (response.status === "success" && response.notifications.length > 0) {
+            const notifHTML = response.notifications.map(notif => `
+                <div class="notification-item">
+                <i class="${notif.icon}"></i>
+                <div class="notification-text">
+                    <div class="notification-title">${notif.title}</div>
+                    <div class="notification-message">${notif.message}</div>
+                    <div class="notification-date">${notif.created_at}</div>
+                </div>
+                </div>
+            `).join('');
+            $("#notificationList").html(notifHTML);
+            } else {
+            $("#notificationList").html('<p>No notifications found.</p>');
+            }
+        },
+        error: function(err) {
+            console.error("Error fetching notifications:", err);
+            $("#notificationList").html('<p class="text-danger">Failed to load notifications.</p>');
+        }
+        });
+    });
+
+    // Close modal
+    $("#closeNotificationModal").on("click", function() {
+        $("#notificationModal").fadeOut(200);
+    });
+
+    $(window).on("click", function(e) {
+        if (e.target.id === "notificationModal") {
+        $("#notificationModal").fadeOut(200);
+        }
+    });
 }
 
 function updateActiveCategoryUI() {

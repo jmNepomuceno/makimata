@@ -3,14 +3,8 @@
     session_start();
 
     $sql = "SELECT 
-                admin_ID AS id,
-                firstname,
-                lastname,
-                email,
-                username,
-                created_at,
-                last_login
-            FROM admin";
+                *
+            FROM order_items";
     $stmt = $pdo->prepare($sql);
     $stmt->execute();
     $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -31,4 +25,6 @@
 
     // echo "<pre>"; print_r($order); echo "</pre>";
     echo "<pre>"; print_r($data); echo "</pre>";
+    echo "<pre>"; print_r($_SESSION); echo "</pre>";
+    
 ?>

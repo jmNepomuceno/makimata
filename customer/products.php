@@ -923,6 +923,16 @@
         </div>
     </div>
 
+    <div class="modal" id="notificationModal">
+        <div class="modal-content">
+            <span class="close" id="closeNotificationModal">&times;</span>
+            <h2>Notifications</h2>
+            <div id="notificationList" class="notification-list">
+            <p class="loading-text">Loading...</p>
+            </div>
+        </div>
+    </div>
+
     <div id="toast-container"></div>
 
     <script src="products.js"></script>

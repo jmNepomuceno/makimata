@@ -16,12 +16,13 @@ document.addEventListener('DOMContentLoaded', function () {
         const logoutBtn = document.getElementById('admin-logout-btn');
         if (logoutBtn) {
             logoutBtn.addEventListener('click', (e) => {
+                console.log('here')
                 e.preventDefault();
                 localStorage.removeItem('admin_logged_in'); // Clear the login flag
                 showToast('Logging out...', 'info');
                 setTimeout(() => {
                     // Redirect to the login page in the same directory
-                    window.location.href = 'login.html'; 
+                    window.location.href = 'http://192.168.100.13:8050/'; 
                 }, 1500);
             });
         }

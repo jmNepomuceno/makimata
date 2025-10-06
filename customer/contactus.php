@@ -6,6 +6,8 @@
     <title>Contact Us - MIKAMATA</title>
     <link rel="stylesheet" href="contactus.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <?php include("../scripts_links/header_links.php") ?>
+
 </head>
 <body>
     <!-- Header -->
@@ -27,149 +29,40 @@
         </div>
     </header>
 
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="container">
-            <h1 class="hero-title">Get In Touch</h1>
-        </div>
-    </section>
+    <main class="admin-main-content">
+      <!-- Tutorial Management -->
+      <section class="admin-section">
+        <!-- Grid View -->
+        <div class="tutorials-grid" id="tutorials-view"></div>
 
-    <!-- Contact Section -->
-    <section class="contact-section">
-        <div class="container">
-            <div class="contact-content">
-                <!-- Contact Form -->
-                <div class="contact-form-container">
-                    <h2 class="form-title">Send us a Message</h2>
-                    <form class="contact-form" id="contactForm">
-                        <div class="form-row">
-                            <input type="text" placeholder="Name*" class="form-input" required>
-                            <input type="email" placeholder="Email*" class="form-input" required>
-                        </div>
-                        <textarea placeholder="Your message*" class="form-textarea" rows="6" required></textarea>
-                        <button type="submit" class="send-btn">
-                            <span>Send Message</span>
-                            <div class="send-icon">→</div>
-                    </form>
-                </div>
-
-                <!-- Contact Info -->
-                <div class="contact-info">
-                    <h3 class="info-title">Contacts Us</h3>
-                    
-                    <div class="info-section">
-                        <h4 class="info-label">Address</h4>
-                        <p class="info-text">705 Sitio Ariada, Alangan, Limay, Bataan</p>
-                    </div>
-
-                    <div class="info-section">
-                        <h4 class="info-label">Email</h4>
-                        <p class="info-text">✉ Mikamatahandicrafts@gmail.com</p>
-                    </div>
-
-                    <div class="info-section">
-                        <h4 class="info-label">Phone Number</h4>
-                        <p class="info-text">📞 +639217329592 / +639622328554</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Map Section -->
-    <section class="map-section">
-        <div class="map-container">
-            <iframe 
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3858.123456789!2d120.5123456!3d14.6123456!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sAriada%2C%20Alangan%2C%20Limay%2C%20Bataan!5e0!3m2!1sen!2sph!4v1234567890"
-                width="100%" 
-                height="450" 
-                style="border:0;" 
-                allowfullscreen="" 
-                loading="lazy" 
-                referrerpolicy="no-referrer-when-downgrade">
-            </iframe>
-        </div>
-    </section>
-
-    <!-- About / Contact / Index -->
-    <section class="info">
-        <div class="container info-grid">
-          <div class="about">
-            <h3>About Us</h3>
-            <div class="about-brand">
-              <span>MIKAMATA</span>
-            </div>
-            <p>
-              The Mithiin Kapakanan Makamatan Tagumpas Livelihood and Handicrafts MIKAMATA is a community-based group established in 2011. The group focuses on making handmade bamboo products such as lampshades, mugs, earrings, phone holders, and furniture.
-            </p>
+        <!-- Bulk Actions -->
+        <div class="bulk-actions" id="bulk-actions" style="display: none;">
+          <span class="selected-count">0 tutorials selected</span>
+          <div class="bulk-buttons">
+            <button class="btn btn-secondary" id="bulk-publish">
+              <i class="fas fa-globe"></i> Publish
+            </button>
+            <button class="btn btn-secondary" id="bulk-archive">
+              <i class="fas fa-archive"></i> Archive
+            </button>
+            <button class="btn btn-secondary" id="bulk-export">
+              <i class="fas fa-download"></i> Export
+            </button>
+            <button class="btn btn-danger" id="bulk-delete">
+              <i class="fas fa-trash"></i> Delete
+            </button>
           </div>
-          <div class="contacts">
-            <h3>Contacts Us</h3>
-            <p><i class="fa-solid fa-envelope"></i> mikamatahandicrafts@gmail.com</p>
-            <p><i class="fa-solid fa-phone"></i> +639217329592 / +639622328554</p>
-          </div>
-          <div class="index">
-            <h3>Index</h3>
-            <ul>
-              <li><a href="home.html">Home</a></li>
-              <li><a href="aboutus.html">About Us</a></li>
-              <li><a href="products.html">Products</a></li>
-              <li><a href="contactus.html">Contact Us</a></li>
-            </ul>
-          </div>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination-wrapper">
+          <div class="pagination-info" id="pagination-info"></div>
+          <div class="pagination" id="pagination-controls"></div>
         </div>
       </section>
+    </main>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container foot">
-          <div class="copy">
-            <p>&copy; Copyright 2025 | MIKAMATA</p>
-          </div>
-        </div>
-    </footer>
+      <script src="contactus.js"></script>
 
-    <script>
-        // Contact form submission
-        document.getElementById('contactForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // Get form data
-            const formData = new FormData(this);
-            const name = this.querySelector('input[placeholder="Name*"]').value;
-            const email = this.querySelector('input[placeholder="Email*"]').value;
-            const message = this.querySelector('textarea').value;
-            
-            // Simple validation
-            if (!name || !email || !message) {
-                alert('Please fill in all required fields.');
-                return;
-            }
-            
-            // Simulate form submission
-            const sendBtn = this.querySelector('.send-btn');
-            const originalText = sendBtn.innerHTML;
-            
-            sendBtn.innerHTML = '<span>Sending...</span>';
-            sendBtn.disabled = true;
-            
-            setTimeout(() => {
-                alert('Thank you for your message! We will get back to you soon.');
-                this.reset();
-                sendBtn.innerHTML = originalText;
-                sendBtn.disabled = false;
-            }, 2000);
-        });
-
-        // Search functionality
-        document.querySelector('.search-input').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                const searchTerm = this.value.trim();
-                if (searchTerm) {
-                    alert(`Searching for: ${searchTerm}`);
-                }
-            }
-        });
-    </script>
 </body>
 </html>

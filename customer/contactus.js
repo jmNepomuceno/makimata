@@ -129,9 +129,7 @@ class TutorialManager {
               </div>
               <div class="tutorial-card-footer">
                   <span class="last-updated">Updated: ${new Date(tutorial.last_updated).toLocaleDateString("en-US", { month: "short", day: "numeric" })}</span>
-                  <div class="action-buttons">
-                      <button class="btn-icon edit-btn" title="Edit" onclick="event.preventDefault(); event.stopPropagation(); tutorialManager.openTutorialModal(${tutorial.id})"><i class="fas fa-edit"></i></button>
-                  </div>
+                  
               </div>
           </${cardTag}>
         `;
