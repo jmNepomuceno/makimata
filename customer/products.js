@@ -1148,8 +1148,6 @@ function renderCompletedOrders(orders) {
 }
 
 
-
-
 function fetchOrders(filters = {}) {
     $.ajax({
         url: "../assets/php/fetch_user_orders.php",
@@ -1338,9 +1336,6 @@ function setupEventListeners() {
         };
         fetchOrders(filters);
     });
-
-
-    
 
 
     $('#logout-btn').click(() => {
@@ -1613,6 +1608,7 @@ function fetchProducts() {
                 console.log(PRODUCTS)
                 renderProducts(PRODUCTS);
                 paginateAndRender(PRODUCTS);
+
             } else {
                 productsGrid.innerHTML = `<div class="no-products">Error: ${response.message}</div>`;
             }
