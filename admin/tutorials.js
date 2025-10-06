@@ -1,51 +1,4 @@
-function generateMockTutorials() {
-  return [
-    {
-      id: 1,
-      title: "Getting Started with MIKAMATA",
-      description: "Learn the basics of using our platform.",
-      type: "video",
-      views: 2847,
-      videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ", // Example URL
-      articleUrl: null,
-      lastUpdated: "2024-03-15",
-      image: "../mik/tutorials/getting-started.jpg",
-    },
-    {
-      id: 2,
-      title: "Advanced Product Configuration Guide",
-      description: "Master advanced product settings with this comprehensive guide.",
-      type: "article",
-      views: 1234,
-      videoUrl: null,
-      articleUrl: "https://www.example.com/articles/advanced-config", // Example URL
-      lastUpdated: "2024-03-12",
-      image: "../mik/tutorials/product-config.jpg",
-    },
-    {
-      id: 3,
-      title: "Common Issues and Solutions",
-      description: "A quick guide to troubleshoot common problems you might encounter.",
-      type: "article",
-      views: 3456,
-      videoUrl: null,
-      articleUrl: "https://www.example.com/articles/troubleshooting", // Example URL
-      lastUpdated: "2024-03-10",
-      image: "../mik/tutorials/troubleshooting.jpg",
-    },
-    // Add more mock data to test pagination
-    ...Array.from({ length: 20 }, (_, i) => ({
-      id: i + 4,
-      title: `Another Tutorial Title ${i + 1}`,
-      description: `Description for tutorial ${i + 1}`,
-      type: ["video", "article"][i % 2],
-      videoUrl: i % 2 === 0 ? "https://www.youtube.com/watch?v=dQw4w9WgXcQ" : null,
-      articleUrl: i % 2 !== 0 ? `https://www.example.com/articles/tutorial-${i + 1}` : null,
-      lastUpdated: `2024-02-${10 + i}`,
-      image: `../mik/tutorials/placeholder-${i % 5}.jpg`, // Use a few rotating placeholders
-    })),
-  ]
-}
+
 
 class TutorialManager {
   constructor() {
@@ -82,29 +35,61 @@ class TutorialManager {
     this.setupEventListeners()
   }
 
-  async loadTutorials() {
-    try {
-      // --- DATABASE INTEGRATION PLACEHOLDER ---
-      // const response = await fetch('/api/tutorials');
-      // this.tutorials = await response.json();
+  // async loadTutorials() {
+  //   console.log('here')
+  //   try {
+  //     // --- DATABASE INTEGRATION PLACEHOLDER ---
+  //     // const response = await fetch('/api/tutorials');
+  //     // this.tutorials = await response.json();
 
-      // For demo, use mock data
-      const savedTutorials = localStorage.getItem("mikamataTutorials");
-      this.tutorials = savedTutorials ? JSON.parse(savedTutorials) : generateMockTutorials();
-      this.saveTutorialsToStorage();
-    } catch (error) {
-      console.error("Error loading tutorials from localStorage:", error)
-      this.tutorials = generateMockTutorials()
-    }
-    this.filteredTutorials = [...this.tutorials]
-    this.renderTutorials()
+  //     // For demo, use mock data
+  //     const savedTutorials = localStorage.getItem("mikamataTutorials");
+  //     this.tutorials = savedTutorials ? JSON.parse(savedTutorials) : generateMockTutorials();
+  //     this.saveTutorialsToStorage();
+  //   } catch (error) {
+  //     console.error("Error loading tutorials from localStorage:", error)
+  //     this.tutorials = generateMockTutorials()
+  //   }
+  //   this.filteredTutorials = [...this.tutorials]
+  //   this.renderTutorials()
+  // }
+
+  // saveTutorialsToStorage() {
+  //   // --- DATABASE INTEGRATION PLACEHOLDER ---
+  //   // This will be removed. Saving is done via API calls.
+  //   localStorage.setItem("mikamataTutorials", JSON.stringify(this.tutorials));
+  // }
+
+  getTutorialIcon(type) {
+    return type === "video" ? "fas fa-play-circle" : "fas fa-file-alt";
   }
 
-  saveTutorialsToStorage() {
-    // --- DATABASE INTEGRATION PLACEHOLDER ---
-    // This will be removed. Saving is done via API calls.
-    localStorage.setItem("mikamataTutorials", JSON.stringify(this.tutorials));
+  loadTutorials() {
+    $.ajax({
+      url: "../assets/php_admin/fetch_tutorials.php", // your PHP backend
+      type: "GET",
+      dataType: "json",
+      success: (res) => {
+        console.log(res)
+        if (res.status === "success") {
+          this.tutorials = res.data;           // store raw tutorials
+          this.filteredTutorials = this.tutorials; // default filter
+          this.renderTutorials();              // render the fetched data
+        } else {
+          $("#tutorials-view").html(
+            `<p style="text-align:center; padding:2rem;">${res.message}</p>`
+          );
+        }
+      },
+      error: (xhr, status, err) => {
+        console.error("AJAX Error:", err);
+        $("#tutorials-view").html(
+          `<p style="text-align:center; padding:2rem; color:red;">Failed to load tutorials.</p>`
+        );
+      }
+    });
   }
+
 
   renderTutorials() {
     const gridView = document.getElementById("tutorials-view")
@@ -121,37 +106,40 @@ class TutorialManager {
     }
 
     gridView.innerHTML = paginatedTutorials
-      .map(
-        (tutorial) => {
-          const link = tutorial.type === 'video' ? tutorial.videoUrl : tutorial.articleUrl;
-          const isClickable = !!link; // Card is clickable if a link exists, regardless of status
-          const cardTag = isClickable ? 'a' : 'div'; // Use 'a' tag if clickable
-          const cardHref = isClickable ? `href="${link}" target="_blank"` : ''; // Add href if it's a link
+      .map((tutorial) => {
+        const link = tutorial.type === 'video' ? tutorial.video_url : tutorial.article_url
+        const isClickable = !!link
+        const cardTag = isClickable ? 'a' : 'div'
+        const cardHref = isClickable ? `href="${link}" target="_blank"` : ''
 
-          return `
-              <${cardTag} class="tutorial-card ${!isClickable ? 'not-clickable' : ''}" ${cardHref}>
-                  <div class="tutorial-card-thumbnail">
-                      <img src="${tutorial.image}" alt="${tutorial.title}">
-                      <span class="type-badge ${tutorial.type}"><i class="fas ${tutorial.type === "video" ? "fa-play" : "fa-file-alt"}"></i> ${tutorial.type}</span>
+        return `
+          <${cardTag} class="tutorial-card ${!isClickable ? 'not-clickable' : ''}" ${cardHref}>
+              <div class="tutorial-card-thumbnail">
+                  <div class="tutorial-icon">
+                    <i class="${this.getTutorialIcon(tutorial.type)}"></i>
                   </div>
-                  <div class="tutorial-card-content">
-                      <h4 class="tutorial-title">${tutorial.title}</h4>
-                      <p class="tutorial-description">${tutorial.description}</p>
+                  <span class="type-badge ${tutorial.type}">
+                    <i class="fas ${tutorial.type === "video" ? "fa-play" : "fa-file-alt"}"></i> ${tutorial.type}
+                  </span>
+              </div>
+              <div class="tutorial-card-content">
+                  <h4 class="tutorial-title"><b>Title</b>: ${tutorial.title}</h4>
+                  <p class="tutorial-description"><i>Description: </i>${tutorial.description}</p>
+              </div>
+              <div class="tutorial-card-footer">
+                  <span class="last-updated">Updated: ${new Date(tutorial.last_updated).toLocaleDateString("en-US", { month: "short", day: "numeric" })}</span>
+                  <div class="action-buttons">
+                      <button class="btn-icon edit-btn" title="Edit" onclick="event.preventDefault(); event.stopPropagation(); tutorialManager.openTutorialModal(${tutorial.id})"><i class="fas fa-edit"></i></button>
                   </div>
-                  <div class="tutorial-card-footer">
-                      <span class="last-updated">Updated: ${new Date(tutorial.lastUpdated).toLocaleDateString("en-US", { month: "short", day: "numeric" })}</span>
-                      <div class="action-buttons">
-                          <button class="btn-icon edit-btn" title="Edit" onclick="event.preventDefault(); event.stopPropagation(); tutorialManager.openTutorialModal(${tutorial.id})"><i class="fas fa-edit"></i></button>
-                      </div>
-                  </div>
-              </${cardTag}>
-          `;
-        }
-      )
+              </div>
+          </${cardTag}>
+        `;
+      })
       .join("")
 
     this.renderPagination()
   }
+
 
   renderPagination() {
     const paginationInfo = document.getElementById("pagination-info")
@@ -262,6 +250,7 @@ class TutorialManager {
   }
 
   openTutorialModal(tutorialId = null) {
+    console.log('here')
     const modal = document.getElementById("tutorial-modal")
     const modalTitle = document.getElementById("modal-title")
     const form = document.getElementById("tutorial-form")
@@ -310,82 +299,91 @@ class TutorialManager {
   async deleteTutorial(tutorialId) {
     const confirmed = await showConfirmation("Are you sure you want to delete this tutorial?", "Delete");
     if (confirmed) {
-        try {
-            // --- DATABASE INTEGRATION PLACEHOLDER ---
-            this.tutorials = this.tutorials.filter(t => t.id !== tutorialId);
-            this.saveTutorialsToStorage();
-            this.filterAndRender();
-            this.closeTutorialModal();
-            this._createLog("delete", `Deleted tutorial ID: ${tutorialId}`, "warning");
+      $.ajax({
+        url: "../assets/php_admin/delete_tutorial.php",
+        type: "POST",
+        data: { id: tutorialId },
+        dataType: "json",
+        success: (res) => {
+          if (res.status === "success") {
             showToast('Tutorial deleted successfully.', 'error');
-        } catch (error) {
-            showToast('Could not delete tutorial.', 'error');
+            this.closeTutorialModal();
+            this.loadTutorials(); // refresh DB data
+          } else {
+            showToast(res.message || 'Could not delete tutorial.', 'error');
+          }
+        },
+        error: (xhr, status, err) => {
+          console.error("AJAX error:", err);
+          showToast('Could not delete tutorial.', 'error');
         }
+      });
     }
   }
 
+
   async saveTutorial() {
+    console.log('save')
     const form = document.getElementById("tutorial-form")
     const tutorialId = Number.parseInt(form.querySelector("#tutorial-id").value)
     const isNew = !tutorialId;
 
     const tutorialData = {
+      id: tutorialId,
       title: form.querySelector("#tutorial-title").value,
       description: form.querySelector("#tutorial-description").value,
       type: form.querySelector("#tutorial-type").value,
       videoUrl: form.querySelector("#video-url").value,
       articleUrl: form.querySelector("#article-url").value,
-      lastUpdated: new Date().toISOString().split("T")[0], // Set to today
+      lastUpdated: new Date().toISOString().split("T")[0], // today
     }
 
     try {
-        // Automatically determine the image URL
-        if (tutorialData.type === 'video' && tutorialData.videoUrl) {
-            const youtubeId = this.getYouTubeVideoId(tutorialData.videoUrl);
-            if (youtubeId) {
-                tutorialData.image = `https://img.youtube.com/vi/${youtubeId}/mqdefault.jpg`;
-            } else {
-                tutorialData.image = this.getPlaceholderImage(tutorialData.videoUrl);
-            }
-        } else if (tutorialData.type === 'article' && tutorialData.articleUrl) {
-            // For articles, fetch the preview image from the URL
-            const response = await fetch(`https://api.microlink.io?url=${encodeURIComponent(tutorialData.articleUrl)}`);
-            const linkData = await response.json();
-            tutorialData.image = linkData.data?.image?.url || this.getPlaceholderImage(tutorialData.articleUrl);
-        } else {
-            tutorialData.image = this.getPlaceholderImage();
+      // --- thumbnail generation (same logic you had) ---
+      if (tutorialData.type === 'video' && tutorialData.videoUrl) {
+        const youtubeId = this.getYouTubeVideoId(tutorialData.videoUrl);
+        tutorialData.image = youtubeId
+          ? `https://img.youtube.com/vi/${youtubeId}/mqdefault.jpg`
+          : this.getPlaceholderImage(tutorialData.videoUrl);
+      } else if (tutorialData.type === 'article' && tutorialData.articleUrl) {
+        try {
+          const response = await fetch(`https://api.microlink.io?url=${encodeURIComponent(tutorialData.articleUrl)}`);
+          const linkData = await response.json();
+          tutorialData.image = linkData.data?.image?.url || this.getPlaceholderImage(tutorialData.articleUrl);
+        } catch {
+          tutorialData.image = this.getPlaceholderImage(tutorialData.articleUrl);
         }
+      } else {
+        tutorialData.image = this.getPlaceholderImage();
+      }
     } catch (e) {
-        console.error("Error fetching thumbnail:", e);
-        tutorialData.image = this.getPlaceholderImage(tutorialData.videoUrl || tutorialData.articleUrl);
+      console.error("Error fetching thumbnail:", e);
+      tutorialData.image = this.getPlaceholderImage();
     }
 
-    try {
-        // --- DATABASE INTEGRATION PLACEHOLDER ---
-        if (isNew) {
-            // CREATE (POST)
-            // const response = await fetch('/api/tutorials', { method: 'POST', body: JSON.stringify(tutorialData) });
-            tutorialData.id = Date.now();
-            this.tutorials.unshift(tutorialData);
-            this._createLog("create", `Created new tutorial: "${tutorialData.title}"`);
+    // --- AJAX call to PHP ---
+    $.ajax({
+      url: isNew ? "../assets/php_admin/add_tutorial.php" : "../assets/php_admin/update_tutorial.php",
+      type: "POST",
+      data: tutorialData,
+      dataType: "json",
+      success: (res) => {
+        console.log(res)
+        if (res.status === "success") {
+          showToast(`Tutorial ${isNew ? 'added' : 'updated'} successfully!`, 'success');
+          this.closeTutorialModal();
+          this.loadTutorials(); // <-- refresh from DB
         } else {
-            // UPDATE (PUT)
-            // const response = await fetch(`/api/tutorials/${tutorialId}`, { method: 'PUT', body: JSON.stringify(tutorialData) });
-            const index = this.tutorials.findIndex((t) => t.id === tutorialId);
-            this.tutorials[index] = { ...this.tutorials[index], ...tutorialData };
-            this._createLog("update", `Updated tutorial: "${tutorialData.title}"`);
+          showToast(res.message || 'Failed to save tutorial.', 'error');
         }
-
-        showToast('Tutorial saved successfully!', 'success');
-        this.closeTutorialModal();
-
-    } catch (error) {
-        console.error('Failed to save tutorial:', error);
+      },
+      error: (xhr, status, err) => {
+        console.error("AJAX error:", err);
         showToast('Could not save tutorial.', 'error');
-    }
-    this.saveTutorialsToStorage() // Save changes to localStorage
-    this.filterAndRender()
+      }
+    });
   }
+
   
   /**
    * Generates a consistent or random placeholder image.

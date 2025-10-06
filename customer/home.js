@@ -395,37 +395,83 @@ const PRODUCTS = [
         });
     }
 
+    function loadFeaturedProducts() {
+      const grid = document.querySelector(".featured .grid");
+      if (!grid) return;
+
+      $.ajax({
+          url: "../assets/php/fetch_new_products.php", // adjust path
+          type: "GET",
+          dataType: "json",
+          success: function(response) {
+              if (response.status !== "success") {
+                  grid.innerHTML = `<p style="grid-column: 1 / -1; text-align:center; padding:2rem;">Failed to load products.</p>`;
+                  return;
+              }
+
+              const products = response.data;
+              grid.innerHTML = "";
+
+              if (products.length === 0) {
+                  grid.innerHTML = `<p style="grid-column: 1 / -1; text-align:center; padding:2rem;">No products available.</p>`;
+                  return;
+              }
+
+              products.forEach(product => {
+                  const cardHTML = `
+                      <article class="card" data-product-id="${product.id}">
+                          <div class="card-media">
+                              <img src="${product.image}" alt="${product.name}">
+                          </div>
+                          <div class="card-meta">
+                              <p class="title">${product.name}</p>
+                              <p class="price">₱${parseFloat(product.price).toFixed(2)}</p>
+                          </div>
+                      </article>
+                  `;
+                  grid.insertAdjacentHTML("beforeend", cardHTML);
+              });
+          },
+          error: function(xhr, status, error) {
+              console.error("AJAX Error:", error);
+              grid.innerHTML = `<p style="grid-column: 1 / -1; text-align:center; padding:2rem;">Error fetching products.</p>`;
+          }
+      });
+  }
+
+
     document.addEventListener('DOMContentLoaded', () => {
-        const categoryFilters = document.querySelector('.category-filters');
-        const productsGrid = document.getElementById('productsGrid');
+      loadFeaturedProducts()
+        // const categoryFilters = document.querySelector('.category-filters');
+        // const productsGrid = document.getElementById('productsGrid');
 
-        loadCartAndWishlist();
-        // updateCounts();
+        // loadCartAndWishlist();
+        // // updateCounts();
 
-        const initialCategory = categoryFilters?.querySelector('.category-btn.active')?.dataset.category || 'lampshades';
-        displayProducts(initialCategory);
+        // const initialCategory = categoryFilters?.querySelector('.category-btn.active')?.dataset.category || 'lampshades';
+        // displayProducts(initialCategory);
 
-        if (categoryFilters) {
-            categoryFilters.addEventListener('click', (event) => {
-                const button = event.target.closest('.category-btn');
-                if (!button) return;
+        // if (categoryFilters) {
+        //     categoryFilters.addEventListener('click', (event) => {
+        //         const button = event.target.closest('.category-btn');
+        //         if (!button) return;
 
-                categoryFilters.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
-                button.classList.add('active');
-                displayProducts(button.dataset.category);
-            });
-        }
+        //         categoryFilters.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
+        //         button.classList.add('active');
+        //         displayProducts(button.dataset.category);
+        //     });
+        // }
 
-        if (productsGrid) {
-            productsGrid.addEventListener('click', (event) => {
-                const card = event.target.closest('.product-card');
-                if (!card) return;
-                const productId = parseInt(card.dataset.productId);
+        // if (productsGrid) {
+        //     productsGrid.addEventListener('click', (event) => {
+        //         const card = event.target.closest('.product-card');
+        //         if (!card) return;
+        //         const productId = parseInt(card.dataset.productId);
 
-                if (event.target.closest('.cart-btn')) addToCart(productId);
-                if (event.target.closest('.wishlist-btn')) toggleWishlist(productId);
-            });
-        }
+        //         if (event.target.closest('.cart-btn')) addToCart(productId);
+        //         if (event.target.closest('.wishlist-btn')) toggleWishlist(productId);
+        //     });
+        // }
 
         function showToast(message, type = "info") {
           const container = $("#toast-container");

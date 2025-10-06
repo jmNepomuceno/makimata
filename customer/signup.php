@@ -147,6 +147,13 @@
     </div>
 
 
+    <div id="loadingOverlay">
+        <div class="spinner"></div>
+        <p>Sending verification email...</p>
+    </div>
+
+
+
     <!-- <script src="address.js"></script> -->
 
     <script src="../assets/js/signup.js"></script>

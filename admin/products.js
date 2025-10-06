@@ -346,7 +346,6 @@ class ProductManager {
   }
 
   renderPagination() {
-    
     const totalProducts = this.filteredProducts.length;
     const totalPages = Math.ceil(totalProducts / this.pageSize);
 
@@ -394,8 +393,6 @@ class ProductManager {
       });
     });
   }
-
-
 
   openProductModal(productId = null) {
     const modal = document.querySelector("#product-modal")
@@ -572,15 +569,27 @@ class ProductManager {
     const confirmed = await showConfirmation('Are you sure you want to delete this product?', 'Delete');
     if (confirmed) {
       const deletingToast = await showToast('Deleting product...', 'info', { duration: 0 });
-      try {
-        // --- DATABASE INTEGRATION PLACEHOLDER ---
+       try {
+        // ✅ Send AJAX request to PHP
+        const response = await $.ajax({
+          url: '../assets/php_admin/delete_product.php',
+          type: 'POST',
+          data: { product_id: id },
+          dataType: 'json'
+        });
 
-        this.products = this.products.filter((p) => p.id !== id);
-        this._createLog('delete', `Deleted product with ID: ${id}`, 'warning');
-        this.saveProductsToStorage();
-        showToast('Product deleted successfully.', 'success', { toastInstance: deletingToast });
-        this.filterAndRender();
-        this.updateProductStats()
+        if (response.status === 'success') {
+          // ✅ Remove product from local array
+          this.products = this.products.filter((p) => p.id !== id);
+          this._createLog('delete', `Deleted product ID: ${id}`, 'warning');
+          this.saveProductsToStorage();
+
+          showToast('Product deleted successfully.', 'success', { toastInstance: deletingToast });
+          this.filterAndRender();
+          this.updateProductStats();
+        } else {
+          showToast(response.message || 'Failed to delete product.', 'error', { toastInstance: deletingToast });
+        }
       } catch (error) {
         console.error("Error deleting product:", error)
         showToast('Failed to delete product.', 'error', { toastInstance: deletingToast });

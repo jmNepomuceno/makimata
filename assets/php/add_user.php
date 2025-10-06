@@ -54,29 +54,29 @@ try {
     $user_id = $pdo->lastInsertId();
 
     // --- Send OTP via Email (PHPMailer) ---
-    // $mail = new PHPMailer(true);
-    // try {
-    //     $mail->isSMTP();
-    //     $mail->Host       = 'smtp.gmail.com'; // Gmail SMTP server
-    //     $mail->SMTPAuth   = true;
-    //     $mail->Username   = 'makimatamakimata@gmail.com';   // your email
-    //     $mail->Password   = 'bcvn hegt gryv ubav';     // Gmail app password
-    //     $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-    //     $mail->Port       = 587;
+    $mail = new PHPMailer(true);
+    try {
+        $mail->isSMTP();
+        $mail->Host       = 'smtp.gmail.com'; // Gmail SMTP server
+        $mail->SMTPAuth   = true;
+        $mail->Username   = 'makimatamakimata@gmail.com';   // your email
+        $mail->Password   = 'bcvn hegt gryv ubav';     // Gmail app password
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Port       = 587;
 
-    //     $mail->setFrom('makimatamakimata@gmail.com', 'makimata');
-    //     $mail->addAddress($email, $firstname.' '.$lastname);
+        $mail->setFrom('makimatamakimata@gmail.com', 'makimata');
+        $mail->addAddress($email, $firstname.' '.$lastname);
 
-    //     $mail->isHTML(true);
-    //     $mail->Subject = "Your OTP Code";
-    //     $mail->Body    = "Hello <b>$firstname</b>,<br><br>Your OTP is: <b>$otp</b><br>This code will expire in 5 minutes.";
-    //     $mail->AltBody = "Your OTP is: $otp";
+        $mail->isHTML(true);
+        $mail->Subject = "Your OTP Code";
+        $mail->Body    = "Hello <b>$firstname</b>,<br><br>Your OTP is: <b>$otp</b><br>This code will expire in 5 minutes.";
+        $mail->AltBody = "Your OTP is: $otp";
 
-    //     $mail->send();
-    // } catch (Exception $e) {
-    //     echo json_encode(["status"=>"error","message"=>"Could not send OTP email. Mailer Error: {$mail->ErrorInfo}"]);
-    //     exit;
-    // }
+        $mail->send();
+    } catch (Exception $e) {
+        echo json_encode(["status"=>"error","message"=>"Could not send OTP email. Mailer Error: {$mail->ErrorInfo}"]);
+        exit;
+    }
 
     // Insert notification for admin
     $stmtNotif = $pdo->prepare("INSERT INTO notifications (type, icon, title, message, recipient, target_id, link)

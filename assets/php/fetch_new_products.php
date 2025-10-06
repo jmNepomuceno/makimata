@@ -15,16 +15,16 @@ try {
                 category, 
                 image, 
                 images
-            FROM products";
+            FROM products WHERE stock_status='new'
+            ORDER BY product_ID ASC
+            LIMIT 8"; // get first 8 products for featured section
     $stmt = $pdo->prepare($sql);
     $stmt->execute();
     $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // Decode JSON column "images" into array
     foreach ($products as &$product) {
         if (!empty($product['images'])) {
-            $decoded = json_decode($product['images'], true);
-            $product['images'] = $decoded ?: [];
+            $product['images'] = json_decode($product['images'], true);
         } else {
             $product['images'] = [];
         }
@@ -41,3 +41,5 @@ try {
         "message" => $e->getMessage()
     ]);
 }
+
+?>

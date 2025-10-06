@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Customers - MIKAMATA Admin</title>
+  <title>Admin - MIKAMATA Admin</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link rel="stylesheet" href="admin.css">
   <link rel="stylesheet" href="customers.css">
@@ -13,6 +13,58 @@
     body {
       zoom: 80%;
     }
+    .custom-modal {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+    }
+
+    .custom-modal-content {
+        background: #fff;
+        padding: 2rem;
+        border-radius: 10px;
+        width: 100%;
+        max-width: 400px;
+        position: relative;
+    }
+
+    .close-modal {
+        position: absolute;
+        right: 15px;
+        top: 10px;
+        font-size: 1.5rem;
+        cursor: pointer;
+    }
+
+    .custom-modal .form-group {
+        margin-bottom: 1rem;
+    }
+
+    .custom-modal input {
+        width: 100%;
+        padding: 0.6rem;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    .btn-delete {
+        background-color: #e74c3c;
+        color: #fff;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .btn-delete:hover {
+        background-color: #c0392b;
+    }
+
+
   </style>
 </head>
 <body>
@@ -27,12 +79,12 @@
           <li><a href="dashboard.php"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
           <li><a href="products.php"><i class="fas fa-cubes"></i> <span>Products</span></a></li>
           <li><a href="orders.php"><i class="fas fa-shopping-cart"></i> <span>Orders</span></a></li>
-          <li><a href="customers.php" class="active"><i class="fas fa-user-group"></i> <span>Customers</span></a></li>
+          <li><a href="customers.php" ><i class="fas fa-user-group"></i> <span>Customers</span></a></li>
           <li><a href="tutorials.php"><i class="fas fa-book-open"></i> <span>Tutorials</span></a></li>
           <li><a href="reviews.php"><i class="fas fa-star"></i> <span>Reviews</span></a></li>
           <li><a href="notifications.php"><i class="fas fa-bell"></i> <span>Notifications</span></a></li>
           <li><a href="activity-logs.php"><i class="fas fa-clipboard-list"></i> <span>Activity Logs</span></a></li>
-          <li><a href="admin.php"><i class="fas fa-user-group"></i> <span>Admin</span></a></li>
+          <li><a href="admin.php" class="active"><i class="fas fa-user-group"></i> <span>Admin</span></a></li>
         </ul>
         <div class="sidebar-bottom-nav">
           <ul>
@@ -49,7 +101,7 @@
           <nav class="breadcrumbs as-title">
             <a href="dashboard.html">Dashboard</a>
             <span class="separator">&gt;</span>
-            <span>Customers</span>
+            <span>Admin</span>
           </nav>
           <p id="current-date"></p>
         </div>
@@ -64,7 +116,7 @@
             </div>
             <div class="stat-info">
               <h3 id="total-customers-count">0</h3>
-              <p>Total Customers</p>
+              <p>Total Admin</p>
             </div>
           </div>
           <div class="stat-card">
@@ -89,17 +141,22 @@
                 <i class="fas fa-search"></i>
                 <input type="text" placeholder="Search by Name or Email" id="customer-search">
               </div>
+
               <div class="pagination-wrapper top-pagination">
                 <div class="pagination-info" id="pagination-info-top"></div>
                 <div class="pagination" id="pagination-controls-top"></div>
               </div>
+
+                <button class="btn btn-primary" id="add-admin-btn">
+                    <i class="fas fa-user-plus"></i> Add Admin
+                </button>
             </div>
           </div>
           <table class="customers-table">
             <thead>
               <tr>
                 <th><input type="checkbox" id="select-all"></th>
-                <th>Customer ID</th>
+                <th>Admin ID</th>
                 <th>First Name</th>
                 <th>Last Name</th>
                 <th>Email</th>
@@ -256,6 +313,38 @@
     </div>
   </div>
 
-  <script src="customers.js"></script>
+    <!-- Add Admin Modal -->
+    <div class="custom-modal" id="addAdminModal" style="display: none;">
+        <div class="custom-modal-content">
+            <span class="close-modal" id="closeAddAdmin">&times;</span>
+            <h2>Add New Admin</h2>
+            <form id="addAdminForm">
+            <div class="form-group">
+                <label>First Name</label>
+                <input type="text" name="firstname" required>
+            </div>
+            <div class="form-group">
+                <label>Last Name</label>
+                <input type="text" name="lastname" required>
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" name="username" required>
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" name="password" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Admin</button>
+            </form>
+        </div>
+    </div>
+
+
+  <script src="admin_management.js"></script>
 </body>
 </html>

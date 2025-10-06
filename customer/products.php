@@ -488,9 +488,10 @@
 
                 <!-- Pagination -->
                 <div class="pagination">
-                    <button class="page-btn active">1</button>
-                    <button class="page-btn">2</button>
-                    <button class="page-btn">></button>
+                    <button class="page-btn prev">&lt;</button>
+                    <button class="page-btn active" data-page="1">1</button>
+                    <button class="page-btn" data-page="2">2</button>
+                    <button class="page-btn next">&gt;</button>
                 </div>
             </div>
         </section>
@@ -564,15 +565,55 @@
 
             <!-- Filter Section -->
             <div class="modal-filters">
-            <label>Start Date: <input type="date" id="completedStartDate"></label>
-            <label>End Date: <input type="date" id="completedEndDate"></label>
-            <button id="applyCompletedFilters" class="filter-btn">Apply Filters</button>
+                <label>Start Date: <input type="date" id="completedStartDate"></label>
+                <label>End Date: <input type="date" id="completedEndDate"></label>
+                <button id="applyCompletedFilters" class="filter-btn">Apply Filters</button>
             </div>
 
             <!-- Orders List -->
             <div class="modal-body complete-orders-body" id="completedOrdersList">
             <!-- Orders will be injected here -->
             </div>
+        </div>
+    </div>
+
+    <div id="order-detail-modal" class="modal">
+        <div class="modal-content large">
+        <div class="modal-header">
+            <h3>Order Details #<span id="modal-order-id"></span></h3>
+            <!-- <span class="close" onclick="closeOrderDetailModal()">&times;</span> -->
+            <span class="close">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div class="order-detail-layout">
+            <div class="order-detail-main">
+                <!-- Order Items -->
+                <div class="details-section">
+                <h4><i class="fas fa-list"></i> Order Items (<span id="modal-item-count">0</span>)</h4>
+                <div id="modal-order-items-list" class="order-items-list"> 
+                </div>
+                </div>
+            </div>
+
+            <div class="order-detail-sidebar">
+                <!-- Customer Info Card -->
+                <div class="details-section">
+                <h4><i class="fas fa-user"></i> Customer</h4>
+                <div class="detail-row"><strong>Name:</strong> <span id="modal-customer-name"></span></div>
+                <div class="detail-row"><strong>Email:</strong> <span id="modal-customer-email"></span></div>
+                <div class="detail-row"><strong>Contact:</strong> <span id="modal-customer-phone"></span></div>
+                <div class="detail-row"><strong>Shipping:</strong> <span id="modal-shipping-address"></span></div>
+                </div>
+
+                <!-- Totals Card -->
+                <div class="details-section">
+                <h4><i class="fas fa-receipt"></i> Totals</h4>
+                <div class="totals-summary" id="modal-totals-summary"> 
+                </div>
+                </div>
+            </div>
+            </div>
+        </div>
         </div>
     </div>
 

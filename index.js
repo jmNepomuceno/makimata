@@ -22,6 +22,7 @@ $(document).ready(function () {
                 if (response.status === "success") {
                     // alert("Login successful!");
                     // Redirect to dashboard or homepage
+                    console.log(window.location.href)
                     window.location.href = "./customer/home.php";
                 } else {
                     showToast("⚠️ " + response.message, "error");

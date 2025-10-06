@@ -882,32 +882,58 @@
 /* --- Receipt Style for Order Detail Modal --- */
 
 /* Make the modal narrow like a receipt */
+/* Modal container: like a printed receipt */
+/* Modal Content */
 #order-detail-modal .modal-content.large {
-  max-width: 700px; /* Narrower width for receipt style */
+  max-width: 700px;
   width: 98vw;
-  background-color: #ffffff;
+  background-color: #f9fafb;
   color: #1a202c;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+  border: 1px solid #e5e7eb;
 }
 
-/* Use a single column layout */
-#order-detail-modal .order-detail-layout {
-  grid-template-columns: 1fr;
-  gap: 0;
+/* Header */
+#order-detail-modal .modal-header {
+  background: #2563eb; /* blue accent */
+  color: #fff;
+  padding: 1rem;
+  text-align: center;
+  border-bottom: 3px solid #1e40af;
 }
 
-/* Set title color to black */
-#order-detail-modal .modal-header h3,
+#order-detail-modal .modal-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+#order-detail-modal .modal-header h3::before {
+  content: "🧾";
+  font-size: 1.3rem;
+}
+
 #order-detail-modal .modal-header .close {
-  color: #1a202c;
+  color: #fff;
+  font-size: 1.2rem;
 }
 
-
-/* Remove default section styling and use dashed separators */
+/* Sections */
 #order-detail-modal .details-section {
   background: none;
   border: none;
-  padding: 0.75rem 0;
-  border-bottom: 2px dashed #cccccc;
+  padding: 1rem;
+  border-bottom: 2px dashed #d1d5db;
+}
+
+#order-detail-modal .details-section:nth-child(odd) {
+  background: #f3f4f6;
 }
 
 #order-detail-modal .details-section:last-child {
@@ -915,65 +941,83 @@
 }
 
 #order-detail-modal .details-section h4 {
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   text-transform: uppercase;
   letter-spacing: 1px;
   margin-bottom: 1rem;
   text-align: center;
   color: #374151;
+  font-weight: 600;
 }
 
-/* Remove images from the item list for a cleaner receipt look */
-#order-detail-modal .order-item .item-image {
-  display: none;
-}
-
-/* Style each line item */
+/* Order Items */
 #order-detail-modal .order-item {
-  background: none;
   border: none;
-  padding: 0.25rem 0;
-  gap: 0.5rem;
+  padding: 0.5rem 0;
+  display: flex;
+  gap: 0.75rem;
   align-items: flex-start;
+  border-bottom: 1px dashed #e5e7eb;
 }
 
-#order-detail-modal .order-item .item-details {
-  flex: 1;
+#order-detail-modal .order-item:last-child {
+  border-bottom: none;
 }
 
 #order-detail-modal .order-item .item-name {
-  font-weight: 500;
-  font-size: 0.9rem;
+  font-weight: 600;
+  font-size: 0.95rem;
   color: #111827;
-  margin-bottom: 0;
+  margin-bottom: 0.25rem;
 }
 
-#order-detail-modal .order-item .item-price {
+#order-detail-modal .order-item .item-price,
+#order-detail-modal .order-item .item-total {
   font-family: 'Courier New', Courier, monospace;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   color: #4b5563;
 }
 
 #order-detail-modal .order-item .item-total {
-  font-family: 'Courier New', Courier, monospace;
-  font-weight: 600;
-  font-size: 0.9rem;
-  color: #111827;
+  font-weight: 700;
+  color: #1f2937;
 }
 
-/* Style the customer and totals sections */
+/* Customer & Totals */
 #order-detail-modal .detail-row {
   display: flex;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.4rem;
   font-family: 'Courier New', Courier, monospace;
   font-size: 0.9rem;
+  align-items: center;
 }
 
 #order-detail-modal .detail-row strong {
-  color: #4b5563;
-  min-width: 120px;
+  color: #374151;
+  min-width: 140px;
   flex-shrink: 0;
   margin-right: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+#order-detail-modal .detail-row strong::before {
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+  color: #2563eb;
+}
+
+#order-detail-modal .detail-row.customer-name strong::before {
+  content: "\f007"; /* user icon */
+}
+
+#order-detail-modal .detail-row.order-date strong::before {
+  content: "\f133"; /* calendar */
+}
+
+#order-detail-modal .detail-row.total-amount strong::before {
+  content: "\f155"; /* money bill */
 }
 
 #order-detail-modal .detail-row span {
@@ -981,17 +1025,18 @@
   flex-grow: 1;
 }
 
+/* Totals Summary */
 #order-detail-modal .totals-summary {
   margin-top: 1rem;
   padding-top: 1rem;
-  border-top: 2px dashed #cccccc;
+  border-top: 3px dashed #d1d5db;
 }
 
 #order-detail-modal .totals-summary .detail-row.total {
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   font-weight: bold;
-  border-top: none;
-  margin-top: 0.5rem;
+  color: #2563eb;
 }
+
 
 /* added */

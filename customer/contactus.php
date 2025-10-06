@@ -15,10 +15,10 @@
                 <img src="mik/logo.png" alt="MIKAMATA Logo" style="width: 130px; height: 40px;">
             </div>
             <nav class="nav">
-                <a href="home.html">Home</a>
-                <a href="products.html">Products</a>
-                <a href="aboutus.html">About Us</a>
-                <a href="contactus.html" class="active">Contact Us</a>
+                <a href="home.php">Home</a>
+                <a href="products.php">Products</a>
+                <a href="aboutus.php">About Us</a>
+                <a href="contactus.php" class="active">Contact Us</a>
             </nav>
             <div class="header-actions">
                 <input type="search" class="search-input" placeholder="Search..." />

@@ -20,6 +20,8 @@ $(document).ready(function () {
         setTimeout(() => toast.remove(), 4000);
     }
 
+    
+
     // Signup submit
     $("#signupForm").on("submit", function (e) {
         e.preventDefault();
@@ -37,6 +39,9 @@ $(document).ready(function () {
         formData.push({ name: "barangay", value: $("#barangay option:selected").text() });
         formData.push({ name: "region", value: $("#region option:selected").text() });
 
+        // Show loading
+        $("#loadingOverlay").fadeIn();
+
         $.ajax({
             url: "../assets/php/add_user.php",
             type: "POST",
@@ -44,6 +49,7 @@ $(document).ready(function () {
             dataType: "json",
             success: function(response) {
                 console.log("AJAX Response:", response);
+
                 if(response.status === "pending") {
                     showToast("✅ Account created! OTP sent to your email.", "success");
                     $("#hiddenEmail").val(response.email); // store email in hidden input
@@ -55,17 +61,18 @@ $(document).ready(function () {
             error: function(xhr,status,error){
                 console.error("AJAX Error:",xhr.responseText,status,error);
                 showToast("⚠️ Something went wrong. Check console for details.","error");
+            },
+            complete: function() {
+                // Hide loader after everything is done
+                $("#loadingOverlay").fadeOut();
             }
         });
-
     });
 
     // Verify OTP
     $("#verifyOtpBtn").click(function() {
-        let mobile = $("#hiddenMobile").val().trim();
+        let mobile = $("#contact").val().trim();
         let otp = $("#otpCode").val().trim();
-
-        mobile = "09196044820"
 
         if (!mobile || !otp) {
             $("#result").html("<span style='color:red;'>Both fields are required.</span>");
@@ -85,7 +92,7 @@ $(document).ready(function () {
                     showToast("✅ Your account has been successfully verified!", "success");
                                 // redirect after toast disappears
                     setTimeout(() => {
-                        location.href = "http://10.10.90.14:8020/";
+                        location.href = "http://192.168.100.13:8050/";
                     }, 4000); // match showToast removal time
                 } else if (res.status === "expired") {
                     $("#result").html("<span style='color:red;'>" + res.message + "</span>");

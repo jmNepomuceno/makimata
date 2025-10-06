@@ -6,7 +6,7 @@ header('Content-Type: application/json; charset=utf-8');
 
 try {
     // ✅ Check if user is logged in
-    if (!isset($_SESSION['user'])) {
+    if (!isset($_SESSION['admin'])) {
         throw new Exception("User not logged in.");
     }
 

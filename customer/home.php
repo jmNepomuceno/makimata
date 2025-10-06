@@ -178,7 +178,7 @@
         </article>
       </div>
       <div style="text-align: center; margin-top: 2rem;">
-        <a href="products.html" class="btn cta">View All Products <i class="fa-solid fa-arrow-right"></i></a>
+        <a href="products.php" class="btn cta">View All Products <i class="fa-solid fa-arrow-right"></i></a>
       </div>
     </div>
   </section>

@@ -32,6 +32,7 @@
           <li><a href="reviews.php"><i class="fas fa-star"></i> <span>Reviews</span></a></li>
           <li><a href="notifications.php"><i class="fas fa-bell"></i> <span>Notifications</span></a></li>
           <li><a href="activity-logs.php"><i class="fas fa-clipboard-list"></i> <span>Activity Logs</span></a></li>
+          <li><a href="admin.php"><i class="fas fa-user-group"></i> <span>Admin</span></a></li>
         </ul>
         <div class="sidebar-bottom-nav">
           <ul>
