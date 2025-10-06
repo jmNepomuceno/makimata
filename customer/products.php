@@ -488,9 +488,10 @@
 
                 <!-- Pagination -->
                 <div class="pagination">
-                    <button class="page-btn active">1</button>
-                    <button class="page-btn">2</button>
-                    <button class="page-btn">></button>
+                    <button class="page-btn prev">&lt;</button>
+                    <button class="page-btn active" data-page="1">1</button>
+                    <button class="page-btn" data-page="2">2</button>
+                    <button class="page-btn next">&gt;</button>
                 </div>
             </div>
         </section>

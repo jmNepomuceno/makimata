@@ -1130,8 +1130,6 @@ function renderCompletedOrders(orders) {
 }
 
 
-
-
 function fetchOrders(filters = {}) {
     $.ajax({
         url: "../assets/php/fetch_user_orders.php",
@@ -1322,9 +1320,6 @@ function setupEventListeners() {
     });
 
 
-    
-
-
     $('#logout-btn').click(() => {
         $.ajax({
             url: "../assets/php/logout.php",
@@ -1492,37 +1487,89 @@ function getFilteredProducts() {
 //     });
 // }
 
-function renderProducts(products = PRODUCTS) {
-    if (!products || products.length === 0) {
-        productsGrid.innerHTML = '<div class="no-products">No products found matching your criteria.</div>';
-        return;
-    }
-    console.log(products)
+let currentPage = 1;
+const itemsPerPage = 12; // adjust as needed
 
-    productsGrid.innerHTML = products.map(product => `
-        <div class="product-card" data-id="${product.id}" data-productCode="${product.product_code}">
-            <div class="product-image">
-                <img src="${product.image}" alt="${product.name}" onclick="openCustomization(${product.id})">
-                <div class="product-actions">
-                    <button class="action-btn cart-btn" onclick="openCustomization(${product.id})" title="Customize">
-                        <i class="fas fa-shopping-cart"></i>
-                    </button>
-                    <button class="action-btn review-btn ${wishlistItems.includes(product.id) ? 'active' : ''}" 
-                            onclick="toggleWishlist(event, ${product.id})" title="Add to Wishlist">
-                        <i class="fas fa-heart"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="product-info">
-                <h3>${product.name}</h3>
-                <p class="price">₱${parseFloat(product.price).toFixed(2)}</p>
-                <div class="product-buttons">
-                    <button class="btn-add-cart" onclick="openCustomization(${product.id})">Add to Cart</button>
-                </div>
+function renderPagination(products) {
+  const totalPages = Math.ceil(products.length / itemsPerPage);
+  const paginationContainer = document.querySelector('.pagination');
+  paginationContainer.innerHTML = '';
+
+  // Previous button
+  const prevBtn = document.createElement('button');
+  prevBtn.className = 'page-btn prev';
+  prevBtn.textContent = '<';
+  prevBtn.disabled = currentPage === 1;
+  prevBtn.addEventListener('click', () => changePage(currentPage - 1));
+  paginationContainer.appendChild(prevBtn);
+
+  // Page numbers
+  for (let i = 1; i <= totalPages; i++) {
+    const pageBtn = document.createElement('button');
+    pageBtn.className = 'page-btn';
+    if (i === currentPage) pageBtn.classList.add('active');
+    pageBtn.textContent = i;
+    pageBtn.dataset.page = i;
+    pageBtn.addEventListener('click', () => changePage(i));
+    paginationContainer.appendChild(pageBtn);
+  }
+
+  // Next button
+  const nextBtn = document.createElement('button');
+  nextBtn.className = 'page-btn next';
+  nextBtn.textContent = '>';
+  nextBtn.disabled = currentPage === totalPages;
+  nextBtn.addEventListener('click', () => changePage(currentPage + 1));
+  paginationContainer.appendChild(nextBtn);
+}
+
+function changePage(page) {
+  currentPage = page;
+  paginateAndRender(PRODUCTS);
+}
+
+function paginateAndRender(products) {
+  const start = (currentPage - 1) * itemsPerPage;
+  const end = start + itemsPerPage;
+  const paginatedProducts = products.slice(start, end);
+
+  renderProducts(paginatedProducts);
+  renderPagination(products);
+}
+
+
+function renderProducts(products = PRODUCTS) {
+  const productsGrid = document.querySelector("#productsGrid");
+  if (!products || products.length === 0) {
+    productsGrid.innerHTML = '<div class="no-products">No products found matching your criteria.</div>';
+    return;
+  }
+
+  productsGrid.innerHTML = products.map(product => `
+    <div class="product-card" data-id="${product.id}" data-productCode="${product.product_code}">
+        <div class="product-image">
+            <img src="${product.image}" alt="${product.name}" onclick="openCustomization(${product.id})">
+            <div class="product-actions">
+                <button class="action-btn cart-btn" onclick="openCustomization(${product.id})" title="Customize">
+                    <i class="fas fa-shopping-cart"></i>
+                </button>
+                <button class="action-btn review-btn ${wishlistItems.includes(product.id) ? 'active' : ''}" 
+                        onclick="toggleWishlist(event, ${product.id})" title="Add to Wishlist">
+                    <i class="fas fa-heart"></i>
+                </button>
             </div>
         </div>
-    `).join('');
+        <div class="product-info">
+            <h3>${product.name}</h3>
+            <p class="price">₱${parseFloat(product.price).toFixed(2)}</p>
+            <div class="product-buttons">
+                <button class="btn-add-cart" onclick="openCustomization(${product.id})">Add to Cart</button>
+            </div>
+        </div>
+    </div>
+  `).join('');
 }
+
 
 
 function fetchProducts() {
@@ -1535,6 +1582,8 @@ function fetchProducts() {
                 PRODUCTS = response.data;
                 console.log(PRODUCTS)
                 renderProducts(PRODUCTS);
+                paginateAndRender(PRODUCTS);
+
             } else {
                 productsGrid.innerHTML = `<div class="no-products">Error: ${response.message}</div>`;
             }

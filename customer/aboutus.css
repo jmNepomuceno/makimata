@@ -473,6 +473,11 @@ body {
   pointer-events: none;
 }
 
+#profileModal .modal-content .profile-info #newPassword,
+#profileModal .modal-content .profile-info #confirmPassword{
+  pointer-events: auto;
+}
+
 /* Animation */
 @keyframes fadeIn {
   from {opacity: 0; transform: translateY(-10px) scale(0.95);}
