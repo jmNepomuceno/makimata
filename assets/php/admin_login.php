@@ -13,8 +13,8 @@
             exit;
         }
 
-        $sql = "SELECT id, firstname, lastname, username, password 
-                FROM admin_users 
+        $sql = "SELECT admin_ID, firstname, lastname, username, password 
+                FROM admin 
                 WHERE username = :username 
                 LIMIT 1";
         $stmt = $pdo->prepare($sql);
@@ -26,7 +26,7 @@
             if ($password === $admin['password']) {
                 // Save session
                 $_SESSION['admin'] = [
-                    "id"        => $admin['id'],
+                    "id"        => $admin['admin_ID'],
                     "firstname" => $admin['firstname'],
                     "lastname"  => $admin['lastname'],
                     "username"  => $admin['username']
