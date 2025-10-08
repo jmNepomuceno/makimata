@@ -5,25 +5,24 @@ $(document).ready(function () {
         container.append(toast);
         setTimeout(() => toast.remove(), 4000);
     }
-
     $("#loginForm").on("submit", function (e) {
         e.preventDefault();
 
-        // serialize everything first
         let formData = $(this).serializeArray();
-        console.table(formData)
 
         $.ajax({
-            url: "../assets/php/login_user.php", // backend PHP
+            url: "../assets/php/login_user.php",
             type: "POST",
             data: formData,
             dataType: "json",
             success: function (response) {
+                console.log(response)
                 if (response.status === "success") {
-                    // alert("Login successful!");
-                    // Redirect to dashboard or homepage
-                    console.log(window.location.href)
-                    window.location.href = "./customer/home.php";
+                    if (response.role === "admin") {
+                        window.location.href = "./admin/dashboard.php";
+                    } else {
+                        window.location.href = "./customer/products.php";
+                    }
                 } else {
                     showToast("⚠️ " + response.message, "error");
                 }
@@ -33,4 +32,5 @@ $(document).ready(function () {
             }
         });
     });
+
 });

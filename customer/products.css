@@ -904,6 +904,14 @@ body {
   margin-top: 5px !important;
 }
 
+#quantity{
+  width: 50px;
+  border:none;
+  border-bottom:1px solid gray;
+  text-align: center;
+  outline:none;
+}
+
 .quantity-controls {
   display: flex;
   align-items: center;
@@ -2017,3 +2025,20 @@ body {
   color: #555;
 }
 
+.address-card {
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    padding: 12px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+.address-card:hover {
+    border-color: #999;
+}
+
+.address-card.selected {
+    border-color: #007bff;
+    background-color: #e8f0ff;
+}

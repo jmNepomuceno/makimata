@@ -1,481 +1,3 @@
-// // Product data
-// const PRODUCTS = [          
-//     {
-//         id: 1,
-//         name: "Bamboo Dome Shade",
-//         description: "Dome-shaped bamboo lampshade with smooth strips, designed to diffuse light evenly for a cozy, warm ambiance. Best for salas or reading corners.",
-//         price: 400.0,
-//         stock: 25,
-//         category: "lampshades",
-//         image: "mik/products/lampshade/l1.png",
-//         images: {
-//             default: "mik/products/lampshade/lampshade1.png",
-//             natural: "mik/products/lampshade/ln1.png",
-//             dark: "mik/products/lampshade/ld1.png",
-//             premium: "mik/products/lampshade/lp1.png"
-//         }
-//     },
-//     {
-//         id: 31,
-//         name: "Market Tote Basket",
-//         description: "Open basket with side handles, convenient for shopping or carrying goods.",
-//         price: 350.0,
-//         stock: 15,
-//         category: "basket",
-//         image: "mik/products/basket/b10.png",
-//         images: {
-//             default: "mik/products/basket/basket10.png",
-//             natural: "mik/products/basket/bn10.png",
-//             dark: "mik/products/basket/bd10.png",
-//             premium: "mik/products/basket/bp10.png"
-//         }
-//     },
-    
-//     {
-//         id: 3,
-//         name: "Round Plant Basket",
-//         description: "Circular seagrass basket perfect for holding indoor plants or as a storage accent.",
-//         price: 470.0,
-//         stock: 18,
-//         category: "basket",
-//         image: "mik/products/basket/b1.png",
-//         images: {
-//             default: "mik/products/basket/basket1.png",
-//             natural: "mik/products/basket/bn1.png",
-//             dark: "mik/products/basket/bd1.png",
-//             premium: "mik/products/basket/bp1.png"
-//         }
-//     },
-//     {
-//         id: 12,
-//         name: "Natural Curve Shade",
-//         description: "Rounded shade with slightly arched sides, perfect for soft lighting and adding a natural accent to any room.",
-//         price: 300.0,
-//         stock: 30,
-//         category: "lampshades",
-//         image: "mik/products/lampshade/l2.png",
-//         images: {
-//             default: "mik/products/lampshade/lampshade2.png",
-//             natural: "mik/products/lampshade/ln2.png",
-//             dark: "mik/products/lampshade/ld2.png",
-//             premium: "mik/products/lampshade/lp2.png"
-//         }
-//     },
-//     {
-//         id: 5,
-//         name: "Mini Bamboo Furniture Set",
-//         description: "Decorative small-scale bamboo chairs and tables, great for display or as accent pieces.",
-//         price: 470.0,
-//         stock: 12,
-//         category: "furnitures",
-//         image: "mik/products/furniture/f1.png",
-//         images: {
-//             default: "mik/products/furniture/furniture1.png",
-//             natural: "mik/products/furniture/fn1.png",
-//             dark: "mik/products/furniture/fd1.png",
-//             premium: "mik/products/furniture/fp1.png"
-//         }
-//     },
-//     {
-//         id: 6,
-//         name: "Twin Bamboo Mugs",
-//         description: "Set of two natural bamboo mugs with sturdy handles, designed for morning coffee or tea. Lightweight yet durable for everyday use.",
-//         price: 470.0,
-//         stock: 40,
-//         category: "mugs",
-//         image: "mik/products/mugs/m2.png",
-//         images: {
-//             default: "mik/products/mugs/mug2.png",
-//             natural: "mik/products/mugs/mn2.png",
-//             dark: "mik/products/mugs/md2.png",
-//             premium: "mik/products/mugs/mp2.png"
-//         }
-//     },
-//     {
-//         id: 7,
-//         name: "Bamboo Utility Stool",
-//         description: "Short stool crafted from bamboo, usable as a seat or footrest.",
-//         price: 470.0,
-//         stock: 8,
-//         category: "furnitures",
-//         image: "mik/products/furniture/f2.png",
-//         images: {
-//             default: "mik/products/furniture/furniture2.png",
-//             natural: "mik/products/furniture/fn2.png",
-//             dark: "mik/products/furniture/fd2.png",
-//             premium: "mik/products/furniture/fp2.png"
-//         }
-//     },
-//     {
-//         id: 8,
-//         name: "Compact Side Table",
-//         description: "Small bamboo table that works beside sofas, beds, or reading chairs.",
-//         price: 470.0,
-//         stock: 10,
-//         category: "furnitures",
-//         image: "mik/products/furniture/f3.png",
-//         images: {
-//             default: "mik/products/furniture/furniture3.png",
-//             natural: "mik/products/furniture/fn3.png",
-//             dark: "mik/products/furniture/fd3.png",
-//             premium: "mik/products/furniture/fp3.png"
-//         }
-//     },
-//     {
-//         id: 9,
-//         name: "Classic Bamboo Cup",
-//         description: "Simple handcrafted mug with visible bamboo grain, making each piece unique and organic-looking.",
-//         price: 470.0,
-//         stock: 50,
-//         category: "mugs",
-//         image: "mik/products/mugs/m3.png",
-//         images: {
-//             default: "mik/products/mugs/mug3.png",
-//             natural: "mik/products/mugs/mn3.png",
-//             dark: "mik/products/mugs/md3.png",
-//             premium: "mik/products/mugs/mp3.png"
-//         }
-//     },
-//     {
-//         id: 10,
-//         name: "Open Shelf Rack",
-//         description: "Simple bamboo shelving unit designed for books, plants, or household décor.",
-//         price: 470.0,
-//         stock: 7,
-//         category: "furnitures",
-//         image: "mik/products/furniture/f4.png",
-//         images: {
-//             default: "mik/products/furniture/furniture4.png",
-//             natural: "mik/products/furniture/fn4.png",
-//             dark: "mik/products/furniture/fd4.png",
-//             premium: "mik/products/furniture/fp4.png"
-//         }
-//     },            
-//     {
-//         id: 11,
-//         name: "Utensil Holder Tube",
-//         description: "Cylindrical bamboo holder to keep spatulas, spoons, or whisks neatly organized.",
-//         price: 120.0,
-//         stock: 100,
-//         category: "kitchenware",
-//         image: "mik/products/kitchenware/k2.png",
-//         images: {
-//             default: "mik/products/kitchenware/kitchenware2.png",
-//             natural: "mik/products/kitchenware/kn2.png",
-//             dark: "mik/products/kitchenware/kd2.png",
-//             premium: "mik/products/kitchenware/kp2.png"
-//         }
-//     },
-//     {
-//         id: 4,
-//         name: "Round Bamboo Plate",
-//         description: "Smooth bamboo plate ideal for serving bread, snacks, or as a decorative dish.",
-//         price: 150.0,
-//         stock: 80,
-//         category: "kitchenware",
-//         image: "mik/products/kitchenware/k1.png",
-//         images: {
-//             default: "mik/products/kitchenware/kitchenware1.png", 
-//             natural: "mik/products/kitchenware/kn1.png",
-//             dark: "mik/products/kitchenware/kd1.png",
-//             premium: "mik/products/kitchenware/kp1.png"
-//         }
-//     },
-    
-//     {
-//         id: 13,
-//         name: "Amber Glow Shade",
-//         description: "Slightly tinted bamboo shade that produces a warm golden light, giving off a calming mood.",
-//         price: 90.0,
-//         stock: 45,
-//         category: "lampshades",
-//         image: "mik/products/lampshade/l3.png",
-//         images: {
-//             default: "mik/products/lampshade/lampshade3.png",
-//             natural: "mik/products/lampshade/ln3.png",
-//             dark: "mik/products/lampshade/ld3.png",
-//             premium: "mik/products/lampshade/lp3.png"
-//         }
-//     },
-//     {
-//         id: 14,
-//         name: "Rustic Edge Shade",
-//         description: "Lampshade with a natural, slightly uneven finish, highlighting the handmade feel and perfect for rustic-themed interiors.",
-//         price: 80.0,
-//         stock: 0,
-//         category: "lampshades",
-//         image: "mik/products/lampshade/l4.png",
-//         images: {
-//             default: "mik/products/lampshade/lampshade4.png",
-//             natural: "mik/products/lampshade/ln4.png",
-//             dark: "mik/products/lampshade/ld4.png",
-//             premium: "mik/products/lampshade/lp4.png"
-//         }
-//     },
-//     {
-//         id: 15,
-//         name: "Serving Tray Rectangle",
-//         description: "Bamboo tray with side handles, durable for carrying meals, snacks, or drinks.",
-//         price: 200.0,
-//         stock: 33,
-//         category: "kitchenware",
-//         image: "mik/products/kitchenware/k3.png",
-//         images: {
-//             default: "mik/products/kitchenware/kitchenware3.png",
-//             natural: "mik/products/kitchenware/kn3.png",
-//             dark: "mik/products/kitchenware/kd3.png",
-//             premium: "mik/products/kitchenware/kp3.png"
-//         }
-//     },
-    
-//     {
-//         id: 16,
-//         name: "Eco Travel Mug",
-//         description: "A portable bamboo mug with insulated lining to keep drinks hot or cold, great for office or outdoor use.",
-//         price: 350.0,
-//         stock: 28,
-//         category: "mugs",
-//         image: "mik/products/mugs/m4.png",
-//         images: {
-//             default: "mik/products/mugs/mug4.png",
-//             natural: "mik/products/mugs/mn4.png",
-//             dark: "mik/products/mugs/md4.png",
-//             premium: "mik/products/mugs/mp4.png"
-//         }
-//     },
-//     {
-//         id: 17,
-//         name: "Fruit Bowl Basket",
-//         description: "Shallow round basket designed for fruits and snacks, also works as a decorative centerpiece.",
-//         price: 220.0,
-//         stock: 22,
-//         category: "basket",
-//         image: "mik/products/basket/b2.png",
-//         images: {
-//             default: "mik/products/basket/basket2.png",
-//             natural: "mik/products/basket/bn2.png",
-//             dark: "mik/products/basket/bd2.png",
-//             premium: "mik/products/basket/bp2.png"
-//         }
-//     },
-//     {
-//         id: 18,
-//         name: "Tall Cylinder Basket",
-//         description: "Vertical bamboo basket with an open top, great for laundry, tall plants, or umbrellas.",
-//         price: 190.0,
-//         stock: 14,
-//         category: "basket",
-//         image: "mik/products/basket/b3.png",
-//         images: {
-//             default: "mik/products/basket/basket3.png",
-//             natural: "mik/products/basket/bn3.png",
-//             dark: "mik/products/basket/bd3.png",
-//             premium: "mik/products/basket/bp3.png"
-//         }
-//     },
-//     {
-//         id: 19,
-//         name: "Small Spoon Set",
-//         description: "Pack of three bamboo spoons, lightweight and perfect for stirring coffee, soups, or desserts.",
-//         price: 250.0,
-//         stock: 90,
-//         category: "kitchenware",
-//         image: "mik/products/kitchenware/k4.png",
-//         images: {
-//             default: "mik/products/kitchenware/kitchenware4.png",
-//             natural: "mik/products/kitchenware/kn4.png",
-//             dark: "mik/products/kitchenware/kd4.png",
-//             premium: "mik/products/kitchenware/kp4.png"
-//         }
-//     },
-//     {
-//         id: 20,
-//         name: "Mix Bowl Bamboo",
-//         description: "Mid-sized bowl useful for salad tossing, mixing batters, or serving dishes.",
-//         price: 180.0,
-//         stock: 48,
-//         category: "kitchenware",
-//         image: "mik/products/kitchenware/k5.png",
-//         images: {
-//             default: "mik/products/kitchenware/kitchenware5.png",
-//             natural: "mik/products/kitchenware/kn5.png",
-//             dark: "mik/products/kitchenware/kd5.png",
-//             premium: "mik/products/kitchenware/kp5.png"
-//         }
-//     },
-    
-//     {
-//         id: 21,
-//         name: "Striped Bamboo Shade",
-//         description: "Features vertical bamboo strips that create subtle line patterns when illuminated. Ideal for minimalist spaces.",
-//         price: 380.0,
-//         stock: 26,
-//         category: "lampshades",
-//         image: "mik/products/lampshade/l5.png",
-//         images: {
-//             default: "mik/products/lampshade/lampshade5.png",
-//             natural: "mik/products/lampshade/ln5.png",
-//             dark: "mik/products/lampshade/ld5.png",
-//             premium: "mik/products/lampshade/lp5.png"
-//         }
-//     },
-//     {
-//         id: 22,
-//         name: "Classic Cylinder Shade",
-//         description: "A straight cylindrical lampshade made of bamboo, offering a clean and timeless look that fits modern and traditional homes.",
-//         price: 290.0,
-//         stock: 35,
-//         category: "lampshades",
-//         image: "mik/products/lampshade/l6.png",
-//         images: {
-//             default: "mik/products/lampshade/lampshade6.png",
-//             natural: "mik/products/lampshade/ln6.png",
-//             dark: "mik/products/lampshade/ld6.png",
-//             premium: "mik/products/lampshade/lp6.png"
-//         }
-//     },
-
-//     {
-//         id: 23,
-//         name: "Cooking Utensils Set",
-//         description: "Three bamboo tools (spoon, spatula, ladle) made for everyday food preparation.",
-//         price: 180.0,
-//         stock: 75,
-//         category: "kitchenware",
-//         image: "mik/products/kitchenware/k6.png",
-//         images: {
-//             default: "mik/products/kitchenware/kitchenware6.png",
-//             natural: "mik/products/kitchenware/kn6.png",
-//             dark: "mik/products/kitchenware/kd6.png",
-//             premium: "mik/products/kitchenware/kp6.png"
-//         }
-//     },
-//     {
-//         id: 24,
-//         name: "Two-Layer Spice Rack",
-//         description: "Functional bamboo rack with two levels, helps keep spices and condiments accessible.",
-//         price: 320.0,
-//         stock: 19,
-//         category: "kitchenware",
-//         image: "mik/products/kitchenware/k7.png",
-//         images: {
-//             default: "mik/products/kitchenware/kitchenware7.png",
-//             natural: "mik/products/kitchenware/kn7.png",
-//             dark: "mik/products/kitchenware/kd7.png",
-//             premium: "mik/products/kitchenware/kp7.png"
-//         }
-//     },
-    
-//     {
-//         id: 25,
-//         name: "Large Laundry Basket",
-//         description: "Spacious and sturdy basket suited for clothes, linens, or blankets.",
-//         price: 650.0,
-//         stock: 9,
-//         category: "basket",
-//         image: "mik/products/basket/b4.png",
-//         images: {
-//             default: "mik/products/basket/basket4.png",
-//             natural: "mik/products/basket/bn4.png",
-//             dark: "mik/products/basket/bd4.png",
-//             premium: "mik/products/basket/bp4.png"
-//         }
-//     },
-//     {
-//         id: 26,
-//         name: "Nesting Basket Trio",
-//         description: "Set of three baskets in small, medium, and large sizes, stackable for easy storage.",
-//         price: 550.0,
-//         stock: 11,
-//         category: "basket",
-//         image: "mik/products/basket/b5.png",
-//         images: {
-//             default: "mik/products/basket/basket5.png",
-//             natural: "mik/products/basket/bn5.png",
-//             dark: "mik/products/basket/bd5.png",
-//             premium: "mik/products/basket/bp5.png"
-//         }
-//     },
-//     {
-//         id: 27,
-//         name: "Flat Wall Basket",
-//         description: "Square basket with handle, made for hanging on walls to store or display items.",
-//         price: 400.0,
-//         stock: 23,
-//         category: "basket",
-//         image: "mik/products/basket/b6.png",
-//         images: {
-//             default: "mik/products/basket/basket6.png",
-//             natural: "mik/products/basket/bn6.png",
-//             dark: "mik/products/basket/bd6.png",
-//             premium: "mik/products/basket/bp6.png"
-//         }
-//     },
-//     {
-//         id: 28,
-//         name: "Everyday Storage Basket",
-//         description: "Medium-sized basket designed for general household use, from toys to kitchen items.",
-//         price: 280.0,
-//         stock: 38,
-//         category: "basket",
-//         image: "mik/products/basket/b7.png",
-//         images: {
-//             default: "mik/products/basket/basket7.png",
-//             natural: "mik/products/basket/bn7.png",
-//             dark: "mik/products/basket/bd7.png",
-//             premium: "mik/products/basket/bp7.png"
-//         }
-//     },
-//     {
-//         id: 29,
-//         name: "Classic Picnic Basket",
-//         description: "Sturdy wicker basket with a lid and handles, perfect for picnics or outdoor gatherings.",
-//         price: 800.0,
-//         stock: 5,
-//         category: "basket",
-//         image: "mik/products/basket/b8.png",
-//         images: {
-//             default: "mik/products/basket/basket8.png",
-//             natural: "mik/products/basket/bn8.png",
-//             dark: "mik/products/basket/bd8.png",
-//             premium: "mik/products/basket/bp8.png"
-//         }
-//     },
-//     {
-//         id: 30,
-//         name: "Compact Desk Basket",
-//         description: "Small bamboo basket ideal for keeping accessories, keys, or office supplies.",
-//         price: 150.0,
-//         stock: 60,
-//         category: "basket",
-//         image: "mik/products/basket/b9.png",
-//         images: {
-//             default: "mik/products/basket/basket9.png",
-//             natural: "mik/products/basket/bn9.png",
-//             dark: "mik/products/basket/bd9.png",
-//             premium: "mik/products/basket/bp9.png"
-//         }
-//     },
-//     {
-//         id: 2,
-//         name: "Rustic Sip Mug",
-//         description: "Thick-walled bamboo mug that keeps drinks warm while offering a natural, earthy style.",
-//         price: 470.0,
-//         stock: 42,
-//         category: "mugs",
-//         image: "mik/products/mugs/m1.png",
-//         images: {
-//             default: "mik/products/mugs/mug1.png",
-//             natural: "mik/products/mugs/mn1.png",
-//             dark: "mik/products/mugs/md1.png",
-//             premium: "mik/products/mugs/mp1.png"
-//         }
-//     },
-    
-    
-    
-    
-// ];
 
 let PRODUCTS = []
 
@@ -1006,6 +528,76 @@ $("#applyCompletedFilters").on("click", function () {
     fetchCompletedOrders(filters);
 });
 
+// simple helper to escape HTML (optional but recommended)\
+
+function escapeHtml(str) {
+  if (!str && str !== 0) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function fetchAndRenderAddresses() {
+  $.ajax({
+    url: '../assets/php/fetch_user_addresses.php',
+    type: 'GET',
+    dataType: 'json',
+    success: function(response) {
+      // debug
+      console.log('fetch_user_addresses response:', response);
+
+      if (response.status === 'success') {
+        const addresses = response.data || [];
+        const container = $('.billing-form-container');
+
+        // remove previously appended dynamic cards only (keeps any hardcoded/default card)
+        container.find('.address-card.dynamic-address').remove();
+
+        // build html for new addresses (class dynamic-address to mark them)
+        let html = '';
+        addresses.forEach(addr => {
+          html += `
+            <div class="address-card dynamic-address ${addr.is_default ? 'selected' : ''}" data-id="${escapeHtml(addr.id)}">
+              <div class="address-card-header">
+                <strong>${escapeHtml(addr.full_name)}</strong>
+                <button class="remove-address-btn" data-id="${escapeHtml(addr.id)}" title="Remove Address">&times;</button>
+              </div>
+              <div class="address-line">
+                <i class="fas fa-map-marker-alt"></i>
+                <span>${escapeHtml(addr.barangay)}, ${escapeHtml(addr.city)}, ${escapeHtml(addr.province)}<br>${escapeHtml(addr.house_no)}</span>
+              </div>
+              <div class="address-line">
+                <i class="fas fa-phone-alt"></i>
+                <span>${escapeHtml(addr.mobile_number)}</span>
+              </div>
+            </div>
+          `;
+        });
+
+        // insert new cards before the "Add New Address" button so Add button remains last
+        container.find('.add-address-btn').before(html);
+
+        // (Optional) If you want the first dynamic address to also populate the user-name/address fields:
+        if (addresses.length && !container.find('.address-card.selected').length) {
+          // if none selected, pick first and mark selected
+          container.find('.address-card.dynamic-address').first().addClass('selected');
+        }
+      } else {
+        console.warn('fetch_user_addresses warning:', response.message);
+      }
+    },
+    error: function(xhr, status, error) {
+      console.error("Error fetching addresses:", error);
+    }
+  });
+}
+
+
+
+
 // Fetch completed orders
 function fetchCompletedOrders(filters = {}) {
     $.ajax({
@@ -1249,9 +841,26 @@ function setupEventListeners() {
 
     // Customization modal listeners
     const decreaseQtyBtn = document.getElementById('decreaseQty');
-    if (decreaseQtyBtn) decreaseQtyBtn.addEventListener('click', () => updateQuantity(-1));
     const increaseQtyBtn = document.getElementById('increaseQty');
+    const quantityInput = document.getElementById('quantity');
+
+    if (decreaseQtyBtn) decreaseQtyBtn.addEventListener('click', () => updateQuantity(-1));
     if (increaseQtyBtn) increaseQtyBtn.addEventListener('click', () => updateQuantity(1));
+
+    // 🔹 Listen for manual input changes
+    if (quantityInput) {
+        quantityInput.addEventListener('input', () => {
+            let value = parseInt(quantityInput.value) || 1;
+            const stock = currentCustomizingProduct.stock || 999;
+
+            if (value < 1) value = 1;
+            if (value > stock) value = stock;
+
+            quantityInput.value = value;
+            updateCustomizationView(false); // Refresh price dynamically
+        });
+    }
+    
     const addCustomizedToCartBtn = document.getElementById('addCustomizedToCart');
     if (addCustomizedToCartBtn) addCustomizedToCartBtn.addEventListener('click', addCustomizedToCart);
     const buyNowBtn = document.getElementById('buyNowBtn');
@@ -1464,6 +1073,185 @@ function setupEventListeners() {
         if (e.target.id === "notificationModal") {
         $("#notificationModal").fadeOut(200);
         }
+    });
+
+
+    // Handle Add New Address
+    $(".add-address-btn").off("click").on("click", function () {
+        const formContainer = $("#newAddressFormContainer");
+        
+        // If already open, toggle visibility
+        if (formContainer.is(":visible")) {
+            formContainer.hide();
+            return;
+        }
+
+        formContainer.html(`
+            <div class="address-form" style="border:1px solid #ddd; padding:1rem; border-radius:8px;">
+                <h4 style="margin-bottom:0.5rem;">New Address</h4>
+                <div class="form-group">
+                    <input type="text" id="house_no" placeholder="House No. / Street" required>
+                </div>
+                <div class="form-group">
+                    <input type="text" id="barangay" placeholder="Barangay" required>
+                </div>
+                <div class="form-group">
+                    <input type="text" id="city" placeholder="City" required>
+                </div>
+                <div class="form-group">
+                    <input type="text" id="province" placeholder="Province" required>
+                </div>
+                <div class="form-group">
+                    <input type="text" id="mobile_number" placeholder="Mobile Number" required maxlength="11">
+                </div>
+                <div style="margin-top:1rem; display:flex; gap:0.5rem;">
+                    <button class="btn-secondary" id="cancelAddAddress">Cancel</button>
+                    <button class="btn-primary" id="saveNewAddress">Save Address</button>
+                </div>
+            </div>
+        `);
+
+        formContainer.slideDown(200);
+
+        // Cancel button
+        $("#cancelAddAddress").on("click", function () {
+            formContainer.slideUp(200);
+        });
+
+        // Save button
+        $("#saveNewAddress").on("click", function () {
+            const house_no = $("#house_no").val().trim();
+            const barangay = $("#barangay").val().trim();
+            const city = $("#city").val().trim();
+            const province = $("#province").val().trim();
+            const mobile_number = $("#mobile_number").val().trim();
+
+            if (!house_no || !barangay || !city || !province || !mobile_number) {
+                alert("Please fill out all fields.");
+                return;
+            }
+
+            const data = { house_no, barangay, city, province, mobile_number };
+            console.log(data);
+
+            $.ajax({
+                url: "../assets/php/add_user_address.php",
+                type: "POST",
+                data: data,
+                dataType: "json",
+                success: function (res) {
+                    console.log(res);
+
+                    if (res.status === "success") {
+                        alert("Address added successfully!");
+                        formContainer.slideUp(200);
+
+                        // ✅ Option 2: Just append the newest address
+                        const newAddr = res.data; // assuming PHP returns { status: 'success', data: { id, full_name, house_no, barangay, city, province, mobile_number } }
+
+                        const newAddressHtml = `
+                            <div class="address-card ${newAddr.is_default ? 'selected' : ''}">
+                                <div class="address-card-header">
+                                    <strong>${newAddr.full_name}</strong>
+                                    <button class="remove-address-btn" data-id="${newAddr.id}" title="Remove Address">Remove</button>
+                                </div>
+                                <div class="address-line">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <span>${newAddr.barangay}, ${newAddr.city}, ${newAddr.province}<br>${newAddr.house_no}</span>
+                                </div>
+                                <div class="address-line">
+                                    <i class="fas fa-phone-alt"></i>
+                                    <span>${newAddr.mobile_number}</span>
+                                </div>
+                            </div>
+                        `;
+
+                        // ✅ Append before "Add New Address" button
+                        $(".billing-form-container .add-address-btn").before(newAddressHtml);
+
+                        // ✅ Optionally clear the input fields
+                        $("#house_no, #barangay, #city, #province, #mobile_number").val("");
+                    } else {
+                        alert(res.message || "Failed to add address.");
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error:", error);
+                    alert("Error saving address. Please try again.");
+                }
+            });
+        });
+
+    });
+
+    const addrContainer = $('.billing-form-container');
+
+    // 1) click on address-card -> select it
+    addrContainer.off('click', '.address-card').on('click', '.address-card', function (e) {
+        // If the click originated from the remove button, ignore selection here
+        if ($(e.target).closest('.remove-address-btn').length) return;
+
+        // remove selected class from siblings and add to clicked
+        addrContainer.find('.address-card').removeClass('selected');
+        $(this).addClass('selected');
+
+        // store selected id
+        const selectedId = $(this).data('id');
+        sessionStorage.setItem('selectedAddressID', selectedId);
+        // console.log('Selected Address ID:', selectedId);
+
+        // OPTIONAL: set as default in DB (uncomment if you want server-side default change)
+        /*
+        $.post('../assets/php/set_default_address.php', { id: selectedId }, function(res) {
+        if (res.status === 'success') {
+            console.log('Default address updated on server.');
+            // refresh list to reflect is_default flags if needed:
+            // fetchAndRenderAddresses();
+        } else {
+            console.warn('Failed to set default:', res.message);
+        }
+        }, 'json');
+        */
+    });
+
+    addrContainer.off('click', '.remove-address-btn').on('click', '.remove-address-btn', function (e) {
+        e.stopPropagation(); // prevent bubbling to the .address-card click handler
+
+        const id = $(this).data('id');
+        if (!id) return;
+
+        if (!confirm('Remove this address?')) return;
+
+        $.ajax({
+        url: '../assets/php/delete_user_address.php',
+        type: 'POST',
+        data: { id },
+        dataType: 'json',
+        success: function(res) {
+            if (res.status === 'success') {
+            // remove the card from DOM
+            $(`.address-card[data-id="${id}"]`).remove();
+
+            // If the removed address was selected, clear selection or select first available
+            const selectedId = sessionStorage.getItem('selectedAddressID');
+            if (String(selectedId) === String(id)) {
+                sessionStorage.removeItem('selectedAddressID');
+                // try to select first available dynamic or default card
+                const next = $('.billing-form-container').find('.address-card').first();
+                if (next.length) {
+                next.addClass('selected');
+                sessionStorage.setItem('selectedAddressID', next.data('id'));
+                }
+            }
+            } else {
+            alert(res.message || 'Failed to remove address.');
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('Error deleting address:', error);
+            alert('Error removing address. Try again.');
+        }
+        });
     });
 }
 
@@ -1865,24 +1653,20 @@ function openCustomization(productId) {
 
 function updateQuantity(change) {
     const quantityEl = document.getElementById('quantity');
-    let quantity = parseInt(quantityEl.textContent) + change;
+    let quantity = parseInt(quantityEl.value) + change;
 
-    // Check against stock
-    const stock = currentCustomizingProduct.stock;
+    // ✅ Check against stock
+    const stock = currentCustomizingProduct.stock || 999;
     quantity = Math.min(quantity, stock);
+    quantity = Math.max(1, quantity);
 
-    quantity = Math.max(1, quantity); // Ensure quantity is at least 1
-    quantityEl.textContent = quantity;
+    quantityEl.value = quantity;
 
-    // Update button states based on new quantity and stock
+    // ✅ Update button states based on new quantity and stock
     const increaseQtyBtn = document.getElementById('increaseQty');
     const decreaseQtyBtn = document.getElementById('decreaseQty');
-    if (increaseQtyBtn) {
-        increaseQtyBtn.disabled = (quantity >= stock);
-    }
-    if (decreaseQtyBtn) {
-        decreaseQtyBtn.disabled = (quantity <= 1);
-    }
+    if (increaseQtyBtn) increaseQtyBtn.disabled = (quantity >= stock);
+    if (decreaseQtyBtn) decreaseQtyBtn.disabled = (quantity <= 1);
 
     updateCustomizationView(false); // Only update price, not image
 }
@@ -1895,7 +1679,7 @@ function updateCustomizationView(updateImage = true) {
     const finishInput = document.querySelector('input[name="finish"]:checked');
     const size = sizeInput ? sizeInput.value : null;
     const finish = finishInput ? finishInput.value : null;
-    const quantity = parseInt(document.getElementById('quantity').textContent);
+    const quantity = parseInt(document.getElementById('quantity').value);
 
     if (size === 'large') price *= 1.1; // Changed from +30% to +10%
     if (size === 'small') price *= 0.8;
@@ -1903,6 +1687,7 @@ function updateCustomizationView(updateImage = true) {
     if (finish === 'dark' || finish === 'premium') price += 40;
 
     const totalPrice = price * quantity;
+    console.log(price, quantity, document.getElementById('quantity').textContent)
     document.getElementById('estimatedPrice').textContent = `₱${totalPrice.toFixed(2)}`;
 
     
@@ -2413,31 +2198,119 @@ function openBillingModal(items, source = 'cart') {
         url: '../assets/php/fetch_user_address_number.php',
         type: 'GET',
         dataType: 'json',
-        success: function(data) {
-            console.log(data)
-            $('#user-name').html(`<b> ${data.data.firstname} ${data.data.lastname} </b>`)
-            $('#user-address').html(`
-                ${data.data.barangay}, ${data.data.city}, ${data.data.province} <br>
-                ${data.data.house_no}
-            `)
+        success: function(response) {
+            console.log("fetch_user_address_number response:", response);
 
-            $('#user-mobile-no').text(`${data.data.mobile_number}`)
+            if (response.status === 'success' && response.data) {
+                const addr = response.data;
+                const addressContainer = $('.billing-form-container');
+
+                // Remove any old default address card
+                addressContainer.find('.address-card.default-address').remove();
+
+                // Build default address card dynamically
+                const html = `
+                    <div class="address-card default-address selected" 
+                        data-id="${escapeHtml(addr.id)}"
+                        data-barangay="${escapeHtml(addr.barangay)}"
+                        data-city="${escapeHtml(addr.city)}"
+                        data-province="${escapeHtml(addr.province)}"
+                        data-house_no="${escapeHtml(addr.house_no)}"
+                        data-mobile="${escapeHtml(addr.mobile_number)}">
+                        
+                        <div class="address-card-header">
+                            <strong>${escapeHtml(addr.firstname)} ${escapeHtml(addr.lastname)}</strong>
+                            <button class="remove-address-btn" data-id="${escapeHtml(addr.id)}" title="Remove Address">&times;</button>
+                        </div>
+
+                        <div class="address-line">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>${escapeHtml(addr.barangay)}, ${escapeHtml(addr.city)}, ${escapeHtml(addr.province)}<br>${escapeHtml(addr.house_no)}</span>
+                        </div>
+
+                        <div class="address-line">
+                            <i class="fas fa-phone-alt"></i>
+                            <span>${escapeHtml(addr.mobile_number)}</span>
+                        </div>
+                    </div>
+                `;
+
+                // Add before the "Add New Address" button
+                addressContainer.find('.add-address-btn').before(html);
+            } else {
+                console.warn("No default address found:", response.message);
+            }
         },
         error: function(xhr, status, error) {
-            console.error("Error loading regions: " + error);
+            console.error("Error fetching default address:", error);
         }
     });
+
+
+    $.ajax({
+        url: '../assets/php/fetch_user_addresses.php',
+        type: 'GET',
+        dataType: 'json',
+        success: function (response) {
+            console.log(response);
+
+            if (response.status === 'success') {
+                const addresses = response.data;
+                const addressContainer = $('.billing-form-container');
+                let html = '';
+
+                addresses.forEach(addr => {
+                    html += `
+                        <div class="address-card ${addr.is_default ? 'selected' : ''}"
+                            data-id="${escapeHtml(addr.id)}"
+                            data-barangay="${escapeHtml(addr.barangay)}"
+                            data-city="${escapeHtml(addr.city)}"
+                            data-province="${escapeHtml(addr.province)}"
+                            data-house_no="${escapeHtml(addr.house_no)}"
+                            data-mobile="${escapeHtml(addr.mobile_number)}">
+                            
+                            <div class="address-card-header">
+                                <strong>${escapeHtml(addr.full_name)}</strong>
+                                <button class="remove-address-btn" data-id="${addr.id}" title="Remove Address">Remove</button>
+                            </div>
+                            
+                            <div class="address-line">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>
+                                    ${escapeHtml(addr.barangay)}, ${escapeHtml(addr.city)}, ${escapeHtml(addr.province)}<br>
+                                    ${escapeHtml(addr.house_no)}
+                                </span>
+                            </div>
+                            
+                            <div class="address-line">
+                                <i class="fas fa-phone-alt"></i>
+                                <span>${escapeHtml(addr.mobile_number)}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                // ✅ Insert address cards before the "Add Address" button
+                addressContainer.find('.add-address-btn').before(html);
+            } else {
+                console.warn(response.message || "No addresses found.");
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error("❌ Error fetching addresses:", error);
+        }
+    });
+
+
 }
 
 // Utility functions
 function handlePlaceOrder() {
-    // Collect order items
+    // 🧾 Collect order items
     let orderItems = [];
-
-    // Support both static .billing-summary-item and dynamic .summary-item
     $('#billingSummaryItems .billing-summary-item, #billingSummaryItems .summary-item').each(function () {
         orderItems.push({
-            product_code: $(this).data('productcode'),  // ✅ product ID
+            product_code: $(this).data('productcode'),
             name: $(this).find('.item-name, strong').first().text().trim(),
             attributes: $(this).find('.item-attributes, .summary-customization-details').text().trim(),
             qty: $(this).find('.item-qty').text().trim() || $(this).text().match(/\(x\d+\)/)?.[0] || "",
@@ -2445,87 +2318,72 @@ function handlePlaceOrder() {
         });
     });
 
-    // Collect user details
-    const userName = $('#user-name').text().trim();
-    const userAddress = $('#user-address').html().trim(); // keep <br>
-    const userMobile = $('#user-mobile-no').text().trim();
+    // 🏠 Get selected address
+    const selectedCard = $(".address-card.selected");
+    if (selectedCard.length === 0) {
+        alert("Please select a delivery address before placing your order.");
+        return;
+    }
 
-    // Collect chosen payment method
-    const paymentMethod = $('input[name="payment"]:checked').val();
-
-    // Collect totals (clean formatting)
-    const cleanMoney = (val) => {
-        if (!val) return 0;
-        return parseFloat(val.replace(/[^\d.]/g, "")) || 0;
+    // 🧩 Extract address details from data attributes
+    const selectedAddress = {
+        id: selectedCard.data("id"),
+        barangay: selectedCard.data("barangay") || "",
+        city: selectedCard.data("city") || "",
+        province: selectedCard.data("province") || "",
+        house_no: selectedCard.data("house_no") || "",
+        mobile: selectedCard.data("mobile") || ""
     };
 
+    const fullName = selectedCard.find('strong').text().trim();
+
+    const userData = {
+        name: fullName,
+        mobile: selectedAddress.mobile,
+        address_id: selectedAddress.id,  // ✅ send the address ID to backend
+        address: {
+            barangay: selectedAddress.barangay,
+            city: selectedAddress.city,
+            province: selectedAddress.province,
+            house_no: selectedAddress.house_no
+        }
+    };
+
+    // 💳 Collect payment and totals
+    const paymentMethod = $('input[name="payment"]:checked').val();
+    const cleanMoney = (val) => parseFloat(val.replace(/[^\d.]/g, "")) || 0;
     const subtotal = cleanMoney($('#billingSubtotal').text());
     const shipping = cleanMoney($('#billingShipping').text());
     const total = cleanMoney($('#billingSummaryTotal .total-line span:last').text());
 
-    // Collect user details (dissected address)
-    let addressHTML = $('#user-address').html().trim();
-    let [firstLine, houseNo] = addressHTML.split('<br>');
-    let [barangay, city, province] = firstLine.split(',').map(s => s.trim());
-
-    const userData = {
-        name: $('#user-name').text().trim(),
-        mobile: $('#user-mobile-no').text().trim(),
-        address: {
-            barangay: barangay || "",
-            city: city || "",
-            province: province || "",
-            house_no: (houseNo || "").trim()
-        }
-    };
-
-    // Build payload
     const orderData = {
         items: orderItems,
         user: userData,
         payment: paymentMethod,
-        totals: {
-            subtotal: subtotal,
-            shipping: shipping,
-            total: total
-        }
+        totals: { subtotal, shipping, total }
     };
 
-    console.log("Sending Order Data:", orderData);
+    console.log("🧾 Sending Order Data:", orderData);
 
-    // AJAX request
-    $.ajax({
-        url: "../assets/php/place_order.php",
-        type: "POST",
-        data: { orderData: JSON.stringify(orderData) },
-        dataType: "json",
-        success: function (response) {
-            console.table(response);
-            if (response.status === "success") {
-                showToast("✅ Order placed successfully!", "success");
-
-                // Logic to remove checked out items from cart
-                const itemsToKeep = cartItems.filter(item => !item.selected);
-                cartItems = itemsToKeep;
-
-                // If the cart is now empty, uncheck the "Select All" box
-                if (document.getElementById('selectAllCheckbox')) {
-                    document.getElementById('selectAllCheckbox').checked = false;
-                }
-
-                updateCounts();
-                saveState();
-                closeModals();
-            } else {
-                alert("Error: " + response.message);
-            }
-        },
-        error: function (xhr, status, error) {
-            console.error("Order error:", error);
-            alert("Something went wrong while placing your order.");
-        }
-    });
+    // 🚀 Send via AJAX
+    // $.ajax({
+    //     url: '../assets/php/submit_order.php',
+    //     method: 'POST',
+    //     data: { order: JSON.stringify(orderData) },
+    //     success: function (response) {
+    //         console.log("✅ Order submitted:", response);
+    //         alert("Your order has been placed successfully!");
+    //         // Optionally redirect to order confirmation page
+    //         // window.location.href = 'order_confirmation.php';
+    //     },
+    //     error: function (xhr, status, error) {
+    //         console.error("❌ Error placing order:", error);
+    //         alert("An error occurred while placing your order. Please try again.");
+    //     }
+    // });
 }
+
+
 
 /**
     * Reverts the main image to the currently selected state when hover ends on any option.

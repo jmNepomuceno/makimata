@@ -61,7 +61,7 @@ class ReviewManager {
       type: "GET",
       dataType: "json",
       success: (response) => {
-        console.log(response.reviews);
+        console.log(response);
 
         if (response.status === "success") {
           this.reviews = response.reviews;
@@ -93,64 +93,135 @@ class ReviewManager {
     }
   }
 
-  renderReviews() {
-    const gridView = document.getElementById("reviews-view")
-    if (!gridView) return
+  computeAverageRatings(reviews) {
+  const grouped = {};
 
-    const startIndex = (this.currentPage - 1) * this.itemsPerPage
-    const endIndex = startIndex + this.itemsPerPage
-    const paginatedReviews = this.filteredReviews.slice(startIndex, endIndex)
+  reviews.forEach(r => {
+    const product = r.productName || "Unnamed Product"; // match the PHP alias
+    if (!grouped[product]) grouped[product] = [];
+    grouped[product].push(Number(r.rating));
+  });
 
-    if (paginatedReviews.length === 0) {
-      gridView.innerHTML = `<p style="text-align: center; padding: 2rem; grid-column: 1 / -1;">No reviews found.</p>`
-      this.renderPagination()
-      return
-    }
+  const averages = Object.entries(grouped).map(([product, ratings]) => {
+    const avg = ratings.reduce((a, b) => a + b, 0) / ratings.length;
+    return { product, average: avg.toFixed(1), count: ratings.length };
+  });
 
-    gridView.innerHTML = paginatedReviews
-      .map((review) => {
-        const isLongComment = review.comment.length > 150
-        const truncatedComment = isLongComment ? review.comment.substring(0, 150) + "..." : review.comment
+  return averages;
+}
 
-        return `
-                <div class="review-card">
-                    <div class="review-card-header">
-                        <div class="customer-info">
-                            <div>
-                                <div class="customer-name">${review.customerName}</div>
-                                <div class="review-date">${new Date(review.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</div>
-                            </div>
-                        </div>
-                        <div class="review-status ${review.status}">${review.status}</div>
-                    </div>
-                    <div class="review-card-body">
-                        <div class="review-rating">
-                            <div class="stars">
-                                ${Array.from({ length: 5 }, (_, i) => `<i class="fas fa-star ${i < Math.floor(review.rating) ? "filled" : ""}"></i>`).join("")}
-                            </div>
-                            <span class="rating-text">${review.rating}</span>
-                        </div>
-                        <p class="review-comment">"${truncatedComment}"</p>
-                        ${isLongComment ? `<button class="read-more-btn" onclick="reviewManager.viewReview(${review.id})">Read More</button>` : ""}
-                    </div>
-                    <div class="review-card-footer">
-                        <div class="review-product-info">
-                            <a href="#">${review.productName}</a>
-                        </div>
-                        <div class="review-actions">
-                            <button class="btn-icon approve" title="Approve" onclick="reviewManager.updateStatus(${review.id}, 'approved')"><i class="fas fa-check"></i></button>
-                            <button class="btn-icon reject" title="Reject" onclick="reviewManager.updateStatus(${review.id}, 'rejected')"><i class="fas fa-times"></i></button>
-                            <button class="btn-icon reply" title="Reply"><i class="fas fa-reply"></i></button>
-                            <button class="btn-icon delete" title="Delete" onclick="reviewManager.deleteReview(${review.id})"><i class="fas fa-trash"></i></button>
-                        </div>
-                    </div>
-                </div>
-            `
-      })
-      .join("")
+renderAverageRatings() {
+  const averages = this.computeAverageRatings(this.reviews);
+  const container = document.getElementById("average-ratings");
+  if (!container) return;
 
-    this.renderPagination()
+  container.innerHTML = averages
+    .map(avg => `
+      <div class="avg-rating-card">
+        <span class="product-name">${avg.product}</span>
+        <div class="stars">
+          ${Array.from({ length: 5 }, (_, i) =>
+            `<i class="fas fa-star ${i < Math.round(avg.average) ? 'filled' : ''}"></i>`
+          ).join('')}
+        </div>
+        <span class="avg-score">${avg.average} (${avg.count} reviews)</span>
+      </div>
+    `)
+    .join('');
+}
+
+renderReviews() {
+  const gridView = document.getElementById("reviews-view");
+  if (!gridView) return;
+
+  const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+  const endIndex = startIndex + this.itemsPerPage;
+  const paginatedReviews = this.filteredReviews.slice(startIndex, endIndex);
+
+  // ✅ Call average rating rendering
+  this.renderAverageRatings();
+
+  if (paginatedReviews.length === 0) {
+    gridView.innerHTML = `
+      <p style="text-align: center; padding: 2rem; grid-column: 1 / -1;">
+        No reviews found.
+      </p>`;
+    this.renderPagination();
+    return;
   }
+
+  // ✅ Group reviews by product name
+  const grouped = {};
+  paginatedReviews.forEach(review => {
+    const key = review.productName || "Unknown Product";
+    if (!grouped[key]) grouped[key] = [];
+    grouped[key].push(review);
+  });
+
+  // ✅ Build HTML by groups
+  let reviewsHTML = "";
+  Object.entries(grouped).forEach(([productName, reviews]) => {
+    reviewsHTML += `
+      <div class="product-group">
+        <h3 class="product-group-title">${productName}</h3>
+        <div class="product-group-reviews">
+          ${reviews.map(review => {
+            const isLongComment = review.comment.length > 150;
+            const truncatedComment = isLongComment
+              ? review.comment.substring(0, 150) + "..."
+              : review.comment;
+
+            return `
+              <div class="review-card">
+                <div class="review-card-header">
+                  <div class="customer-info">
+                    <div>
+                      <div class="customer-name">${review.customerName}</div>
+                      <div class="review-date">
+                        ${new Date(review.created_at).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="review-status ${review.status}">${review.status}</div>
+                </div>
+                <div class="review-card-body">
+                  <div class="review-rating">
+                    <div class="stars">
+                      ${Array.from({ length: 5 }, (_, i) =>
+                        `<i class="fas fa-star ${i < Math.floor(review.rating) ? "filled" : ""}"></i>`
+                      ).join("")}
+                    </div>
+                    <span class="rating-text">${review.rating}</span>
+                  </div>
+                  <p class="review-comment">"${truncatedComment}"</p>
+                  ${isLongComment
+                    ? `<button class="read-more-btn" onclick="reviewManager.viewReview(${review.id})">Read More</button>`
+                    : ""}
+                </div>
+                <div class="review-card-footer">
+                  <div class="review-actions">
+                    <button class="btn-icon approve" title="Approve" onclick="reviewManager.updateStatus(${review.id}, 'approved')"><i class="fas fa-check"></i></button>
+                    <button class="btn-icon reject" title="Reject" onclick="reviewManager.updateStatus(${review.id}, 'rejected')"><i class="fas fa-times"></i></button>
+                    <button class="btn-icon reply" title="Reply"><i class="fas fa-reply"></i></button>
+                    <button class="btn-icon delete" title="Delete" onclick="reviewManager.deleteReview(${review.id})"><i class="fas fa-trash"></i></button>
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join("")}
+        </div>
+      </div>
+    `;
+  });
+
+  gridView.innerHTML = reviewsHTML;
+  this.renderPagination();
+}
+
 
   closeReviewModal() {
     const modal = document.getElementById("review-modal")

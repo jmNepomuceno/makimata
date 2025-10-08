@@ -34,7 +34,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Order Receipt - <?= htmlspecialchars($order['order_code']) ?></title>
+<title>Billing Invoice - <?= htmlspecialchars($order['order_code']) ?></title>
 <style>
     body {
         font-family: Arial, sans-serif;
@@ -145,7 +145,7 @@
 <body>
 <div class="receipt-container" id="receipt">
     <div class="receipt-header">
-        <h2>Order Receipt</h2>
+        <h2>Billing Invoice</h2>
         <p>Order Code: <?= htmlspecialchars($order['order_code']) ?></p>
         <button class="print-btn" onclick="printReceipt()">🖨 Print</button>
     </div>

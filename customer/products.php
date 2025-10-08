@@ -422,8 +422,8 @@
                     </div>
                 </div>
                 <nav class="nav">
-                    <a href="home.php">Home</a>
                     <a href="products.php" class="active">Products</a>
+                    <a href="home.php">Overview</a>
                     <a href="aboutus.php">About Us</a>
                     <a href="contactus.php">Contact Us</a>
                 </nav>
@@ -714,7 +714,14 @@
                                 <div class="quantity-wrapper">
                                     <div class="quantity-controls">
                                         <button type="button" id="decreaseQty" class="qty-btn">-</button>
-                                        <span id="quantity" class="qty-display">1</span>
+                                        <input 
+                                        type="number" 
+                                        id="quantity" 
+                                        class="qty-display" 
+                                        value="1" 
+                                        min="1" 
+                                        step="1" 
+                                        />
                                         <button type="button" id="increaseQty" class="qty-btn">+</button>
                                     </div>
                                     <small id="productStock" class="stock-display"></small>
@@ -767,27 +774,13 @@
                     <!-- Right Column: Delivery & Payment -->
                     <div class="billing-form-container">
                         <h3>Delivery</h3>
-                        <div class="address-card selected">
-                            <div class="address-card-header">
-                                <strong id="user-name">Ruben Padilla</strong>
-                                <button class="remove-address-btn" title="Remove Address">Remove</button>
-                            </div>
-                            <div class="address-line">
-                                <i class="fas fa-map-marker-alt"></i>
-                                <span id="user-address">
-                                    Alangan, Limay, Bataan<br>
-                                    123 Masasarap Street
-                                </span>
-                            </div>
-                            <div class="address-line">
-                                <i class="fas fa-phone-alt"></i>
-                                <span id="user-mobile-no">09123456789</span>
-                            </div>
-                        </div>
 
                         <button class="add-address-btn">
                             <i class="fas fa-plus"></i> Add New Address
                         </button>
+
+                        <div id="newAddressFormContainer" style="display:none; margin-top:1rem;">
+                        </div>
 
                         <div class="payment-section">
                             <h3>Payment Method</h3>

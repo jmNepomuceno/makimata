@@ -53,7 +53,6 @@
             </form>
 
             <p class="signup-link">Don't have an account? <a href="./customer/signup.php">Create one</a></p>
-            <a id="admin-link" href="./admin/login.php">Admin?</a>
         </div>
     </div>
 

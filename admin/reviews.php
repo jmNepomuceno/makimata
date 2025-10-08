@@ -79,6 +79,10 @@
         <!-- Reviews Grid View -->
         <div class="reviews-grid" id="reviews-view"></div>
 
+        <!-- ⭐ Average Ratings Section -->
+        <div id="average-ratings" class="average-ratings-container"></div>
+
+
         <!-- Pagination -->
         <div class="pagination-wrapper">
           <div class="pagination-info" id="pagination-info"></div>

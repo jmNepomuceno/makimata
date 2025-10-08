@@ -17,8 +17,8 @@
           <img src="mik/logo.png" alt="MIKAMATA Logo" style="width: 130px; height: 40px;">
         </div>
         <nav class="nav">
-          <a href="home.php">Home</a>
           <a href="products.php">Products</a>
+          <a href="home.php">Overview</a>
           <a href="aboutus.php" class="active">About Us</a>
           <a href="contactus.php">Contact Us</a>
         </nav>

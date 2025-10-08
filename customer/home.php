@@ -24,10 +24,10 @@
         
       </div>
       <nav class="nav">
-        <a href="home.php" class="active">Home</a>
-        <a href="products.php">Products</a>
-        <a href="aboutus.php">About Us</a>
-        <a href="contactus.php">Contact Us</a>
+          <a href="products.php">Products</a>
+          <a href="home.php" class="active">Overview</a>
+          <a href="aboutus.php" >About Us</a>
+          <a href="contactus.php">Contact Us</a>
       </nav>
       <div class="header-actions">
         <div class="search">

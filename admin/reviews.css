@@ -409,3 +409,57 @@
   background: rgba(239, 68, 68, 0.3);
   color: #f87171;
 }
+
+.average-ratings-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.avg-rating-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  padding: 1rem;
+  width: 220px;
+  transition: transform 0.2s ease;
+}
+
+.avg-rating-card:hover {
+  transform: translateY(-3px);
+}
+
+.avg-rating-card .product-name {
+  font-weight: 600;
+  display: block;
+  margin-bottom: 0.4rem;
+  color: #333;
+}
+
+.avg-rating-card .stars {
+  color: #ffc107;
+  margin-bottom: 0.3rem;
+}
+
+.avg-rating-card .avg-score {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.product-group {
+  margin-bottom: 2rem;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 1rem;
+}
+
+.product-group-title {
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+.product-group-reviews {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
