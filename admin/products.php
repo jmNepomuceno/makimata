@@ -97,12 +97,13 @@
 
       <!-- Products Management -->
       <section class="admin-section">
-        <div class="section-header">
+       <div class="section-header">
           <div class="section-controls">
             <div class="search-box">
               <input type="text" id="product-search" placeholder="Search products...">
               <i class="fas fa-search"></i>
             </div>
+
             <select id="category-filter" class="form-select">
               <option value="">All Categories</option>
               <option value="lampshades">Lampshades</option>
@@ -111,16 +112,24 @@
               <option value="kitchenware">Kitchenware</option>
               <option value="furniture">Furniture</option>
             </select>
+
             <div class="filter-group price-filter">
               <input type="number" id="min-price" placeholder="Min Price" class="form-input">
               <span>-</span>
               <input type="number" id="max-price" placeholder="Max Price" class="form-input">
             </div>
-            <button class="btn btn-primary" id="add-product-btn">
-              <i class="fas fa-plus"></i> Add Product
-            </button>
+
+            <div class="button-group">
+              <button class="btn btn-primary" id="add-product-btn">
+                <i class="fas fa-plus"></i> Add Product
+              </button>
+              <button class="btn btn-warning" id="manage-featured-products-btn">
+                <i class="fas fa-star"></i> Manage New Products
+              </button>
+            </div>
           </div>
         </div>
+
 
         <!-- Table View -->
         <div class="table-responsive" id="table-view">
@@ -133,6 +142,7 @@
                 <th>Category</th>
                 <th data-sort="price" class="sortable">Price <i class="fas fa-sort"></i></th>
                 <th data-sort="stock" class="sortable">Stock <i class="fas fa-sort"></i></th>
+                <th data-sort="status" class="sortable">Status <i class="fas fa-sort"></i></th>
                 <th data-sort="dateAdded" class="sortable">Date Added <i class="fas fa-sort"></i></th>
                 <th>Actions</th>
               </tr>

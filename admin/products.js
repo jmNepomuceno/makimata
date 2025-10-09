@@ -181,6 +181,7 @@ class ProductManager {
         if (editButton) {
           const productId = parseInt(editButton.dataset.id);
           if (productId) {
+            console.log(productId)
             this.editProduct(productId);
           }
         }
@@ -193,6 +194,28 @@ class ProductManager {
         }
       });
     }
+
+    // document.getElementById("manage-featured-products-btn").addEventListener("click", function () {
+    //     // Toggle filter mode
+    //     const isActive = this.classList.toggle("active");
+
+    //     console.log(this.products)
+    //     console.log(this.filteredProducts)
+
+    //     // if (isActive) {
+    //     //     this.innerHTML = `<i class="fas fa-list"></i> Show All Products`;
+    //     //     productManager.filteredProducts = productManager.allProducts.filter(
+    //     //         (p) => p.stock_status === "new"
+    //     //     );
+    //     // } else {
+    //     //     this.innerHTML = `<i class="fas fa-star"></i> Manage Featured Products`;
+    //     //     productManager.filteredProducts = [...productManager.allProducts];
+    //     // }
+
+    //     // productManager.currentPage = 1; // reset pagination
+    //     // productManager.renderTableView();
+    // });
+
   }
 
   filterAndRender() {
@@ -308,7 +331,7 @@ class ProductManager {
     const start = (this.currentPage - 1) * this.pageSize;
     const end = start + this.pageSize;
     const pageProducts = this.filteredProducts.slice(start, end);
-
+    console.log(pageProducts)
     tableBody.innerHTML = pageProducts
       .map(
         (product) => `
@@ -316,7 +339,7 @@ class ProductManager {
             <td><input type="checkbox" class="product-checkbox" data-id="${product.id}" onchange="productManager.updateBulkActionsVisibility()"></td>
             <td>#${product.id}</td>
             <td class="product-info-cell">
-                <img src="${ 
+                <img src="${
                   (product.image && product.image.startsWith('data:image'))
                     ? product.image
                     : (product.image || 'mik/products/placeholder.png')
@@ -324,9 +347,20 @@ class ProductManager {
                 <span>${product.name}</span>
             </td>
             <td><span class="category-badge ${product.category}">${product.category}</span></td>
-            <td>₱${product.price.toLocaleString()}</td>
-            <td><span class="stock-badge ${product.stock > 10 ? 'normal' : (product.stock > 0 ? 'low' : 'out')}">${product.stock}</span></td>
-            <td>${product.dateAdded || 'N/A'}</td>
+            <td>₱${parseFloat(product.price).toLocaleString()}</td>
+            <td><span class="stock-badge ${
+              product.stock > 10 ? 'normal' : (product.stock > 0 ? 'low' : 'out')
+            }">${product.stock}</span></td>
+
+            <!-- 🟡 New Column: Stock Status -->
+            <td>
+              <select class="stock-status-select" data-id="${product.id}">
+                <option value="new" ${product.stock_status === 'new' ? 'selected' : ''}>New</option>
+                <option value="old" ${product.stock_status === 'old' ? 'selected' : ''}>Old</option>
+              </select>
+            </td>
+
+            <td>${product.created_at || 'N/A'}</td>
             <td>
                 <div class="action-buttons">
                     <button class="btn-icon edit-btn" data-id="${product.id}" title="Edit">
@@ -343,7 +377,63 @@ class ProductManager {
       .join("");
 
     this.renderPagination();
+    
+    // ✅ Attach event listeners for stock status changes
+    document.querySelectorAll(".stock-status-select").forEach(select => {
+      select.addEventListener("change", (e) => {
+        const productId = e.target.dataset.id;
+        const newStatus = e.target.value;
+        this.updateStockStatus(productId, newStatus);
+      });
+    });
+
+  document.getElementById("manage-featured-products-btn").addEventListener("click", () => {
+      const $btn = $(this);
+      const isActive = $btn.hasClass('active');
+
+      console.log(this.products)
+      console.log(this.filteredProducts)
+
+      if (!isActive) {
+          // 🟢 Activate featured mode — show only new items
+          $btn.addClass('active').html('<i class="fas fa-list"></i> Show All Products');
+
+          this.filteredProducts = this.products.filter(function (p) {
+              return p.stock_status === 'new';
+          });
+      } else {
+          // 🔄 Show all products again
+          $btn.removeClass('active').html('<i class="fas fa-star"></i> Manage Featured Products');
+          this.filteredProducts = [...this.allProducts];
+      }
+
+      this.currentPage = 1;
+      this.renderTableView();
+    });
+
+    
   }
+
+  updateStockStatus(productId, newStatus) {
+    $.ajax({
+        url: '../assets/php_admin/update_stock_status.php',
+        method: 'POST',
+        data: { productId: productId, status: newStatus },
+        success: function(response) {
+            if (response.status === "success") {
+                showToast('✅ Stock status updated!', 'success');
+            } else {
+                alert("⚠️ " + response.message);
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error("❌ Error:", error);
+            alert("An error occurred. Please try again.");
+        }
+    });
+  }
+
+
 
   renderPagination() {
     const totalProducts = this.filteredProducts.length;

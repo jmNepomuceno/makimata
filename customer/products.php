@@ -17,6 +17,7 @@
         .customization-content {
             display: flex;
             gap: 30px;
+            height: 500px;
         }
         .customization-left {
             flex: 1.5; /* Give more space to images */
@@ -68,6 +69,8 @@
         }
         .customization-right {
             flex: 1;
+
+            height: 500px !important;
         }
         .finish-options .radio-tile {
             display: flex;
@@ -709,6 +712,45 @@
                                     </label>
                                 </div>
                             </div>
+
+                            <div class="option-group">
+                                <label class="option-label">Engraving / Personalization</label>
+                                <input type="text" id="engravingText" class="form-control" placeholder="Enter text to engrave (optional)" name="engravingText">
+                                <small class="option-note">+₱50 if text is added</small>
+                            </div>
+
+                            <div class="option-group">
+                                <label class="option-label">Gift Packaging</label>
+                                <select id="giftPackaging" class="form-control" name="giftPackaging">
+                                    <option value="none" selected>None</option>
+                                    <option value="basic">Basic Wrap (+₱50)</option>
+                                    <option value="premium">Premium Wrap (+₱100)</option>
+                                </select>
+                            </div>
+
+                            <div class="option-group">
+                                <label class="option-label">Custom Message Card</label>
+                                <textarea id="messageCard" class="form-control" rows="2" placeholder="Enter message (optional, +₱20)" name="messageCard"></textarea>
+                            </div>
+
+                            <div class="option-group">
+                                <label class="option-label">Special Handling / Care</label>
+                                <select id="specialHandling" class="form-control" name="specialHandling">
+                                    <option value="none" selected>None</option>
+                                    <option value="fragile">Fragile Handling (+₱10)</option>
+                                    <option value="eco">Eco-friendly Wrap (+₱15)</option>
+                                </select>
+                            </div>
+
+                            <div class="option-group">
+                                <label class="option-label">Delivery Preference</label>
+                                <select id="deliveryPreference" class="form-control" name="deliveryPreference">
+                                    <option value="standard" selected>Standard (Free)</option>
+                                    <option value="express">Express (+₱100)</option>
+                                    <option value="scheduled">Scheduled Date (+₱50)</option>
+                                </select>
+                            </div>
+
                             <div class="option-group">
                                 <label class="option-label">Quantity</label>
                                 <div class="quantity-wrapper">

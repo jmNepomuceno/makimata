@@ -2042,3 +2042,67 @@ body {
     border-color: #007bff;
     background-color: #e8f0ff;
 }
+
+/* Container spacing */
+.option-group {
+  margin-bottom: 1.25rem;
+}
+
+/* Labels */
+.option-label {
+  font-weight: 600;
+  display: block;
+  margin-bottom: 0.4rem;
+  color: #333;
+}
+
+/* Notes under inputs */
+.option-note {
+  display: block;
+  font-size: 0.85rem;
+  color: #6c757d;
+  margin-top: 0.3rem;
+}
+
+/* Inputs, selects, textareas */
+.option-group .form-control {
+  border-radius: 0.5rem;
+  border: 1px solid #ced4da;
+  transition: all 0.2s ease;
+  padding: 0.55rem 0.75rem;
+}
+
+/* Focus effect */
+.option-group .form-control:focus {
+  border-color: #198754;
+  box-shadow: 0 0 0 0.15rem rgba(25, 135, 84, 0.25);
+}
+
+/* Optional: highlight filled inputs */
+.option-group .form-control:not(:placeholder-shown),
+.option-group .form-control:valid {
+  border-color: #198754;
+}
+
+/* Dropdowns */
+.option-group select.form-control {
+  background-color: #fff;
+  cursor: pointer;
+}
+
+/* Textarea auto resize appearance */
+.option-group textarea.form-control {
+  resize: vertical;
+  min-height: 70px;
+}
+
+/* Optional: subtle hover */
+.option-group .form-control:hover {
+  border-color: #adb5bd;
+}
+
+/* Light divider (optional if many options) */
+.option-group:not(:last-child) {
+  border-bottom: 1px dashed #e2e3e5;
+  padding-bottom: 1rem;
+}

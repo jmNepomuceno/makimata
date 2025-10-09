@@ -14,7 +14,8 @@ try {
                 stock, 
                 category, 
                 image, 
-                images
+                images,
+                stock_status
             FROM products";
     $stmt = $pdo->prepare($sql);
     $stmt->execute();

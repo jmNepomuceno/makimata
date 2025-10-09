@@ -821,3 +821,47 @@
     padding: 1rem;
   }
 }
+
+.section-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.button-group {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+  color: white;
+}
+
+.btn-warning {
+  background-color: #ffc107;
+  color: #212529;
+}
+
+.stock-status-select {
+  padding: 4px 6px;
+  border-radius: 4px;
+
+}
+
+.stock-status-select[value='new'] {
+  background-color: #d1e7dd;
+  color: #0f5132;
+}
+
+.stock-status-select[value='old'] {
+  background-color: #f8d7da;
+  color: #842029;
+}
+
+#manage-featured-products-btn.active {
+  background-color: #fbc02d;
+  color: #fff;
+  border-color: #f9a825;
+}

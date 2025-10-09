@@ -876,6 +876,36 @@ function setupEventListeners() {
         updateCustomizationView(true);
     }));
 
+    // ---- Engraving (text input) ----
+    const engravingInput = document.querySelector('input[name="engravingText"]');
+    if (engravingInput) {
+        engravingInput.addEventListener('input', () => updateCustomizationView(true));
+    }
+
+    // ---- Gift Packaging (dropdown) ----
+    const giftSelect = document.querySelector('select[name="giftPackaging"]');
+    if (giftSelect) {
+        giftSelect.addEventListener('change', () => updateCustomizationView(true));
+    }
+
+    // ---- Message Card (textarea) ----
+    const messageCard = document.querySelector('textarea[name="messageCard"]');
+    if (messageCard) {
+        messageCard.addEventListener('input', () => updateCustomizationView(true));
+    }
+
+    // ---- Special Handling (dropdown) ----
+    const handlingSelect = document.querySelector('select[name="specialHandling"]');
+    if (handlingSelect) {
+        handlingSelect.addEventListener('change', () => updateCustomizationView(true));
+    }
+
+    // ---- Delivery Preference (dropdown) ----
+    const deliverySelect = document.querySelector('select[name="deliveryPreference"]');
+    if (deliverySelect) {
+        deliverySelect.addEventListener('change', () => updateCustomizationView(true));
+    }
+
     // Add hover listeners for finish options
     document.querySelectorAll('.finish-options label').forEach(label => {
         const radio = label.querySelector('input[type="radio"]');
@@ -1671,35 +1701,113 @@ function updateQuantity(change) {
     updateCustomizationView(false); // Only update price, not image
 }
 
+function getCustomizationExtras() {
+  const engravingText = document.querySelector('input[name="engravingText"]')?.value.trim() || '';
+  const giftPackaging = document.querySelector('select[name="giftPackaging"]')?.value || 'none';
+  const messageCard = document.querySelector('textarea[name="messageCard"]')?.value.trim() || '';
+  const specialHandling = document.querySelector('select[name="specialHandling"]')?.value || 'none';
+  const deliveryPreference = document.querySelector('select[name="deliveryPreference"]')?.value || 'standard';
+
+  // --- Compute extra cost ---
+  let extraCost = 0;
+
+  // Engraving
+  if (engravingText) extraCost += 50;
+
+  // Gift Packaging
+  if (giftPackaging === 'basic') extraCost += 50;
+  else if (giftPackaging === 'premium') extraCost += 100;
+
+  // Message Card
+  if (messageCard) extraCost += 20;
+
+  // Special Handling
+  if (specialHandling === 'fragile') extraCost += 10;
+  else if (specialHandling === 'eco') extraCost += 15;
+
+  // Delivery Preference
+  if (deliveryPreference === 'express') extraCost += 100;
+  else if (deliveryPreference === 'scheduled') extraCost += 50;
+
+  // --- Build human-readable attributes string ---
+  const attributes = [
+    engravingText && `Engraving: "${engravingText}"`,
+    giftPackaging !== 'none' && `Packaging: ${giftPackaging}`,
+    messageCard && `Card: "${messageCard}"`,
+    specialHandling !== 'none' && `Handling: ${specialHandling}`,
+    deliveryPreference && `Delivery: ${deliveryPreference}`,
+  ]
+    .filter(Boolean)
+    .join(' | ');
+
+  return {
+    extraCost,
+    engravingText,
+    giftPackaging,
+    messageCard,
+    specialHandling,
+    deliveryPreference,
+    attributes,
+  };
+}
+
+
+
+
 function updateCustomizationView(updateImage = true) {
     if (!currentCustomizingProduct) return;
 
+    // --- Base price setup ---
     let price = currentCustomizingProduct.price;
     const sizeInput = document.querySelector('input[name="size"]:checked');
     const finishInput = document.querySelector('input[name="finish"]:checked');
+    
     const size = sizeInput ? sizeInput.value : null;
     const finish = finishInput ? finishInput.value : null;
+
     const quantity = parseInt(document.getElementById('quantity').value);
 
-    if (size === 'large') price *= 1.1; // Changed from +30% to +10%
-    if (size === 'small') price *= 0.8;
-    
+    // --- Price adjustment for size ---
+    if (size === 'large') price *= 1.1; // +10%
+    if (size === 'small') price *= 0.8; // -20%
+
+    // --- Price adjustment for finish ---
     if (finish === 'dark' || finish === 'premium') price += 40;
-
-    const totalPrice = price * quantity;
-    console.log(price, quantity, document.getElementById('quantity').textContent)
-    document.getElementById('estimatedPrice').textContent = `₱${totalPrice.toFixed(2)}`;
-
     
-    if (updateImage && finish) {
-        
-        const imageKey = finish;
 
+    let finalPrice = price * quantity;
+
+    // --- NEW: get all customization extras ---
+    const {
+        extraCost,
+        engravingText,
+        giftPackaging,
+        messageCard,
+        specialHandling,
+        deliveryPreference,
+        attributes
+    } = getCustomizationExtras();
+
+    console.log(extraCost)
+
+    finalPrice += extraCost;
+
+    // --- Update price display ---
+    document.getElementById('estimatedPrice').textContent = `₱${finalPrice.toFixed(2)}`;
+
+    // --- Update attributes summary (if exists) ---
+    const attrEl = document.getElementById('attributes-summary');
+    if (attrEl) {
+        attrEl.textContent = attributes || 'No customizations';
+    }
+
+    // --- Optional image update ---
+    if (updateImage && finish) {
+        const imageKey = finish;
         if (currentCustomizingProduct.images && currentCustomizingProduct.images[imageKey]) {
             const newImageSrc = currentCustomizingProduct.images[imageKey];
             document.getElementById('customizationImage').src = newImageSrc;
 
-            
             const thumbnailToSelect = document.querySelector(`#thumbnailGallery img[src="${newImageSrc}"]`);
             if (thumbnailToSelect) {
                 document.querySelectorAll('#thumbnailGallery img').forEach(img => img.classList.remove('active'));
@@ -1708,7 +1816,7 @@ function updateCustomizationView(updateImage = true) {
         }
     }
 
-    // Enable/disable action buttons based on selection
+    // --- Enable/disable buttons based on selection ---
     const addToCartBtn = document.getElementById('addCustomizedToCart');
     const buyNowBtn = document.getElementById('buyNowBtn');
     const warningEl = document.getElementById('customizationWarning');
@@ -1718,7 +1826,7 @@ function updateCustomizationView(updateImage = true) {
     addToCartBtn.disabled = !areOptionsSelected || isOutOfStock;
     if (buyNowBtn) buyNowBtn.disabled = !areOptionsSelected || isOutOfStock;
 
-    // Show/hide warning message
+    // --- Show warning message if needed ---
     if (warningEl) {
         if (isOutOfStock) {
             warningEl.innerHTML = '<i class="fas fa-exclamation-circle"></i> This item is currently out of stock.';
@@ -1727,18 +1835,18 @@ function updateCustomizationView(updateImage = true) {
             warningEl.style.display = 'none';
         } else {
             warningEl.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Please select a size and finish to proceed.';
-            warningEl.style.display = 'flex'; // Use flex to align icon and text
+            warningEl.style.display = 'flex';
         }
     }
 
-    // Update tooltips for disabled buttons
+    // --- Update tooltip text for disabled buttons ---
     let tooltip = "Please select a size and finish to proceed.";
-    if (isOutOfStock) {
-        tooltip = "This item is out of stock.";
-    }
+    if (isOutOfStock) tooltip = "This item is out of stock.";
+
     addToCartBtn.title = (!areOptionsSelected || isOutOfStock) ? tooltip : '';
     if (buyNowBtn) buyNowBtn.title = (!areOptionsSelected || isOutOfStock) ? tooltip : '';
 }
+
 
 function setActiveThumbnail(thumbnailElement) {
     document.querySelectorAll('#thumbnailGallery img').forEach(img => img.classList.remove('active'));
@@ -1767,56 +1875,92 @@ function addCustomizedToCart() {
     const selectedSizeInput = document.querySelector('input[name="size"]:checked');
     const selectedFinishInput = document.querySelector('input[name="finish"]:checked');
 
-    // Guard clause to prevent errors if options are not selected, even if buttons are somehow enabled.
+    // Guard clause to prevent missing selections
     if (!selectedSizeInput || !selectedFinishInput) {
-        // The button should be disabled, so this is a fallback.
-        // The visible warning in updateCustomizationView is the primary user feedback.
         console.error("Add to cart button was clicked without selections.");
         return;
     }
 
-    // Robustly find the size label to prevent script crashes.
+    // Get human-readable size label
     let sizeLabel = '';
     const sizeLabelElement = selectedSizeInput.closest('label');
     if (sizeLabelElement) {
         const radioLabelSpan = sizeLabelElement.querySelector('.radio-label');
         if (radioLabelSpan) {
-            sizeLabel = radioLabelSpan.textContent;
+            sizeLabel = radioLabelSpan.textContent.trim();
         }
     }
-    // Fallback to the value if the complex label isn't found.
-    if (!sizeLabel) {
-        sizeLabel = selectedSizeInput.value;
-    }
+    if (!sizeLabel) sizeLabel = selectedSizeInput.value;
 
-    const quantityToAdd = parseInt(document.getElementById('quantity').textContent);
+    // Get quantity safely
+    const quantityToAdd = parseInt(document.getElementById('quantity').value || 1);
+
+    // Collect universal customizations
+    const engravingText = document.getElementById('engravingText')?.value.trim() || '';
+    const giftPackaging = document.getElementById('giftPackaging')?.value || 'none';
+    const messageCard = document.getElementById('messageCard')?.value.trim() || '';
+    const specialHandling = document.getElementById('specialHandling')?.value || 'none';
+    const deliveryPreference = document.getElementById('deliveryPreference')?.value || 'standard';
+
+    // Calculate extra costs (optional if you already include this in estimated price)
+    let extraCost = 0;
+    if (engravingText) extraCost += 50;
+    if (giftPackaging === 'basic') extraCost += 50;
+    if (giftPackaging === 'premium') extraCost += 100;
+    if (messageCard) extraCost += 20;
+    if (specialHandling === 'fragile') extraCost += 10;
+    if (specialHandling === 'eco') extraCost += 15;
+    if (deliveryPreference === 'express') extraCost += 100;
+    if (deliveryPreference === 'scheduled') extraCost += 50;
+
+    // Construct readable customization summary
     const customizationDetails = {
         size: selectedSizeInput.value,
-        sizeLabel: sizeLabel, // Use the safe, retrieved label
-        finish: selectedFinishInput.value
+        sizeLabel,
+        finish: selectedFinishInput.value,
+        engraving: engravingText || null,
+        giftPackaging,
+        messageCard: messageCard || null,
+        specialHandling,
+        deliveryPreference,
+        extraCost
     };
 
+    // Generate readable attribute string for order_items or cart display
+    const attributes = [
+        `Size: ${sizeLabel}`,
+        `Finish: ${selectedFinishInput.value}`,
+        engravingText ? `Engraving: "${engravingText}"` : null,
+        giftPackaging !== 'none' ? `Gift Packaging: ${giftPackaging}` : null,
+        messageCard ? `Message Card: "${messageCard}"` : null,
+        specialHandling !== 'none' ? `Handling: ${specialHandling}` : null,
+        deliveryPreference !== 'standard' ? `Delivery: ${deliveryPreference}` : null
+    ].filter(Boolean).join(' | ');
+
+    // Check if same customized product already exists in cart
     const existingItem = cartItems.find(item => {
         if (item.id !== product.id || !item.customization) return false;
-        return item.customization.size === customizationDetails.size &&
-                item.customization.finish === customizationDetails.finish;
+        return JSON.stringify(item.customization) === JSON.stringify(customizationDetails);
     });
 
     if (existingItem) {
         existingItem.quantity += quantityToAdd;
     } else {
-        cartItems.unshift({ // Add to the beginning of the array
+        cartItems.unshift({
             id: product.id,
             quantity: quantityToAdd,
             customization: customizationDetails,
+            attributes,
             selected: true
         });
     }
+
     updateCounts();
     saveState();
-    closeModals(); // Close the modal after adding to cart
+    closeModals();
+
     showSuccessNotification({
-        product: product,
+        product,
         customization: customizationDetails,
         quantity: quantityToAdd
     });
@@ -2365,22 +2509,40 @@ function handlePlaceOrder() {
 
     console.log("🧾 Sending Order Data:", orderData);
 
-    // 🚀 Send via AJAX
-    // $.ajax({
-    //     url: '../assets/php/submit_order.php',
-    //     method: 'POST',
-    //     data: { order: JSON.stringify(orderData) },
-    //     success: function (response) {
-    //         console.log("✅ Order submitted:", response);
-    //         alert("Your order has been placed successfully!");
-    //         // Optionally redirect to order confirmation page
-    //         // window.location.href = 'order_confirmation.php';
-    //     },
-    //     error: function (xhr, status, error) {
-    //         console.error("❌ Error placing order:", error);
-    //         alert("An error occurred while placing your order. Please try again.");
-    //     }
-    // });
+    $.ajax({
+        url: "../assets/php/place_order.php",
+        type: "POST",
+        data: { orderData: JSON.stringify(orderData) },
+        dataType: "json",
+        success: function (response) {
+            console.table(response);
+
+            if (response.status === "success") {
+                showToast("✅ Order placed successfully!", "success");
+
+                // ✅ Logic to remove checked-out items from cart
+                const itemsToKeep = cartItems.filter(item => !item.selected);
+                cartItems = itemsToKeep;
+
+                // ✅ If the cart is now empty, uncheck the "Select All" box
+                if (document.getElementById('selectAllCheckbox')) {
+                    document.getElementById('selectAllCheckbox').checked = false;
+                }
+
+                updateCounts();
+                saveState();
+                closeModals();
+
+            } else {
+                alert("Error: " + (response.message || "Unknown error occurred."));
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error("Order error:", error);
+            alert("Something went wrong while placing your order. Please try again later.");
+        }
+    });
+
 }
 
 
