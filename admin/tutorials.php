@@ -60,9 +60,9 @@
         <div class="section-header">
           <h2>Tutorial Management</h2>
           <div class="table-controls">
-            <button class="btn btn-primary" id="add-tutorial-btn">
+            <!-- <button class="btn btn-primary" id="add-tutorial-btn">
               <i class="fas fa-plus"></i> Add New Tutorial
-            </button>
+            </button> -->
           </div>
         </div>
 

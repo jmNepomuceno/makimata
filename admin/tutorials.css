@@ -1005,3 +1005,102 @@
 }
 
 /*  */
+/* === Tutorial Status Badges === */
+.tutorial-status {
+  margin-top: 8px;
+}
+
+.tutorial-status .badge {
+  display: inline-block;
+  padding: 0.4rem 0.8rem;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Approved = Green */
+.badge-success {
+  background-color: #28a745;
+  color: #fff;
+}
+
+/* Rejected = Red */
+.badge-danger {
+  background-color: #dc3545;
+  color: #fff;
+}
+
+/* Pending = Yellow / Orange */
+.badge-warning {
+  background-color: #ffc107;
+  color: #000;
+  animation: pulsePending 1.5s infinite;
+}
+
+/* Optional pulse effect for pending status */
+@keyframes pulsePending {
+  0% { box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.5); }
+  70% { box-shadow: 0 0 0 8px rgba(255, 193, 7, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 193, 7, 0); }
+}
+
+/* Make approve/reject buttons smaller and cleaner */
+.tutorial-card-footer .btn-sm {
+  font-size: 0.8rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+}
+
+/* Optional: spacing between buttons */
+.tutorial-card-footer .btn-sm + .btn-sm {
+  margin-left: 4px;
+}
+
+/* ✅ Approve and Reject buttons inside tutorial cards */
+.tutorial-card-footer .approve-btn,
+.tutorial-card-footer .reject-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  padding: 0.35rem 0.7rem;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+/* ✅ Approve button style */
+.tutorial-card-footer .approve-btn {
+  background-color: #28a745;
+  color: #fff;
+}
+.tutorial-card-footer .approve-btn:hover {
+  background-color: #218838;
+  transform: translateY(-1px);
+}
+
+/* ❌ Reject button style */
+.tutorial-card-footer .reject-btn {
+  background-color: #dc3545;
+  color: #fff;
+}
+.tutorial-card-footer .reject-btn:hover {
+  background-color: #c82333;
+  transform: translateY(-1px);
+}
+
+/* Optional: disabled state */
+.tutorial-card-footer .approve-btn:disabled,
+.tutorial-card-footer .reject-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* To space them nicely in the footer */
+.tutorial-card-footer .approve-btn + .reject-btn {
+  margin-left: 0.4rem;
+}

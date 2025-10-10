@@ -91,55 +91,122 @@ class TutorialManager {
     });
   }
 
+  updateTutorialStatus(tutorialId, newStatus) {
+    // Example: AJAX call to backend (PHP)
+    $.ajax({
+      url: "../assets/php_admin/update_tutorial_status.php",
+      type: "POST",
+      data: { tutorialId: tutorialId, status: newStatus },
+      success: (response) => {
+        console.log(response)
+        // You can adjust this part based on your backend response
+        alert(`Tutorial has been ${newStatus}.`);
+        
+        // Update in the local data
+        const tutorial = this.tutorials.find(t => t.id === tutorialId);
+        if (tutorial) tutorial.status = newStatus;
 
-  renderTutorials() {
-    const gridView = document.getElementById("tutorials-view")
-    if (!gridView) return
-
-    const startIndex = (this.currentPage - 1) * this.itemsPerPage
-    const endIndex = startIndex + this.itemsPerPage
-    const paginatedTutorials = this.filteredTutorials.slice(startIndex, endIndex)
-
-    if (paginatedTutorials.length === 0) {
-      gridView.innerHTML = `<p style="text-align: center; padding: 2rem; grid-column: 1 / -1;">No tutorials found.</p>`
-      this.renderPagination()
-      return
-    }
-
-    gridView.innerHTML = paginatedTutorials
-      .map((tutorial) => {
-        const link = tutorial.type === 'video' ? tutorial.video_url : tutorial.article_url
-        const isClickable = !!link
-        const cardTag = isClickable ? 'a' : 'div'
-        const cardHref = isClickable ? `href="${link}" target="_blank"` : ''
-
-        return `
-          <${cardTag} class="tutorial-card ${!isClickable ? 'not-clickable' : ''}" ${cardHref}>
-              <div class="tutorial-card-thumbnail">
-                  <div class="tutorial-icon">
-                    <i class="${this.getTutorialIcon(tutorial.type)}"></i>
-                  </div>
-                  <span class="type-badge ${tutorial.type}">
-                    <i class="fas ${tutorial.type === "video" ? "fa-play" : "fa-file-alt"}"></i> ${tutorial.type}
-                  </span>
-              </div>
-              <div class="tutorial-card-content">
-                  <h4 class="tutorial-title"><b>Title</b>: ${tutorial.title}</h4>
-                  <p class="tutorial-description"><i>Description: </i>${tutorial.description}</p>
-              </div>
-              <div class="tutorial-card-footer">
-                  <span class="last-updated">Updated: ${new Date(tutorial.last_updated).toLocaleDateString("en-US", { month: "short", day: "numeric" })}</span>
-                  <div class="action-buttons">
-                      <button class="btn-icon edit-btn" title="Edit" onclick="event.preventDefault(); event.stopPropagation(); tutorialManager.openTutorialModal(${tutorial.id})"><i class="fas fa-edit"></i></button>
-                  </div>
-              </div>
-          </${cardTag}>
-        `;
-      })
-      .join("")
-
-    this.renderPagination()
+        this.renderTutorials();
+      },
+      error: () => {
+        alert("Error updating tutorial status.");
+      }
+    });
   }
+
+
+renderTutorials() {
+  const gridView = document.getElementById("tutorials-view");
+  if (!gridView) return;
+
+  const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+  const endIndex = startIndex + this.itemsPerPage;
+  const paginatedTutorials = this.filteredTutorials.slice(startIndex, endIndex);
+  console.log(paginatedTutorials)
+
+  if (paginatedTutorials.length === 0) {
+    gridView.innerHTML = `<p style="text-align: center; padding: 2rem; grid-column: 1 / -1;">No tutorials found.</p>`;
+    this.renderPagination();
+    return;
+  }
+
+  gridView.innerHTML = paginatedTutorials
+    .map((tutorial) => {
+      const link = tutorial.type === 'video' ? tutorial.video_url : tutorial.article_url;
+      const isClickable = !!link;
+      const cardTag = isClickable ? 'a' : 'div';
+      const cardHref = isClickable ? `href="${link}" target="_blank"` : '';
+
+      // Status badge (Pending, Approved, Rejected)
+      const statusClass = tutorial.status === 'approved'
+        ? 'badge-success'
+        : tutorial.status === 'rejected'
+        ? 'badge-danger'
+        : 'badge-warning';
+
+      const statusText = tutorial.status
+        ? tutorial.status.charAt(0).toUpperCase() + tutorial.status.slice(1)
+        : 'Pending';
+
+      return `
+        <${cardTag} class="tutorial-card ${!isClickable ? 'not-clickable' : ''}" ${cardHref}>
+          <div class="tutorial-card-thumbnail">
+            <div class="tutorial-icon">
+              <i class="${this.getTutorialIcon(tutorial.type)}"></i>
+            </div>
+            <span class="type-badge ${tutorial.type}">
+              <i class="fas ${tutorial.type === "video" ? "fa-play" : "fa-file-alt"}"></i> ${tutorial.type}
+            </span>
+          </div>
+          <div class="tutorial-card-content">
+            <h4 class="tutorial-title"><b>Title</b>: ${tutorial.title}</h4>
+            <p class="tutorial-description"><i>Description: </i>${tutorial.description}</p>
+            <p class="tutorial-status">
+              <span class="badge ${statusClass}">${statusText}</span>
+            </p>
+          </div>
+          <div class="tutorial-card-footer">
+            <span class="last-updated">Updated: ${new Date(tutorial.last_updated).toLocaleDateString("en-US", { month: "short", day: "numeric" })}</span>
+            <div class="action-buttons">
+              ${
+                tutorial.status === 'pending'
+                  ? `
+                    <button class="btn btn-sm btn-success approve-btn" data-id="${tutorial.id}">
+                      <i class="fas fa-check"></i> Approve
+                    </button>
+                    <button class="btn btn-sm btn-danger reject-btn" data-id="${tutorial.id}">
+                      <i class="fas fa-times"></i> Reject
+                    </button>
+                  `
+                  : `
+                    <button class="btn-icon edit-btn" title="Edit" onclick="event.preventDefault(); event.stopPropagation(); tutorialManager.openTutorialModal(${tutorial.id})">
+                      <i class="fas fa-edit"></i>
+                    </button>
+                  `
+              }
+            </div>
+          </div>
+        </${cardTag}>
+      `;
+    })
+    .join("");
+
+  this.renderPagination();
+
+  // Attach approval/rejection handlers using jQuery
+  $(".approve-btn").off("click").on("click", (e) => {
+    e.preventDefault();
+    const tutorialId = $(e.currentTarget).data("id");
+    this.updateTutorialStatus(tutorialId, "approved");
+  });
+
+  $(".reject-btn").off("click").on("click", (e) => {
+    e.preventDefault();
+    const tutorialId = $(e.currentTarget).data("id");
+    this.updateTutorialStatus(tutorialId, "rejected");
+  });
+}
+
 
 
   renderPagination() {

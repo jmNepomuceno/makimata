@@ -9,7 +9,7 @@
     // $stmt->execute();
     // $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    $stmtUpdate = $pdo->prepare("UPDATE products SET stock_status = 'old'");
+    $stmtUpdate = $pdo->prepare("UPDATE tutorials SET status = 'pending'");
     $stmtUpdate->execute();
 
     // $orderId = "ORD000004";

@@ -100,25 +100,34 @@ class TutorialManager {
 
 
   renderTutorials() {
-    const gridView = document.getElementById("tutorials-view")
-    if (!gridView) return
+    const gridView = document.getElementById("tutorials-view");
+    if (!gridView) return;
 
-    const startIndex = (this.currentPage - 1) * this.itemsPerPage
-    const endIndex = startIndex + this.itemsPerPage
-    const paginatedTutorials = this.filteredTutorials.slice(startIndex, endIndex)
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    const paginatedTutorials = this.filteredTutorials.slice(startIndex, endIndex);
 
     if (paginatedTutorials.length === 0) {
-      gridView.innerHTML = `<p style="text-align: center; padding: 2rem; grid-column: 1 / -1;">No tutorials found.</p>`
-      this.renderPagination()
-      return
+      gridView.innerHTML = `
+        <p style="text-align: center; padding: 2rem; grid-column: 1 / -1;">
+          No tutorials found.
+        </p>`;
+      this.renderPagination();
+      return;
     }
 
     gridView.innerHTML = paginatedTutorials
       .map((tutorial) => {
-        const link = tutorial.type === 'video' ? tutorial.video_url : tutorial.article_url
-        const isClickable = !!link
-        const cardTag = isClickable ? 'a' : 'div'
-        const cardHref = isClickable ? `href="${link}" target="_blank"` : ''
+        const link = tutorial.type === 'video' ? tutorial.video_url : tutorial.article_url;
+        const isClickable = !!link;
+        const cardTag = isClickable ? 'a' : 'div';
+        const cardHref = isClickable ? `href="${link}" target="_blank"` : '';
+
+        // 🟡 Status badge class based on status
+        let statusClass = '';
+        if (tutorial.status === 'approved') statusClass = 'status-approved';
+        else if (tutorial.status === 'rejected') statusClass = 'status-rejected';
+        else statusClass = 'status-pending';
 
         return `
           <${cardTag} class="tutorial-card ${!isClickable ? 'not-clickable' : ''}" ${cardHref}>
@@ -131,22 +140,31 @@ class TutorialManager {
                   </span>
               </div>
               <div class="tutorial-card-content">
-                  <h4 class="tutorial-title"><b>Title</b>: ${tutorial.title}</h4>
-                  <p class="tutorial-description"><i>Description: </i>${tutorial.description}</p>
+                  <h4 class="tutorial-title"><b>Title:</b> ${tutorial.title}</h4>
+                  <p class="tutorial-description"><i>Description:</i> ${tutorial.description}</p>
               </div>
               <div class="tutorial-card-footer">
-                  <span class="last-updated">Updated: ${new Date(tutorial.last_updated).toLocaleDateString("en-US", { month: "short", day: "numeric" })}</span>
+                  <span class="last-updated">
+                    Updated: ${new Date(tutorial.last_updated).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                  </span>
+                  <span class="status-badge ${statusClass}">
+                    ${tutorial.status.charAt(0).toUpperCase() + tutorial.status.slice(1)}
+                  </span>
                   <div class="action-buttons">
-                      <button class="btn-icon edit-btn" title="Edit" onclick="event.preventDefault(); event.stopPropagation(); tutorialManager.openTutorialModal(${tutorial.id})"><i class="fas fa-edit"></i></button>
+                      <button class="btn-icon edit-btn" title="Edit"
+                        onclick="event.preventDefault(); event.stopPropagation(); tutorialManager.openTutorialModal(${tutorial.id})">
+                        <i class="fas fa-edit"></i>
+                      </button>
                   </div>
               </div>
           </${cardTag}>
         `;
       })
-      .join("")
+      .join("");
 
-    this.renderPagination()
+    this.renderPagination();
   }
+
 
 
   renderPagination() {

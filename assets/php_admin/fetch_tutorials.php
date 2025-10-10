@@ -14,7 +14,8 @@ try {
                 article_url, 
                 views, 
                 last_updated, 
-                icon
+                icon,
+                status
             FROM tutorials
             ORDER BY last_updated DESC";
 
