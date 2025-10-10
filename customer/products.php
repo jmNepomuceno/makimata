@@ -772,6 +772,25 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="preview-container" style="position: relative; display: inline-block;">
+                    <img id="customizationImage" src="mik/products/mugs/m1.png" alt="Product" style="width: 100%; border-radius: 8px;">
+                    <div id="engravePreview" 
+                        style="
+                            position: absolute; 
+                            top: 50%; 
+                            left: 50%; 
+                            transform: translate(-50%, -50%);
+                            color: #3c3c3c;
+                            font-family: 'Georgia', serif;
+                            font-size: 20px;
+                            font-weight: bold;
+                            text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+                            pointer-events: none;
+                            text-align: center;
+                        ">
+                    </div>
+                </div>
             </div>
             
             <div class="customization-footer">

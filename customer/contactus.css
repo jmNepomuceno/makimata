@@ -1404,3 +1404,25 @@ header{
 height: auto;
 }
 
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.section-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.section-controls .btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.section-header{
+  /* border:1px solid red; */
+  /* justify-content: flex-end; */
+}

@@ -29,9 +29,16 @@ try {
 
     $orders = [];
     foreach ($ordersData as $row) {
-        // Fetch items
-        $sqlItems = "SELECT name, quantity AS qty, price 
-                     FROM order_items WHERE order_code = :order_code";
+
+        // Fetch items including attributes and customization
+        $sqlItems = "SELECT 
+                        name, 
+                        quantity AS qty, 
+                        price,
+                        attributes,
+                        customization_json
+                     FROM order_items 
+                     WHERE order_code = :order_code";
         $stmtItems = $pdo->prepare($sqlItems);
         $stmtItems->execute([":order_code" => $row['order_code']]);
         $items = $stmtItems->fetchAll(PDO::FETCH_ASSOC);
@@ -48,6 +55,7 @@ try {
         ]);
         $review = $stmtReview->fetch(PDO::FETCH_ASSOC);
 
+        // Push data
         $orders[] = [
             "id"     => $row['order_code'],
             "date"   => $row['created_at'],

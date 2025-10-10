@@ -606,6 +606,7 @@ function fetchCompletedOrders(filters = {}) {
         data: filters,
         dataType: "json",
         success: function (response) {
+            console.log(response)
             if (response.status === "success") {
                 renderCompletedOrders(response.orders);
             } else {
@@ -629,21 +630,32 @@ function renderCompletedOrders(orders) {
         return;
     }
 
+    console.log(orders)
+
     let html = "";
     orders.forEach(order => {
-        let itemsHtml = order.items.map(item => `
-            <div class="order-item">
-                <span>${item.name} (${item.qty}x)</span>
-                <span>₱${item.price}</span>
-            </div>
-        `).join("");
+        const itemsHtml = order.items.map(item => {
+            const attrList = item.attributes
+                ? item.attributes.split("|").map(a => `<div class="attr-item">${a.trim()}</div>`).join("")
+                : "<div class='attr-item text-muted'>No customization</div>";
 
+            return `
+                <div class="order-item">
+                    <div>
+                        <div class="item-name fw-bold">${item.name} (${item.qty}×)</div>
+                        <div class="item-attrs">${attrList}</div>
+                    </div>
+                    <div class="item-price">₱${item.price}</div>
+                </div>
+            `;
+        }).join("");
+
+        // Review UI
         let reviewHtml = "";
         if (order.review) {
-            // Already reviewed → show static review
-            const starsHtml = [...Array(5)].map((_, i) => `
-                <i class="fa-star ${i < order.review.rating ? "fas" : "far"}"></i>
-            `).join("");
+            const starsHtml = [...Array(5)].map((_, i) =>
+                `<i class="fa-star ${i < order.review.rating ? "fas" : "far"}"></i>`
+            ).join("");
 
             reviewHtml = `
                 <div class="review-display">
@@ -653,31 +665,18 @@ function renderCompletedOrders(orders) {
                 </div>
             `;
         } else {
-            // Not yet reviewed → show form
             reviewHtml = `
                 <div class="review-section" data-order="${order.id}">
                     <div class="stars">
-                        ${[1,2,3,4,5].map(star => `
-                            <i class="fa-star far" data-star="${star}"></i>
-                        `).join("")}
+                        ${[1,2,3,4,5].map(star =>
+                            `<i class="fa-star far" data-star="${star}"></i>`
+                        ).join("")}
                     </div>
                     <textarea class="review-comment" placeholder="Write your comment (optional)..."></textarea>
                     <button class="submit-review">Submit Review</button>
                 </div>
             `;
         }
-
-        html += `
-            <div class="completed-order-card">
-                <div class="order-header">
-                    <h3>Order #${order.id}</h3>
-                    <span>${order.date}</span>
-                </div>
-                <div class="order-items">${itemsHtml}</div>
-                <div class="order-total">Total: ₱${order.total}</div>
-                ${reviewHtml}
-            </div>
-        `;
 
         html += `
             <div class="completed-order-card">
@@ -695,24 +694,22 @@ function renderCompletedOrders(orders) {
                 ${reviewHtml}
             </div>
         `;
-
     });
 
     $("#completedOrdersList").html(html);
 
-    // Handle star selection
+    // ⭐ Rating logic
     $(".stars i").on("click", function () {
-        let starValue = $(this).data("star");
-        $(this).parent().find("i").removeClass("fas").addClass("far");
-        $(this).parent().find("i").each(function () {
-            if ($(this).data("star") <= starValue) {
-                $(this).removeClass("far").addClass("fas");
-            }
+        const starValue = $(this).data("star");
+        const parent = $(this).parent();
+        parent.find("i").removeClass("fas").addClass("far");
+        parent.find("i").each(function () {
+            if ($(this).data("star") <= starValue) $(this).removeClass("far").addClass("fas");
         });
-        $(this).parent().attr("data-selected", starValue);
+        parent.attr("data-selected", starValue);
     });
 
-    // Handle submit review
+    // 💬 Submit review
     $(".submit-review").on("click", function () {
         const parent = $(this).closest(".review-section");
         const orderId = parent.data("order");
@@ -724,20 +721,15 @@ function renderCompletedOrders(orders) {
             type: "POST",
             data: { orderId, stars, comment },
             dataType: "json",
-            success: function (res) {
-                if (res.status === "success") {
-                    alert("Review submitted!");
-                    fetchCompletedOrders(); // Refresh list
-                } else {
-                    alert(res.message);
-                }
+            success: res => {
+                alert(res.status === "success" ? "Review submitted!" : res.message);
+                if (res.status === "success") fetchCompletedOrders();
             },
-            error: function () {
-                alert("Failed to submit review.");
-            }
+            error: () => alert("Failed to submit review.")
         });
     });
 }
+
 
 
 function fetchOrders(filters = {}) {
@@ -787,11 +779,59 @@ function fetchOrders(filters = {}) {
                     timelineHtml += '</div>';
 
                     // Items
-                    let itemsHtml = '<ul class="order-items">';
+                    let itemsHtml = `
+                        <table class="order-items-table">
+                            <thead>
+                                <tr>
+                                    <th>Item Name</th>
+                                    <th>Total Price</th>
+                                    <th>Attributes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                    `;
+
                     order.items.forEach(item => {
-                        itemsHtml += `<li>${item.name} (${item.attributes}) - Qty: ${item.qty} - ₱${parseFloat(item.price).toFixed(2)}</li>`;
+                        let attributesHtml = '';
+
+                        if (item.attributes && item.attributes.trim() !== '') {
+                            // Try to parse JSON
+                            try {
+                                const attr = JSON.parse(item.attributes);
+                                const attrPairs = [];
+
+                                if (attr.sizeLabel) attrPairs.push(`<div><strong>Size:</strong> ${attr.sizeLabel}</div>`);
+                                if (attr.finish) attrPairs.push(`<div><strong>Finish:</strong> ${attr.finish}</div>`);
+                                if (attr.engravingText) attrPairs.push(`<div><strong>Engraving:</strong> "${attr.engravingText}"</div>`);
+                                if (attr.messageCard) attrPairs.push(`<div><strong>Message Card:</strong> "${attr.messageCard}"</div>`);
+                                if (attr.giftPackaging && attr.giftPackaging !== 'none') attrPairs.push(`<div><strong>Gift Packaging:</strong> ${attr.giftPackaging}</div>`);
+                                if (attr.specialHandling && attr.specialHandling !== 'none') attrPairs.push(`<div><strong>Handling:</strong> ${attr.specialHandling}</div>`);
+                                if (attr.deliveryPreference && attr.deliveryPreference !== 'standard') attrPairs.push(`<div><strong>Delivery:</strong> ${attr.deliveryPreference}</div>`);
+
+                                attributesHtml = `<div class="attributes-block">${attrPairs.join('')}</div>`;
+                            } catch {
+                                // Fallback for plain text
+                                const parts = item.attributes.split('|').map(p => `<div>${p.trim()}</div>`).join('');
+                                attributesHtml = `<div class="attributes-block">${parts}</div>`;
+                            }
+                        } else {
+                            attributesHtml = `<span class="no-attributes">No customizations</span>`;
+                        }
+
+                        itemsHtml += `
+                            <tr>
+                                <td>${item.name}</td>
+                                <td>₱${parseFloat(item.price).toFixed(2)} × ${item.qty}</td>
+                                <td>${attributesHtml}</td>
+                            </tr>
+                        `;
                     });
-                    itemsHtml += '</ul>';
+
+                    itemsHtml += `
+                            </tbody>
+                        </table>
+                    `;
+
 
                     // Cancel button if pending
                     let cancelBtn = '';
@@ -905,6 +945,11 @@ function setupEventListeners() {
     if (deliverySelect) {
         deliverySelect.addEventListener('change', () => updateCustomizationView(true));
     }
+
+    document.getElementById('engravingText').addEventListener('input', function() {
+        const engravingPreview = document.getElementById('engravePreview');
+        engravingPreview.textContent = this.value.trim();
+    });
 
     // Add hover listeners for finish options
     document.querySelectorAll('.finish-options label').forEach(label => {
@@ -1662,7 +1707,9 @@ function openCustomization(productId) {
     }
 
     // Set the initial image to the main product image (not a variant)
-    document.getElementById('customizationImage').src = product.image;
+    console.log(product.image)
+    document.getElementById('customizationImage').src = `/customer/${product.image}`;
+
 
     // Call updateCustomizationView to set initial price and button states.
     updateCustomizationView(false); // Pass false so it doesn't try to change the image yet
@@ -1751,9 +1798,6 @@ function getCustomizationExtras() {
   };
 }
 
-
-
-
 function updateCustomizationView(updateImage = true) {
     if (!currentCustomizingProduct) return;
 
@@ -1788,7 +1832,13 @@ function updateCustomizationView(updateImage = true) {
         attributes
     } = getCustomizationExtras();
 
-    console.log(extraCost)
+    
+    // --- 🆕 Update engraving text preview ---
+    const engravingInput = document.getElementById('engravingText');
+    if (engravingInput) {
+        const engravingPreview = document.getElementById('engravePreview');
+        engravingPreview.textContent = engravingInput.value.trim() || '';
+    }
 
     finalPrice += extraCost;
 
@@ -1806,6 +1856,7 @@ function updateCustomizationView(updateImage = true) {
         const imageKey = finish;
         if (currentCustomizingProduct.images && currentCustomizingProduct.images[imageKey]) {
             const newImageSrc = currentCustomizingProduct.images[imageKey];
+            console.log('here')
             document.getElementById('customizationImage').src = newImageSrc;
 
             const thumbnailToSelect = document.querySelector(`#thumbnailGallery img[src="${newImageSrc}"]`);
@@ -1881,39 +1932,37 @@ function addCustomizedToCart() {
         return;
     }
 
-    // Get human-readable size label
+    // --- Get readable size label ---
     let sizeLabel = '';
     const sizeLabelElement = selectedSizeInput.closest('label');
     if (sizeLabelElement) {
         const radioLabelSpan = sizeLabelElement.querySelector('.radio-label');
-        if (radioLabelSpan) {
-            sizeLabel = radioLabelSpan.textContent.trim();
-        }
+        if (radioLabelSpan) sizeLabel = radioLabelSpan.textContent.trim();
     }
     if (!sizeLabel) sizeLabel = selectedSizeInput.value;
 
-    // Get quantity safely
+    // --- Quantity ---
     const quantityToAdd = parseInt(document.getElementById('quantity').value || 1);
 
-    // Collect universal customizations
-    const engravingText = document.getElementById('engravingText')?.value.trim() || '';
-    const giftPackaging = document.getElementById('giftPackaging')?.value || 'none';
-    const messageCard = document.getElementById('messageCard')?.value.trim() || '';
-    const specialHandling = document.getElementById('specialHandling')?.value || 'none';
-    const deliveryPreference = document.getElementById('deliveryPreference')?.value || 'standard';
+    // --- Fetch universal customizations ---
+    const { engravingText, giftPackaging, messageCard, specialHandling, deliveryPreference, extraCost, attributes: extraAttributes } = getCustomizationExtras();
 
-    // Calculate extra costs (optional if you already include this in estimated price)
-    let extraCost = 0;
-    if (engravingText) extraCost += 50;
-    if (giftPackaging === 'basic') extraCost += 50;
-    if (giftPackaging === 'premium') extraCost += 100;
-    if (messageCard) extraCost += 20;
-    if (specialHandling === 'fragile') extraCost += 10;
-    if (specialHandling === 'eco') extraCost += 15;
-    if (deliveryPreference === 'express') extraCost += 100;
-    if (deliveryPreference === 'scheduled') extraCost += 50;
+    // --- Base price computation ---
+    let basePrice = product.price;
 
-    // Construct readable customization summary
+    // Adjust for size
+    if (selectedSizeInput.value === 'large') basePrice *= 1.1;
+    if (selectedSizeInput.value === 'small') basePrice *= 0.8;
+
+    // Adjust for finish
+    if (['dark', 'premium'].includes(selectedFinishInput.value)) basePrice += 40;
+
+    // Add extra costs
+    basePrice += extraCost;
+
+    const finalPrice = basePrice * quantityToAdd;
+
+    // --- Build final customization object ---
     const customizationDetails = {
         size: selectedSizeInput.value,
         sizeLabel,
@@ -1926,18 +1975,15 @@ function addCustomizedToCart() {
         extraCost
     };
 
-    // Generate readable attribute string for order_items or cart display
+    // --- Merge base attributes + extras ---
     const attributes = [
         `Size: ${sizeLabel}`,
         `Finish: ${selectedFinishInput.value}`,
-        engravingText ? `Engraving: "${engravingText}"` : null,
-        giftPackaging !== 'none' ? `Gift Packaging: ${giftPackaging}` : null,
-        messageCard ? `Message Card: "${messageCard}"` : null,
-        specialHandling !== 'none' ? `Handling: ${specialHandling}` : null,
-        deliveryPreference !== 'standard' ? `Delivery: ${deliveryPreference}` : null
+        extraAttributes
     ].filter(Boolean).join(' | ');
+    console.log(attributes)
 
-    // Check if same customized product already exists in cart
+    // --- Check if item already exists in cart (same customizations) ---
     const existingItem = cartItems.find(item => {
         if (item.id !== product.id || !item.customization) return false;
         return JSON.stringify(item.customization) === JSON.stringify(customizationDetails);
@@ -1948,7 +1994,9 @@ function addCustomizedToCart() {
     } else {
         cartItems.unshift({
             id: product.id,
+            name: product.name,
             quantity: quantityToAdd,
+            price: finalPrice, // ✅ Include price with extras
             customization: customizationDetails,
             attributes,
             selected: true
@@ -1965,6 +2013,7 @@ function addCustomizedToCart() {
         quantity: quantityToAdd
     });
 }
+
 
 function buyNow() {
     if (!currentCustomizingProduct) return;
@@ -2044,8 +2093,7 @@ function renderCartItems() {
     }
 
     const allSelected = cartItems.length > 0 && cartItems.every(item => item.selected);
-    
-    // Start building the HTML string
+
     let cartHTML = `
         <div class="cart-select-all">
             <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAllCartItems()" ${allSelected ? 'checked' : ''}>
@@ -2053,17 +2101,29 @@ function renderCartItems() {
         </div>
     `;
 
-    // Append the items to the string
     cartHTML += cartItems.map((item, index) => {
         const product = PRODUCTS.find(p => p.id === item.id);
         if (!product) return '';
 
         let itemPrice = product.price;
-        if (item.customization) { // Check if customization exists before accessing its properties
+
+        if (item.customization) {
+            // Apply size-based price adjustments
             if (item.customization.size === 'large') itemPrice *= 1.1;
             if (item.customization.size === 'small') itemPrice *= 0.8;
-            if (item.customization.finish === 'dark' || item.customization.finish === 'premium') itemPrice += 40;
+
+            // Apply finish-based adjustments
+            if (item.customization.finish === 'dark' || item.customization.finish === 'premium') {
+                itemPrice += 40;
+            }
+
+            // ✅ Add extraCost (engraving, gift wrap, etc.)
+            if (item.customization.extraCost) {
+                itemPrice += item.customization.extraCost;
+            }
         }
+
+        const totalItemPrice = itemPrice * item.quantity;
 
         return `
             <div class="cart-item">
@@ -2073,11 +2133,11 @@ function renderCartItems() {
                     <h4>${product.name}</h4>
                     ${item.customization ? `
                         <div class="customization-details">
-                            <small>Size: ${item.customization.sizeLabel}</small>
-                            <small>Finish: ${FINISH_DISPLAY_NAMES[item.customization.finish] || item.customization.finish}</small>
+                            <small>${item.attributes}</small>
                         </div>
                     ` : ''}
-                    <p class="item-price">₱${itemPrice.toFixed(2)}</p>
+                    <p class="item-price">₱${itemPrice.toFixed(2)} <small>x${item.quantity}</small></p>
+                    <p class="item-subtotal">Subtotal: ₱${totalItemPrice.toFixed(2)}</p>
                 </div>
                 <div class="quantity-controls">
                     <button ${item.quantity === 1 ? 'disabled' : ''} onclick="updateCartQuantity(${item.id}, ${item.quantity - 1}, ${index})">-</button>
@@ -2091,7 +2151,6 @@ function renderCartItems() {
         `;
     }).join('');
 
-    // Set the final HTML
     cartItemsEl.innerHTML = cartHTML;
 
     const total = getCartTotal();
@@ -2105,6 +2164,7 @@ function renderCartItems() {
         </div>
     `;
 }
+
 
 function renderWishlistItems() {
     const wishlistItemsEl = document.getElementById('wishlistItems');
@@ -2157,85 +2217,108 @@ function handleCheckout() {
 }
 
 function openBillingModal(items, source = 'cart') {
-    closeModals(); // Close cart modal first
+    closeModals();
 
     const summaryItemsEl = document.getElementById('billingSummaryItems');
-    // Target the main summary box on the left, not the footer element.
     const summaryBoxEl = summaryItemsEl ? summaryItemsEl.parentElement : null;
     let total = 0;
 
-    // Prevent errors if billing summary elements are not in the DOM
     if (!summaryItemsEl || !summaryBoxEl) {
         console.error("Billing modal summary elements not found. Check your HTML.");
         alert("Could not display billing information. An error occurred.");
         return;
     }
 
-    // Clear any old total section from the summary box to prevent duplication on reopen
     const oldTotalEl = summaryBoxEl.querySelector('#billingSummaryTotal');
-    if (oldTotalEl) {
-        oldTotalEl.remove();
-    }
+    if (oldTotalEl) oldTotalEl.remove();
 
     let summaryHTML = items.map(item => {
         const product = PRODUCTS.find(p => p.id === item.id);
         if (!product) return '';
 
         let itemPrice = product.price;
-        let customizationDetailsHTML = '';
+        let customizationDetails = [];
+
+        // ✅ Apply existing customization logic
         if (item.customization) {
             if (item.customization.size === 'large') itemPrice *= 1.1;
             if (item.customization.size === 'small') itemPrice *= 0.8;
             if (item.customization.finish === 'dark' || item.customization.finish === 'premium') itemPrice += 40;
 
-            const finishDisplayName = FINISH_DISPLAY_NAMES[item.customization.finish] || item.customization.finish;
-            customizationDetailsHTML = `
-                <div class="summary-customization-details">
-                    <span>Size: ${item.customization.sizeLabel}</span> | <span>Finish: ${finishDisplayName}</span>
-                </div>
-            `;
+            // ✅ Add extraCost if exists
+            if (item.customization.extraCost) itemPrice += item.customization.extraCost;
+
+            // ✅ Build readable customization details
+            if (item.customization.sizeLabel) customizationDetails.push(`Size: ${item.customization.sizeLabel}`);
+            if (item.customization.finish) {
+                const finishDisplayName = FINISH_DISPLAY_NAMES[item.customization.finish] || item.customization.finish;
+                customizationDetails.push(`Finish: ${finishDisplayName}`);
+            }
+
+            // 🏷 Engraving text
+            if (item.customization.engravingText) {
+                customizationDetails.push(`Engraving: "${item.customization.engravingText}"`);
+            }
+
+            // 💌 Message Card (optional text)
+            if (item.customization.messageCard && item.customization.messageCard.trim() !== '') {
+                customizationDetails.push(`Message Card: "${item.customization.messageCard}"`);
+            }
+
+            // 🎁 Gift Packaging
+            if (item.customization.giftPackaging && item.customization.giftPackaging !== 'none') {
+                customizationDetails.push(`Gift Packaging: ${item.customization.giftPackaging}`);
+            }
+
+            // ♻️ Special Handling
+            if (item.customization.specialHandling && item.customization.specialHandling !== 'none') {
+                customizationDetails.push(`Handling: ${item.customization.specialHandling}`);
+            }
+
+            // 🚚 Delivery Preference
+            if (item.customization.deliveryPreference && item.customization.deliveryPreference !== 'standard') {
+                customizationDetails.push(`Delivery: ${item.customization.deliveryPreference}`);
+            }
         }
+
+        const customizationDetailsHTML = customizationDetails.length > 0 
+            ? `<div class="summary-customization-details">${customizationDetails.join(' | ')}</div>`
+            : '';
+
         const subtotal = itemPrice * item.quantity;
         total += subtotal;
 
         return `
-            <div class="summary-item" data-id="${product.id}" data-productCode="${product.product_code}" style="display: flex; align-items: center; gap: 15px; padding: 1rem 0; border-bottom: 1px solid #f1f3f5;">
-                <img src="${product.image}" alt="${product.name}" style="width: 70px; height: 70px; border-radius: 6px; object-fit: cover;">
-                <div class="item-info" style="display: flex; justify-content: space-between; flex-grow: 1; align-items: flex-start;">
+            <div class="summary-item" data-id="${product.id}" data-productCode="${product.product_code}" 
+                style="display: flex; align-items: center; gap: 15px; padding: 1rem 0; border-bottom: 1px solid #f1f3f5;">
+                <img src="${product.image}" alt="${product.name}" 
+                    style="width: 70px; height: 70px; border-radius: 6px; object-fit: cover;">
+                <div class="item-info" 
+                    style="display: flex; justify-content: space-between; flex-grow: 1; align-items: flex-start;">
                     <div>
                         <strong style="font-size: 1.05rem; font-weight: 600;">${product.name}</strong> (x${item.quantity})
                         ${customizationDetailsHTML}
                     </div>
-                    <p style="font-size: 1rem; font-weight: 600; white-space: nowrap; margin-left: 1rem;">₱${subtotal.toFixed(2)}</p>
+                    <p style="font-size: 1rem; font-weight: 600; white-space: nowrap; margin-left: 1rem;">
+                        ₱${subtotal.toFixed(2)}
+                    </p>
                 </div>
             </div>
         `;
     }).join('');
-    
+
     summaryItemsEl.innerHTML = summaryHTML;
 
-    const subtotal = total; // This is already the calculated total from the items
-    const shippingFee = 50.00; 
+    const subtotal = total;
+    const shippingFee = 50.00;
     const finalTotal = subtotal + shippingFee;
 
-    // Create a new element for the total and append it to the summary box.
-    // This ensures the total is in the correct location (the left column).
     const summaryTotalEl = document.createElement('div');
-    summaryTotalEl.id = 'billingSummaryTotal'; // This ID is targeted by our CSS
-
+    summaryTotalEl.id = 'billingSummaryTotal';
     summaryTotalEl.innerHTML = `
-        <div class="summary-line">
-            <span>Subtotal</span>
-            <span>₱${subtotal.toFixed(2)}</span>
-        </div>
-        <div class="summary-line">
-            <span>Shipping Fee</span>
-            <span>₱${shippingFee.toFixed(2)}</span>
-        </div>
-        <div class="summary-line total-line">
-            <span>Total</span>
-            <span>₱${finalTotal.toFixed(2)}</span>
-        </div>
+        <div class="summary-line"><span>Subtotal</span><span>₱${subtotal.toFixed(2)}</span></div>
+        <div class="summary-line"><span>Shipping Fee</span><span>₱${shippingFee.toFixed(2)}</span></div>
+        <div class="summary-line total-line"><span>Total</span><span>₱${finalTotal.toFixed(2)}</span></div>
     `;
     summaryBoxEl.appendChild(summaryTotalEl);
 
@@ -2652,18 +2735,29 @@ function getCartTotal() {
     return cartItems
         .filter(item => item.selected)
         .reduce((total, item) => {
-        const product = PRODUCTS.find(p => p.id === item.id);
-        let price = product?.price || 0;
+            const product = PRODUCTS.find(p => p.id === item.id);
+            let price = product?.price || 0;
 
-        if (item.customization) {
-            if (item.customization.size === 'large') price *= 1.1;
-            if (item.customization.size === 'small') price *= 0.8;
-            if (item.customization.finish === 'dark' || item.customization.finish === 'premium') price += 40;
-        }
+            if (item.customization) {
+                // Apply size adjustments
+                if (item.customization.size === 'large') price *= 1.1;
+                if (item.customization.size === 'small') price *= 0.8;
 
-        return total + (price * item.quantity);
-    }, 0);
+                // Apply finish adjustments
+                if (item.customization.finish === 'dark' || item.customization.finish === 'premium') {
+                    price += 40;
+                }
+
+                // ✅ Include any extra cost (engraving, gift wrap, etc.)
+                if (item.customization.extraCost) {
+                    price += item.customization.extraCost;
+                }
+            }
+
+            return total + (price * item.quantity);
+        }, 0);
 }
+
 
 function updateCounts() {
     const cartCount = cartItems.reduce((total, item) => total + item.quantity, 0);

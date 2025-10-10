@@ -35,6 +35,13 @@ class TutorialManager {
     this.setupEventListeners()
   }
 
+  showToast(message, type = "info") {
+    const container = $("#toast-container");
+    const toast = $("<div>").addClass(`toast ${type}`).text(message);
+    container.append(toast);
+    setTimeout(() => toast.remove(), 4000);
+}
+
   // async loadTutorials() {
   //   console.log('here')
   //   try {
@@ -129,7 +136,9 @@ class TutorialManager {
               </div>
               <div class="tutorial-card-footer">
                   <span class="last-updated">Updated: ${new Date(tutorial.last_updated).toLocaleDateString("en-US", { month: "short", day: "numeric" })}</span>
-                  
+                  <div class="action-buttons">
+                      <button class="btn-icon edit-btn" title="Edit" onclick="event.preventDefault(); event.stopPropagation(); tutorialManager.openTutorialModal(${tutorial.id})"><i class="fas fa-edit"></i></button>
+                  </div>
               </div>
           </${cardTag}>
         `;
@@ -305,16 +314,16 @@ class TutorialManager {
         dataType: "json",
         success: (res) => {
           if (res.status === "success") {
-            showToast('Tutorial deleted successfully.', 'error');
+            this.showToast('Tutorial deleted successfully.', 'error');
             this.closeTutorialModal();
             this.loadTutorials(); // refresh DB data
           } else {
-            showToast(res.message || 'Could not delete tutorial.', 'error');
+            this.showToast(res.message || 'Could not delete tutorial.', 'error');
           }
         },
         error: (xhr, status, err) => {
           console.error("AJAX error:", err);
-          showToast('Could not delete tutorial.', 'error');
+          this.showToast('Could not delete tutorial.', 'error');
         }
       });
     }
@@ -369,16 +378,16 @@ class TutorialManager {
       success: (res) => {
         console.log(res)
         if (res.status === "success") {
-          showToast(`Tutorial ${isNew ? 'added' : 'updated'} successfully!`, 'success');
+          this.showToast(`Tutorial ${isNew ? 'added' : 'updated'} successfully!`, 'success');
           this.closeTutorialModal();
           this.loadTutorials(); // <-- refresh from DB
         } else {
-          showToast(res.message || 'Failed to save tutorial.', 'error');
+          this.showToast(res.message || 'Failed to save tutorial.', 'error');
         }
       },
       error: (xhr, status, err) => {
         console.error("AJAX error:", err);
-        showToast('Could not save tutorial.', 'error');
+        this.showToast('Could not save tutorial.', 'error');
       }
     });
   }

@@ -1,34 +1,53 @@
 <?php
-    include("../assets/connection/connection.php");
-    if (!isset($_GET['orderId'])) {
-        die("Order code is required.");
+include("../assets/connection/connection.php");
+if (!isset($_GET['orderId'])) {
+    die("Order code is required.");
+}
+
+$order_code = $_GET['orderId'];
+
+try {
+    // Fetch order details
+    $stmt = $pdo->prepare("SELECT * FROM orders WHERE order_code = :order_code");
+    $stmt->execute(['order_code' => $order_code]);
+    $order = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$order) {
+        die("Order not found.");
     }
 
-    $order_code = $_GET['orderId'];
+    // Fetch user details
+    $stmt = $pdo->prepare("SELECT * FROM users WHERE mobile_number = :mobile LIMIT 1");
+    $stmt->execute(['mobile' => $order['mobile']]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    try {
-        // Fetch order details
-        $stmt = $pdo->prepare("SELECT * FROM orders WHERE order_code = :order_code");
-        $stmt->execute(['order_code' => $order_code]);
-        $order = $stmt->fetch(PDO::FETCH_ASSOC);
+    // Fetch order items
+    $stmt = $pdo->prepare("SELECT * FROM order_items WHERE order_code = :order_code");
+    $stmt->execute(['order_code' => $order_code]);
+    $order_items = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        if (!$order) {
-            die("Order not found.");
-        }
+} catch (PDOException $e) {
+    die("DB Error: " . $e->getMessage());
+}
 
-        // Fetch user details
-        $stmt = $pdo->prepare("SELECT * FROM users WHERE mobile_number = :mobile LIMIT 1");
-        $stmt->execute(['mobile' => $order['mobile']]);
-        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+// Helper: Format attributes into readable blocks
+function parseAttributes($attributes) {
+    if (!$attributes) return "<em>No customizations</em>";
 
-        // Fetch order items
-        $stmt = $pdo->prepare("SELECT * FROM order_items WHERE order_code = :order_code");
-        $stmt->execute(['order_code' => $order_code]);
-        $order_items = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-    } catch (PDOException $e) {
-        die("DB Error: " . $e->getMessage());
+    $parts = explode('|', $attributes);
+    $html = '<div class="attr-list">';
+    foreach ($parts as $p) {
+        $p = trim($p);
+        if (!$p) continue;
+        // Split key-value pair (e.g., "Size: Large +10%")
+        $kv = explode(':', $p, 2);
+        $key = trim($kv[0] ?? '');
+        $value = trim($kv[1] ?? '');
+        $html .= "<div class='attr-item'><strong>{$key}</strong>: {$value}</div>";
     }
+    $html .= '</div>';
+    return $html;
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -43,13 +62,12 @@
         color: #1a202c;
     }
     .receipt-container {
-        max-width: 700px;
+        max-width: 750px;
         margin: auto;
         background: #fff;
         border-radius: 12px;
         box-shadow: 0 10px 25px rgba(0,0,0,0.15);
         overflow: hidden;
-        position: relative;
     }
     .receipt-header {
         background: #2563eb;
@@ -57,9 +75,6 @@
         padding: 1rem;
         text-align: center;
         position: relative;
-    }
-    .receipt-header h2 {
-        margin: 0;
     }
     .print-btn {
         position: absolute;
@@ -76,17 +91,12 @@
         box-shadow: 0 2px 6px rgba(0,0,0,0.15);
         transition: all 0.2s ease-in-out;
     }
-    .print-btn:hover {
-        background: #2563eb;
-        color: #fff;
-    }
+    .print-btn:hover { background: #2563eb; color: #fff; }
     .section {
         padding: 1rem 1.5rem;
         border-bottom: 1px dashed #d1d5db;
     }
-    .section:last-child {
-        border-bottom: none;
-    }
+    .section:last-child { border-bottom: none; }
     h3 {
         margin-bottom: .5rem;
         font-size: 1rem;
@@ -96,50 +106,43 @@
         display: inline-block;
         padding-bottom: .2rem;
     }
-    .detail-row {
-        margin: .3rem 0;
-    }
-    .detail-row strong {
-        display: inline-block;
-        width: 140px;
-        color: #111827;
-    }
+    .detail-row { margin: .3rem 0; }
+    .detail-row strong { width: 140px; display: inline-block; color: #111827; }
     table {
         width: 100%;
         border-collapse: collapse;
         margin-top: .5rem;
     }
-    table th, table td {
+    th, td {
         border-bottom: 1px dashed #d1d5db;
-        padding: .5rem;
+        padding: .6rem;
         text-align: left;
+        vertical-align: top;
     }
-    table th {
-        background: #f9fafb;
-        text-transform: uppercase;
-        font-size: .85rem;
+    th { background: #f9fafb; text-transform: uppercase; font-size: .85rem; }
+    .attr-list {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+    .attr-item {
+        background: #f3f4f6;
+        border-radius: 4px;
+        padding: 3px 6px;
+        font-size: 0.85rem;
+    }
+    .attr-item strong {
+        color: #1e40af;
     }
     .total-section {
         padding: 1rem 1.5rem;
         text-align: right;
     }
-    .total-section div {
-        margin: .3rem 0;
-    }
     .total-section strong {
         font-size: 1.1rem;
         color: #2563eb;
     }
-
-    /* Print Styling */
-    @media print {
-        body {
-            background: #fff;
-        }
-        .print-btn {
-            display: none;
-        }
-    }
+    @media print { .print-btn { display: none; } body { background: #fff; } }
 </style>
 </head>
 <body>
@@ -150,7 +153,7 @@
         <button class="print-btn" onclick="printReceipt()">🖨 Print</button>
     </div>
 
-    <!-- Customer Details -->
+    <!-- Customer Info -->
     <div class="section">
         <h3>Customer Info</h3>
         <div class="detail-row"><strong>Name:</strong> <?= htmlspecialchars($user['firstname'] . " " . $user['lastname']) ?></div>
@@ -173,24 +176,35 @@
                     <th>Attributes</th>
                     <th>Qty</th>
                     <th>Price</th>
-                    <th>Total</th>
+                    <th>Subtotal</th>
                 </tr>
             </thead>
             <tbody>
                 <?php foreach ($order_items as $item): ?>
-                <tr>
-                    <td><?= htmlspecialchars($item['name']) ?></td>
-                    <td><?= htmlspecialchars($item['attributes']) ?></td>
-                    <td><?= (int)$item['quantity'] ?></td>
-                    <td>₱<?= number_format($item['price'], 2) ?></td>
-                    <td>₱<?= number_format($item['quantity'] * $item['price'], 2) ?></td>
-                </tr>
+                    <?php
+                        $attributesHTML = parseAttributes($item['attributes']);
+                        $itemTotal = $item['quantity'] * $item['price'];
+                        $extraCost = floatval($item['extra_cost'] ?? 0);
+                    ?>
+                    <tr>
+                        <td><?= htmlspecialchars($item['name']) ?></td>
+                        <td><?= $attributesHTML ?>
+                            <?php if ($extraCost > 0): ?>
+                                <div style="margin-top:4px;color:#2563eb;font-size:0.85rem;">
+                                    <em>Customization +₱<?= number_format($extraCost,2) ?></em>
+                                </div>
+                            <?php endif; ?>
+                        </td>
+                        <td><?= (int)$item['quantity'] ?></td>
+                        <td>₱<?= number_format($item['price'], 2) ?></td>
+                        <td>₱<?= number_format($itemTotal + $extraCost, 2) ?></td>
+                    </tr>
                 <?php endforeach; ?>
             </tbody>
         </table>
     </div>
 
-    <!-- Payment & Totals -->
+    <!-- Totals -->
     <div class="section total-section">
         <div><strong>Subtotal:</strong> ₱<?= number_format($order['subtotal'], 2) ?></div>
         <div><strong>Shipping:</strong> ₱<?= number_format($order['shipping'], 2) ?></div>
@@ -202,9 +216,7 @@
 </div>
 
 <script>
-function printReceipt() {
-    window.print();
-}
+function printReceipt() { window.print(); }
 </script>
 </body>
 </html>

@@ -259,34 +259,27 @@ class OrderManager {
 
         console.log(order)
 
-        // itemsList.innerHTML = order.items.map(item => {
-        //     const price = parseFloat(item.price) / item.qty;
-        //     const total = price * parseInt(item.qty);
-        //     return `
-        //         <div class="order-item">
-        //             <img src="../placeholder.svg?height=60&width=60" alt="${item.name}" class="item-image">
-        //             <div class="item-details">
-        //                 <div class="item-name">${item.name}</div>
-        //                 <div class="item-price">₱${price.toFixed(2)} x ${item.qty}</div>
-        //             </div>
-        //             <div class="item-total">₱${total.toFixed(2)}</div>
-        //         </div>
-        //     `;
-        // }).join('');
-
         itemsList.innerHTML = order.items.map(item => {
             const price = parseFloat(item.price) / item.qty;
             const total = price * parseInt(item.qty);
+
+            // Split the attributes string into separate lines
+            const attrList = item.attributes
+                ? item.attributes.split('|').map(attr => `<div class="attr-item">${attr.trim()}</div>`).join('')
+                : '<div class="attr-item text-muted">No customization</div>';
+
             return `
                 <div class="order-item">
-                    <div class="item-details">
-                        <div class="item-name">${item.name}</div>
-                        <div class="item-price">₱${price.toFixed(2)} x ${item.qty}</div>
+                    <div class="item-info">
+                        <div class="item-name fw-bold">${item.name}</div>
+                        <div class="item-attrs">${attrList}</div>
+                        <div class="item-price">₱${price.toFixed(2)} × ${item.qty}</div>
                     </div>
-                    <div class="item-total">₱${total.toFixed(2)}</div>
+                    <div class="item-total fw-semibold">₱${total.toFixed(2)}</div>
                 </div>
             `;
         }).join('');
+
 
         // Populate totals
         const shippingCost = 50; // Set to 0 if shipping already included in total

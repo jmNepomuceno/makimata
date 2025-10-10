@@ -1040,3 +1040,17 @@
 
 
 /* added */
+
+.item-attrs {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 6px;
+    margin-top: 4px;
+}
+
+.attr-item {
+    background: #f4f4f4;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+}

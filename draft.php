@@ -2,15 +2,15 @@
     include("./assets/connection/connection.php");
     session_start();
 
-    $sql = "SELECT 
-                *
-            FROM orders";
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute();
-    $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    // $sql = "SELECT 
+    //             *
+    //         FROM order_items";
+    // $stmt = $pdo->prepare($sql);
+    // $stmt->execute();
+    // $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // $stmtUpdate = $pdo->prepare("UPDATE products SET stock_status = 'old'");
-    // $stmtUpdate->execute();
+    $stmtUpdate = $pdo->prepare("UPDATE products SET stock_status = 'old'");
+    $stmtUpdate->execute();
 
     // $orderId = "ORD000004";
 
@@ -24,8 +24,8 @@
     // $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     // echo "<pre>"; print_r($order); echo "</pre>";
-    echo "<pre>"; print_r($data); echo "</pre>";
-    echo "<pre>"; print_r($_SESSION); echo "</pre>";
+    // echo "<pre>"; print_r($data); echo "</pre>";
+    // echo "<pre>"; print_r($_SESSION); echo "</pre>";
     
 ?>
 
