@@ -24,7 +24,7 @@ class OrderManager {
             // For demonstration, we'll use mock data.
             this.orders = await  this.getMockOrders();
             this.filteredOrders = [...this.orders];
-            console.log(this.orders)
+            console.table(this.orders)
         } catch (error) {
             console.error("Error loading orders:", error);
             this.orders = [];
@@ -245,56 +245,98 @@ class OrderManager {
         const order = this.orders.find(o => o.id === orderId);
         if (!modal || !order) return;
 
-        // Populate modal basic info
-        document.getElementById('modal-order-id').textContent = order.id;
-        document.getElementById('modal-customer-name').textContent = order.customer.name;
-        document.getElementById('modal-customer-email').textContent = order.customer.email || 'N/A';
-        document.getElementById('modal-customer-phone').textContent = order.customer.phone || 'N/A';
-        document.getElementById('modal-shipping-address').textContent = order.shippingAddress;
+        // Basic Info
+        $('#modal-order-id').text(order.id);
+        $('#modal-customer-name').text(order.customer.name);
+        $('#modal-customer-email').text(order.customer.email || 'N/A');
+        $('#modal-customer-phone').text(order.customer.phone || 'N/A');
+        $('#modal-shipping-address').text(order.shippingAddress);
 
-        // Populate items
-        const itemsList = document.getElementById('modal-order-items-list');
+        // Order Items
+        const itemsList = $('#modal-order-items-list');
         const totalItems = order.items.reduce((sum, item) => sum + parseInt(item.qty), 0);
-        document.getElementById('modal-item-count').textContent = totalItems;
+        $('#modal-item-count').text(totalItems);
 
-        console.log(order)
+        itemsList.empty(); // Clear old content
 
-        itemsList.innerHTML = order.items.map(item => {
+        order.items.forEach(item => {
             const price = parseFloat(item.price) / item.qty;
             const total = price * parseInt(item.qty);
 
-            // Split the attributes string into separate lines
+            // Extract engraving text from attributes
+            let engravingText = '';
+            if (item.attributes && item.attributes.toLowerCase().includes('engraving')) {
+                const match = item.attributes.match(/"([^"]+)"/);
+                engravingText = match ? match[1] : '';
+            }
+
+            // Split attributes
             const attrList = item.attributes
-                ? item.attributes.split('|').map(attr => `<div class="attr-item">${attr.trim()}</div>`).join('')
+                ? item.attributes.split('|').map(attr => {
+                    const trimmed = attr.trim();
+                    if (trimmed.toLowerCase().includes('engraving')) {
+                        return `<div class="attr-item engraving-text"><i class="fas fa-pen-nib"></i> ${trimmed}</div>`;
+                    }
+                    return `<div class="attr-item">${trimmed}</div>`;
+                }).join('')
                 : '<div class="attr-item text-muted">No customization</div>';
 
-            return `
+            // Build preview image with optional engraving overlay
+            const previewHTML = `
+                <div class="item-preview" style="position:relative; width:400px; height:400px; margin-bottom:10px;">
+                    <img src="${item.image}" alt="${item.name}" style="width:100%; height:100%; object-fit:contain; border-radius:10px;">
+                    ${
+                        engravingText
+                            ? `<span class="engrave-overlay"
+                                style="
+                                    position:absolute;
+                                    top:${item.styling?.top || '50%'};
+                                    left:${item.styling?.left || '50%'};
+                                    transform:${item.styling?.transform || 'translate(-50%, -50%)'};
+                                    font-family: 'Georgia', serif;
+                                    font-size:18px;
+                                    font-weight:bold;
+                                    color:#222;
+                                    text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
+                                ">
+                                ${engravingText}
+                            </span>`
+                            : ''
+                    }
+                </div>
+            `;
+
+            // Final item markup
+            const itemHTML = `
                 <div class="order-item">
                     <div class="item-info">
                         <div class="item-name fw-bold">${item.name}</div>
+                        ${previewHTML}
                         <div class="item-attrs">${attrList}</div>
                         <div class="item-price">₱${price.toFixed(2)} × ${item.qty}</div>
                     </div>
                     <div class="item-total fw-semibold">₱${total.toFixed(2)}</div>
                 </div>
             `;
-        }).join('');
 
+            itemsList.append(itemHTML);
+        });
 
-        // Populate totals
-        const shippingCost = 50; // Set to 0 if shipping already included in total
+        // Totals
+        const shippingCost = 50;
         const subtotal = order.items.reduce((sum, item) => sum + (parseFloat(item.price / item.qty) * parseInt(item.qty)), 0);
         const grandTotal = subtotal + shippingCost;
 
-        const totalsSummary = document.getElementById('modal-totals-summary');
-        totalsSummary.innerHTML = `
+        $('#modal-totals-summary').html(`
             <div class="detail-row"><strong>Subtotal:</strong> <span>₱${subtotal.toFixed(2)}</span></div>
             <div class="detail-row"><strong>Shipping:</strong> <span>₱${shippingCost.toFixed(2)}</span></div>
             <div class="detail-row total"><strong>Grand Total:</strong> <span>₱${grandTotal.toFixed(2)}</span></div>
-        `;
+        `);
 
-        modal.style.display = 'flex';
+        $(modal).fadeIn(150);
     }
+
+
 
 
     editOrder(orderId) {

@@ -2188,3 +2188,288 @@ body {
     padding: 2px 6px;
     font-size: 0.8rem;
 }
+
+.cart-image-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.cart-image-wrapper img {
+  width: 80px;
+  height: auto;
+  border-radius: 8px;
+}
+
+.engrave-preview {
+  position: absolute;
+  transform: translateX(-50%);
+  color: rgba(0, 0, 0, 0.75);
+  font-weight: 600;
+  font-size: 13px;
+  text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
+  pointer-events: none;
+}
+
+
+.preview-container{
+  width: 400px;
+  height: 400px;
+  margin-left:50px;
+  border:1px solid red;
+}
+
+
+.preview-container #customizationImageEngrave{
+  border:1px solid black;
+  width: 100%;
+  height: 100%;
+}
+
+#engravingModal .modal-content span{
+  font-size: 3rem;
+  cursor: pointer;
+  margin:10px;
+}
+#engravePreviewContainer{
+    display:flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  padding:0;
+  margin:0;
+}
+
+#engravePreviewContainer #engravePreview{
+  position:relative;
+  width: 400px;
+  height: 400px;
+  margin-left:50px;
+  border:1px solid red;
+  padding:0;
+  margin:0;
+}
+
+#engravePreviewContainer #engravePreview img{
+    width: 100%;
+    height: 100%;
+}
+
+#engravePreviewContainer #engravePreview div{
+  position: absolute; 
+  color: #3c3c3c;
+  top: 50%; 
+  left: 50%; 
+  transform: translate(-50%, -50%);
+  font-family: 'Georgia', serif;
+  font-size: 1rem;
+  font-weight: bold;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+  pointer-events: none;
+  text-align: center;
+}
+
+.preview-container #engravePreview{
+  position: absolute; 
+  top: 28%; 
+  left: 23%; 
+  transform: translate(-50%, -50%);
+  color: #3c3c3c;
+  font-family: 'Georgia', serif;
+  font-size: 1rem;
+  font-weight: bold;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+  pointer-events: none;
+  text-align: center;
+}
+
+/* 
+  id:1
+  top: 73%; 
+  left: 50%; 
+  transform: translate(-50%, -50%) rotate(-90deg);
+
+  id:2 
+  top: 65%; 
+  left: 65%; 
+  transform: translate(-50%, -50%);
+
+  id:3
+  top: 50%; 
+  left: 50%; 
+  transform: translate(-50%, -50%);
+
+  id:4
+  top: 40%; 
+  left: 48%; 
+  transform: translate(-50%, -50%);
+
+  id:5
+  top: 60%; 
+  left: 56%; 
+  transform: translate(-50%, -50%) rotate(-90deg);
+
+  id:6
+  top: 50%; 
+  left: 35.5%; 
+  transform: translate(-50%, -50%);
+
+  id:7
+  top: 82%; 
+  left: 80%; 
+  transform: translate(-50%, -50%);
+
+  id:8
+    top: 73%; 
+  left: 38%; 
+  transform: translate(-50%, -50%) rotate(-90deg);
+
+  id:9
+    top: 70%; 
+  left: 41%; 
+  transform: translate(-50%, -50%);
+
+  id:10
+  top: 45%; 
+  left: 23%; 
+  transform: translate(-50%, -50%);
+
+  id:11
+    top: 45%; 
+  left: 23%; 
+  transform: translate(-50%, -50%) rotate(20deg);
+
+  id:12
+  top: 35%; 
+  left: 58%; 
+  transform: translate(-50%, -50%) rotate(20deg);
+
+  id:13
+    top: 30%; 
+  left: 50%; 
+  transform: translate(-50%, -50%) rotate(-50deg);
+
+  id: 14
+  top: 84%; 
+  left: 35%; 
+  transform: translate(-50%, -50%);
+
+  id:15
+  top: 70%; 
+  left: 44%; 
+  transform: translate(-50%, -50%) rotate(-90deg);
+
+  id:16
+  top: 70%; 
+  left: 46.5%; 
+  transform: translate(-50%, -50%);
+
+  id:17
+  top: 53%; 
+  left: 50%; 
+  transform: translate(-50%, -50%);
+
+  id:18
+  top: 73%; 
+  left: 50%; 
+  transform: translate(-50%, -50%) rotate(-90deg);
+
+  id:19
+    top: 73%; 
+  left: 47%; 
+  transform: translate(-50%, -50%) rotate(-90deg);
+
+  id:20
+  top: 73%; 
+  left: 51%; 
+  transform: translate(-50%, -50%) rotate(-90deg);
+
+  id:21
+    top: 88.5%; 
+  left: 17%; 
+  transform: translate(-50%, -50%) rotate(19deg);
+
+  id:22
+  top: 80%; 
+  left: 40%; 
+  transform: translate(-50%, -50%);
+
+  id:23
+  top: 45%; 
+  left: 60%; 
+  transform: translate(-50%, -50%);
+
+  id:24
+  top: 45%; 
+  left: 40%; 
+  transform: translate(-50%, -50%);
+
+  id:25
+  top: 29%; 
+  left: 40%; 
+  transform: translate(-50%, -50%);
+
+  id:26
+  top: 90%; 
+  left: 50%; 
+  transform: translate(-50%, -50%);
+
+  id:27
+  top: 65%; 
+  left: 35%; 
+  transform: translate(-50%, -50%) rotate(10deg);
+
+  id:28
+  top: 54%; 
+  left: 35%; 
+  transform: translate(-50%, -50%) rotate(5deg);
+
+  id:29
+    top: 57%; 
+  left: 35%; 
+  transform: translate(-50%, -50%) rotate(17deg);
+
+  id:30
+  top: 49%; 
+  left: 35%; 
+  transform: translate(-50%, -50%) rotate(17deg);
+
+  id:31
+    top: 58%; 
+  left: 55%; 
+  transform: translate(-50%, -50%);
+
+  id: 32
+  top: 63%; 
+  left: 26%; 
+  transform: translate(-50%, -50%) rotate(-90deg);
+
+  id:33
+  top: 90%; 
+  left: 18%; 
+  transform: translate(-50%, -50%) rotate(17deg);
+
+  id:34
+  top: 55%; 
+  left: 56%; 
+  transform: translate(-50%, -50%) rotate(-90deg);
+
+  id:35
+  top: 85%; 
+  left: 80%; 
+  transform: translate(-50%, -50%) ;
+
+  id:36
+    top: 75%; 
+  left: 50%; 
+  transform: translate(-50%, -50%) rotate(-20deg);
+
+  id:37
+    top: 65%; 
+  left: 35%; 
+  transform: translate(-50%, -50%) rotate(-30deg);
+
+  id:38 
+  top: 28%; 
+  left: 23%; 
+  transform: translate(-50%, -50%);
+*/

@@ -15,7 +15,8 @@ try {
                 category, 
                 image, 
                 images,
-                stock_status
+                stock_status,
+                styling
             FROM products";
     $stmt = $pdo->prepare($sql);
     $stmt->execute();
@@ -28,6 +29,15 @@ try {
             $product['images'] = $decoded ?: [];
         } else {
             $product['images'] = [];
+        }
+    }
+
+    foreach ($products as &$product) {
+        if (!empty($product['styling'])) {
+            $decoded = json_decode($product['styling'], true);
+            $product['styling'] = $decoded ?: [];
+        } else {
+            $product['styling'] = [];
         }
     }
 

@@ -1662,6 +1662,22 @@ function openCustomization(productId) {
     document.getElementById('customizationTitle').textContent = `Customize ${product.name}`;
     document.getElementById('customizationName').textContent = product.name;
     document.getElementById('customizationDescription').textContent = product.description;
+
+    // --- Apply dynamic engraving position based on database styling ---
+    const previewEl = document.getElementById('engravePreview');
+
+    // Safety: reset first
+    previewEl.style.top = '50%';
+    previewEl.style.left = '50%';
+    previewEl.style.transform = 'translate(-50%, -50%)';
+
+    // Apply product styling if available
+    if (product.styling) {
+        const style = product.styling;
+        if (style.top) previewEl.style.top = style.top;
+        if (style.left) previewEl.style.left = style.left;
+        if (style.transform) previewEl.style.transform = style.transform;
+    }
     
     // Populate thumbnails
     const thumbnailGallery = document.getElementById('thumbnailGallery');
@@ -1709,6 +1725,7 @@ function openCustomization(productId) {
     // Set the initial image to the main product image (not a variant)
     console.log(product.image)
     document.getElementById('customizationImage').src = `/customer/${product.image}`;
+    document.getElementById('customizationImageEngrave').src = `/customer/${product.image}`;
 
 
     // Call updateCustomizationView to set initial price and button states.
@@ -1900,23 +1917,47 @@ function updateCustomizationView(updateImage = true) {
 
 
 function setActiveThumbnail(thumbnailElement) {
+    // --- Highlight the selected thumbnail ---
     document.querySelectorAll('#thumbnailGallery img').forEach(img => img.classList.remove('active'));
     thumbnailElement.classList.add('active');
 
-    // Sync the finish radio button with the selected thumbnail
+    // --- Sync the finish radio button with the selected thumbnail ---
     const finishKey = thumbnailElement.dataset.key; // 'default', 'natural', 'dark', 'premium'
-    
-    // 'default' thumbnail corresponds to 'natural' finish. Others map directly.
     const finishValueToSelect = (finishKey === 'default') ? 'natural' : finishKey;
 
     const finishRadio = document.querySelector(`input[name="finish"][value="${finishValueToSelect}"]`);
-    if (finishRadio) {
-        finishRadio.checked = true;
-    }
-    
-    // Always trigger a full update to sync image, price, and UI state.
+    if (finishRadio) finishRadio.checked = true;
+
+    // --- Update main preview image & product state ---
     updateCustomizationView(true);
+
+    // --- 🪄 Apply dynamic engraving text positioning ---
+    const product = currentCustomizingProduct;
+    const previewEl = document.getElementById('engravePreview');
+
+    if (!previewEl) return; // guard clause
+
+    // Reset to defaults first
+    previewEl.style.top = '50%';
+    previewEl.style.left = '50%';
+    previewEl.style.transform = 'translate(-50%, -50%)';
+
+    // Check if styling exists
+    if (product.styling) {
+        let styleData = product.styling;
+
+        // If styling is per finish type (object of objects)
+        if (styleData[finishKey]) {
+            styleData = styleData[finishKey];
+        }
+
+        // Apply the styles safely
+        if (styleData.top) previewEl.style.top = styleData.top;
+        if (styleData.left) previewEl.style.left = styleData.left;
+        if (styleData.transform) previewEl.style.transform = styleData.transform;
+    }
 }
+
 
 function addCustomizedToCart() {
     if (!currentCustomizingProduct) return;
@@ -1962,12 +2003,19 @@ function addCustomizedToCart() {
 
     const finalPrice = basePrice * quantityToAdd;
 
-    // --- Build final customization object ---
+    // Determine the image currently shown in the customization preview
+    const currentImage = document.getElementById('customizationImage')?.src || product.image;
+
+    // Default engraving position (you can tweak this later dynamically if needed)
+    const engravingPosition = { bottom: '10px', left: '50%' };
+
     const customizationDetails = {
         size: selectedSizeInput.value,
         sizeLabel,
         finish: selectedFinishInput.value,
         engraving: engravingText || null,
+        engravingPosition,
+        imageWithFinish: currentImage, // ✅ store the preview image
         giftPackaging,
         messageCard: messageCard || null,
         specialHandling,
@@ -2105,47 +2153,78 @@ function renderCartItems() {
         const product = PRODUCTS.find(p => p.id === item.id);
         if (!product) return '';
 
+        let breakdown = [];
         let itemPrice = product.price;
+        let basePrice = product.price;
+
+        breakdown.push(`<div><strong>Base Price:</strong> ₱${basePrice.toFixed(2)}</div>`);
 
         if (item.customization) {
-            // Apply size-based price adjustments
-            if (item.customization.size === 'large') itemPrice *= 1.1;
-            if (item.customization.size === 'small') itemPrice *= 0.8;
-
-            // Apply finish-based adjustments
-            if (item.customization.finish === 'dark' || item.customization.finish === 'premium') {
-                itemPrice += 40;
+            // Size-based price adjustments
+            if (item.customization.size === 'large') {
+                const added = basePrice * 0.10;
+                itemPrice += added;
+                breakdown.push(`<div>Size (Large +10%): ₱${added.toFixed(2)}</div>`);
+            }
+            if (item.customization.size === 'small') {
+                const reduced = basePrice * 0.20;
+                itemPrice -= reduced;
+                breakdown.push(`<div>Size (Small -20%): -₱${reduced.toFixed(2)}</div>`);
             }
 
-            // ✅ Add extraCost (engraving, gift wrap, etc.)
+            // Finish-based adjustments
+            if (item.customization.finish === 'dark' || item.customization.finish === 'premium') {
+                itemPrice += 40;
+                breakdown.push(`<div>Finish (${item.customization.finish}): +₱40.00</div>`);
+            }
+
+            // Engraving or other extra costs
             if (item.customization.extraCost) {
+                breakdown.push(`<div>Engraving/Extra: +₱${item.customization.extraCost.toFixed(2)}</div>`);
                 itemPrice += item.customization.extraCost;
             }
         }
 
         const totalItemPrice = itemPrice * item.quantity;
 
+        // Generate attribute text
+        const attrText = item.attributes
+            ? `<div class="customization-details"><small>${item.attributes}</small></div>`
+            : '';
+
+        // Generate breakdown HTML
+        const breakdownHTML = `
+            <div class="price-breakdown" style="font-size:13px; color:#555; margin-top:5px;">
+                ${breakdown.join('')}
+                <div><strong>Subtotal:</strong> ₱${itemPrice.toFixed(2)} × ${item.quantity}</div>
+                <div><strong>Total:</strong> ₱${totalItemPrice.toFixed(2)}</div>
+            </div>
+        `;
+
         return `
             <div class="cart-item">
                 <input type="checkbox" class="cart-item-checkbox" onchange="toggleCartItemSelection(${index})" ${item.selected ? 'checked' : ''}>
                 <img src="${product.image}" alt="${product.name}">
+                
                 <div class="item-details">
                     <h4>${product.name}</h4>
-                    ${item.customization ? `
-                        <div class="customization-details">
-                            <small>${item.attributes}</small>
-                        </div>
-                    ` : ''}
-                    <p class="item-price">₱${itemPrice.toFixed(2)} <small>x${item.quantity}</small></p>
-                    <p class="item-subtotal">Subtotal: ₱${totalItemPrice.toFixed(2)}</p>
+                    ${attrText}
+                    ${breakdownHTML}
                 </div>
+
                 <div class="quantity-controls">
                     <button ${item.quantity === 1 ? 'disabled' : ''} onclick="updateCartQuantity(${item.id}, ${item.quantity - 1}, ${index})">-</button>
                     <span>${item.quantity}</span>
                     <button onclick="updateCartQuantity(${item.id}, ${item.quantity + 1}, ${index})">+</button>
                 </div>
+
                 <button class="remove-btn" onclick="removeFromCart(${item.id}, ${index})">
                     <i class="fas fa-trash"></i>
+                </button>
+
+                <button class="btn-view-engraving" 
+                    onclick="viewEngraving('${product.image}', '${encodeURIComponent(JSON.stringify(product.styling))}', '${encodeURIComponent(item.customization?.engraving || '')}')">
+                    <i class="fas fa-eye"></i> View Engraving
                 </button>
             </div>
         `;
@@ -2164,6 +2243,42 @@ function renderCartItems() {
         </div>
     `;
 }
+
+
+function viewEngraving(image, stylingJSON, engravingText) {
+    console.log(stylingJSON)
+    const container = document.getElementById('engravePreviewContainer');
+    const decodedText = decodeURIComponent(engravingText);
+    const style = JSON.parse(decodeURIComponent(stylingJSON || '{}'));
+
+    container.innerHTML = `
+        <div id="engravePreview" style="position:relative; display:inline-block;">
+            <img src="${image}" alt="Preview" style="width:100%; border-radius:8px;">
+            <div class="engraved-text"
+                style="
+                    position:absolute;
+                    top:${style.top || '50%'};
+                    left:${style.left || '50%'};
+                    transform:${style.transform || 'translate(-50%, -50%)'};
+                    font-family:'Times New Roman', serif;
+                    font-size:1.2rem;
+                    font-weight:bold;
+                    color:#222;
+                    text-shadow:1px 1px 2px rgba(0,0,0,0.3);
+                ">
+                ${decodedText || '(No engraving)'}
+            </div>
+        </div>
+    `;
+
+    document.getElementById('engravingModal').style.display = 'block';
+}
+
+
+function closeEngravingModal() {
+  document.getElementById('engravingModal').style.display = 'none';
+}
+
 
 
 function renderWishlistItems() {
@@ -2232,6 +2347,7 @@ function openBillingModal(items, source = 'cart') {
     const oldTotalEl = summaryBoxEl.querySelector('#billingSummaryTotal');
     if (oldTotalEl) oldTotalEl.remove();
 
+    console.log(items)
     let summaryHTML = items.map(item => {
         const product = PRODUCTS.find(p => p.id === item.id);
         if (!product) return '';
@@ -2248,16 +2364,17 @@ function openBillingModal(items, source = 'cart') {
             // ✅ Add extraCost if exists
             if (item.customization.extraCost) itemPrice += item.customization.extraCost;
 
+            // ✅ Add ₱50 if engraving text exists
+            if (item.customization.engraving && item.customization.engraving.trim() !== '') {
+                itemPrice += 50;
+                customizationDetails.push(`Engraving: "${item.customization.engraving}" (+₱50)`);
+            }
+
             // ✅ Build readable customization details
             if (item.customization.sizeLabel) customizationDetails.push(`Size: ${item.customization.sizeLabel}`);
             if (item.customization.finish) {
                 const finishDisplayName = FINISH_DISPLAY_NAMES[item.customization.finish] || item.customization.finish;
                 customizationDetails.push(`Finish: ${finishDisplayName}`);
-            }
-
-            // 🏷 Engraving text
-            if (item.customization.engravingText) {
-                customizationDetails.push(`Engraving: "${item.customization.engravingText}"`);
             }
 
             // 💌 Message Card (optional text)
@@ -2281,6 +2398,7 @@ function openBillingModal(items, source = 'cart') {
             }
         }
 
+        console.log(customizationDetails)
         const customizationDetailsHTML = customizationDetails.length > 0 
             ? `<div class="summary-customization-details">${customizationDetails.join(' | ')}</div>`
             : '';

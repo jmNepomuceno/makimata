@@ -890,9 +890,9 @@
   background-color: #f9fafb;
   color: #1a202c;
   border-radius: 12px;
-  overflow: hidden;
   box-shadow: 0 10px 25px rgba(0,0,0,0.15);
   border: 1px solid #e5e7eb;
+  height: 1000px !important;
 }
 
 /* Header */
@@ -1053,4 +1053,14 @@
     padding: 4px 8px;
     border-radius: 6px;
     font-size: 0.85rem;
+}
+
+.attr-item.engraving-text {
+  color: #c27ba0;
+  font-style: italic;
+  margin-left: 10px;
+}
+.attr-item.engraving-text i {
+  margin-right: 4px;
+  color: #b56576;
 }
