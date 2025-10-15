@@ -382,21 +382,22 @@ class OrderManager {
             const newStatus = document.getElementById('edit-modal-order-status').value;
             if (!newStatus) return showToast('Please select a status.', 'warning');
 
+            // Show loading overlay
+            const overlay = document.getElementById('loading-overlay');
+            overlay.style.display = 'flex';
+
             $.ajax({
                 url: '../assets/php_admin/update_order_status.php',
                 type: 'POST',
                 dataType: 'json',
                 data: { ids: [order.id], status: newStatus },
                 success: (response) => {
-                    console.log(response)
+                    overlay.style.display = 'none'; // Hide overlay
+
                     if (response.status === 'success') {
-                        // Update the local order object
                         order.status = newStatus;
                         order.history.push({ status: newStatus, date: new Date().toISOString() });
-
-                        // Refresh modal timeline
                         this.editOrder(orderId);
-
                         this.filterAndRender();
                         this.updateStats();
                         showToast('Order status updated.', 'success');
@@ -405,6 +406,7 @@ class OrderManager {
                     }
                 },
                 error: (xhr, status, error) => {
+                    overlay.style.display = 'none'; // Hide overlay
                     console.error("Error updating order: " + error);
                     showToast('Error updating order.', 'error');
                 }
@@ -413,6 +415,7 @@ class OrderManager {
 
         modal.style.display = 'flex';
     }
+
 
 
     async updateOrderStatus(orderId) {

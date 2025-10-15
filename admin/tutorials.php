@@ -1,181 +1,200 @@
+<?php
+// Mikamata Tutorial Module - Admin Interface
+session_start();
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tutorials - MIKAMATA Admin</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  <link rel="stylesheet" href="admin.css">
-  <link rel="stylesheet" href="tutorials.css">
-  <?php include("../scripts_links/header_links.php") ?>
-
-  <style>
-    body {
-      zoom: 80%;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tutorials - MIKAMATA Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="admin.css">
+    <link rel="stylesheet" href="tutorials.css">
+    <?php include("../scripts_links/header_links.php") ?>
+    <style>
+        body {
+            zoom: 80%;
+        }
+    </style>
 </head>
 <body>
-  <div class="admin-container">
-    <!-- Sidebar -->
-    <aside class="admin-sidebar">
-      <div class="sidebar-header">
-        <img src="mik/logo.png" alt="MIKAMATA Logo" class="admin-logo">
-      </div>
-      <nav class="sidebar-nav">
-        <ul>
-          <li><a href="dashboard.php"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
-          <li><a href="products.php"><i class="fas fa-cubes"></i> <span>Products</span></a></li>
-          <li><a href="orders.php"><i class="fas fa-shopping-cart"></i> <span>Orders</span></a></li>
-          <li><a href="customers.php"><i class="fas fa-user-group"></i> <span>Users</span></a></li>
-          <li><a href="tutorials.php" class="active"><i class="fas fa-book-open"></i> <span>Tutorials</span></a></li>
-          <li><a href="reviews.php"><i class="fas fa-star"></i> <span>Reviews</span></a></li>
-          <li><a href="notifications.php"><i class="fas fa-bell"></i> <span>Notifications</span></a></li>
-          <li><a href="activity-logs.php"><i class="fas fa-clipboard-list"></i> <span>Activity Logs</span></a></li>
-          <li><a href="admin.php"><i class="fas fa-user-group"></i> <span>Admin</span></a></li>
-        </ul>
-        <div class="sidebar-bottom-nav">
-          <ul>
-            <li><a href="#" id="admin-logout-btn"><i class="fas fa-right-from-bracket"></i> <span>Logout</span></a></li>
-          </ul>
-        </div>
-      </nav>
-    </aside>
-
-    <!-- Main Content -->
-    <main class="admin-main-content">
-      <header class="admin-main-header">
-        <div>
-          <nav class="breadcrumbs as-title">
-            <a href="dashboard.html">Dashboard</a>
-            <span class="separator">&gt;</span>
-            <span>Tutorials</span>
-          </nav>
-          <p id="current-date"></p>
-        </div>
-      </header>
-
-      <!-- Tutorial Management -->
-      <section class="admin-section">
-        <div class="section-header">
-          <h2>Tutorial Management</h2>
-          <div class="table-controls">
-            <!-- <button class="btn btn-primary" id="add-tutorial-btn">
-              <i class="fas fa-plus"></i> Add New Tutorial
-            </button> -->
-          </div>
-        </div>
-
-        <!-- Grid View -->
-        <div class="tutorials-grid" id="tutorials-view"></div>
-
-        <!-- Bulk Actions -->
-        <div class="bulk-actions" id="bulk-actions" style="display: none;">
-          <span class="selected-count">0 tutorials selected</span>
-          <div class="bulk-buttons">
-            <button class="btn btn-secondary" id="bulk-publish">
-              <i class="fas fa-globe"></i> Publish
-            </button>
-            <button class="btn btn-secondary" id="bulk-archive">
-              <i class="fas fa-archive"></i> Archive
-            </button>
-            <button class="btn btn-secondary" id="bulk-export">
-              <i class="fas fa-download"></i> Export
-            </button>
-            <button class="btn btn-danger" id="bulk-delete">
-              <i class="fas fa-trash"></i> Delete
-            </button>
-          </div>
-        </div>
-
-        <!-- Pagination -->
-        <div class="pagination-wrapper">
-          <div class="pagination-info" id="pagination-info"></div>
-          <div class="pagination" id="pagination-controls"></div>
-        </div>
-      </section>
-    </main>
-  </div>
-
-  <!-- Tutorial Modal -->
-  <div id="tutorial-modal" class="modal">
-    <div class="modal-content modal-large">
-      <div class="modal-header">
-        <h3 id="modal-title">Add New Tutorial</h3>
-        <button class="modal-close">&times;</button>
-      </div>
-      <div class="modal-body">
-        <form id="tutorial-form" class="tutorial-form">
-          <input type="hidden" id="tutorial-id" name="tutorial_id">
-          
-          <div class="form-section">
-            <h4>Basic Information</h4>
-            <div class="form-row">
-              <div class="form-group">
-                <label for="tutorial-title" class="form-label">Title *</label>
-                <input type="text" id="tutorial-title" name="title" class="form-input" required>
-              </div>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <img src="mik/logo.png" alt="MIKAMATA Logo" class="admin-logo">
             </div>
-
-            <div class="form-group">
-              <label for="tutorial-description" class="form-label">Description</label>
-              <textarea id="tutorial-description" name="description" class="form-textarea" rows="3"></textarea>
-            </div>
-
-            <div class="form-row">
-              <div class="form-group">
-                <label for="tutorial-type" class="form-label">Type *</label>
-                <select id="tutorial-type" name="type" class="form-select" required>
-                  <option value="">Select Type</option>
-                  <option value="video">Video</option>
-                  <option value="article">Article</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          <div class="form-section">
-            <h4>Content</h4>
-
-            <!-- This will be shown for 'video' type -->
-            <div class="form-group" id="video-url-group" style="display: none;">
-              <label for="video-url" class="form-label">Video URL (e.g., YouTube, Vimeo)</label>
-              <input type="url" id="video-url" name="video_url" class="form-input" placeholder="https://youtube.com/watch?v=...">
-            </div>
-
-            <!-- This will be shown for 'article' type -->
-            <div class="form-group" id="article-url-group" style="display: none;">
-              <label for="article-url" class="form-label">External Article URL</label>
-              <input type="url" id="article-url" name="article_url" class="form-input" placeholder="https://example.com/my-article">
-            </div>
-
-            <div class="form-group" id="content-editor-group" style="display: none;">
-              <label for="tutorial-content" class="form-label">Content (for Articles)</label>
-              <div class="content-editor">
-                <div class="editor-toolbar">
-                  <button type="button" class="editor-btn" data-command="bold"><i class="fas fa-bold"></i></button>
-                  <button type="button" class="editor-btn" data-command="italic"><i class="fas fa-italic"></i></button>
-                  <button type="button" class="editor-btn" data-command="underline"><i class="fas fa-underline"></i></button>
-                  <button type="button" class="editor-btn" data-command="insertUnorderedList"><i class="fas fa-list-ul"></i></button>
-                  <button type="button" class="editor-btn" data-command="insertOrderedList"><i class="fas fa-list-ol"></i></button>
-                  <button type="button" class="editor-btn" data-command="createLink"><i class="fas fa-link"></i></button>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="dashboard.php"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
+                    <li><a href="products.php"><i class="fas fa-cubes"></i> <span>Products</span></a></li>
+                    <li><a href="orders.php"><i class="fas fa-shopping-cart"></i> <span>Orders</span></a></li>
+                    <li><a href="customers.php"><i class="fas fa-user-group"></i> <span>Customers</span></a></li>
+                    <li><a href="tutorials.php" class="active"><i class="fas fa-book-open"></i> <span>Tutorials</span></a></li>
+                    <li><a href="reviews.php"><i class="fas fa-star"></i> <span>Reviews</span></a></li>
+                    <li><a href="notifications.php"><i class="fas fa-bell"></i> <span>Notifications</span></a></li>
+                    <li><a href="activity-logs.php"><i class="fas fa-clipboard-list"></i> <span>Activity Logs</span></a></li>
+                    <li><a href="admin.php"><i class="fas fa-user-group"></i> <span>Admin</span></a></li>
+                </ul>
+                <div class="sidebar-bottom-nav">
+                    <ul>
+                        <li><a href="#" id="admin-logout-btn"><i class="fas fa-right-from-bracket"></i> <span>Logout</span></a></li>
+                    </ul>
                 </div>
-                <div id="tutorial-content" class="content-area" contenteditable="true"></div>
-              </div>
-            </div>
-          </div>
+            </nav>
+        </aside>
 
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" id="cancel-btn">Cancel</button>
-        <button type="button" class="btn btn-danger" id="delete-tutorial-btn" style="display: none;"><i class="fas fa-trash"></i> Delete Tutorial</button>
-        <button type="submit" form="tutorial-form" class="btn btn-primary" id="save-tutorial-btn">Save Tutorial</button>
-      </div>
+        <!-- Main Content -->
+        <main class="admin-main-content">
+            <header class="admin-main-header">
+                <div>
+                    <nav class="breadcrumbs as-title">
+                        <a href="dashboard.php">Dashboard</a>
+                        <span class="separator">&gt;</span>
+                        <span>Tutorials</span>
+                    </nav>
+                    <p id="current-date"></p>
+                </div>
+            </header>
+
+            <!-- Stats Cards -->
+            <section class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Total Tutorials</div>
+                    <div class="stat-value" id="totalCount">0</div>
+                </div>
+                <div class="stat-card pending">
+                    <div class="stat-label">Pending Review</div>
+                    <div class="stat-value" id="pendingCount">0</div>
+                </div>
+                <div class="stat-card approved">
+                    <div class="stat-label">Approved</div>
+                    <div class="stat-value" id="approvedCount">0</div>
+                </div>
+                <div class="stat-card rejected">
+                    <div class="stat-label">Rejected</div>
+                    <div class="stat-value" id="rejectedCount">0</div>
+                </div>
+            </section>
+
+            <!-- Filters & Table Section -->
+            <section class="admin-section">
+                <div class="filters-bar">
+                    <div class="filter-group">
+                        <button class="filter-btn active" data-filter="all">All</button>
+                        <button class="filter-btn" data-filter="pending">Pending</button>
+                        <button class="filter-btn" data-filter="approved">Approved</button>
+                        <button class="filter-btn" data-filter="rejected">Rejected</button>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="tutorials-table">
+                        <thead>
+                            <tr>
+                                <th>Sender Name</th>
+                                <th>Title</th>
+                                <th>Description</th>
+                                <th>Status</th>
+                                <th>Video File</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tutorialsTableBody">
+                            <!-- Tutorials will be loaded here by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
     </div>
-  </div>
 
-  <script src="tutorials.js"></script>
-  <script src="admin.js"></script>
+    <!-- Add/Edit Tutorial Modal -->
+    <div id="tutorialModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">View Tutorial</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="tutorialForm">
+                    <div class="form-group">
+                        <label for="tutorialTitle">Tutorial Title *</label>
+                        <input 
+                            type="text" 
+                            id="tutorialTitle" 
+                            name="title" 
+                            required 
+                            placeholder="e.g., Traditional Basket Weaving Techniques"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tutorialDescription">Description *</label>
+                        <textarea 
+                            id="tutorialDescription" 
+                            name="description" 
+                            required 
+                            placeholder="Describe what viewers will learn from your tutorial..."
+                        ></textarea>
+                        <span class="form-help">Provide a clear description of what your tutorial covers</span>
+                    </div>
+
+                    <!-- User Info Display -->
+                    <div class="form-group user-info-display" style="display: none;">
+                        <label>Uploaded By</label>
+                        <p><strong>Name:</strong> <span id="uploaderName"></span></p>
+                        <p><strong>Email:</strong> <span id="uploaderEmail"></span></p>
+                    </div>
+
+                    <div id="videoFields" style="display: block;">
+                        <div class="form-group">
+                            <label for="videoFile">Upload Video File *</label>
+                            <input 
+                                type="file" 
+                                id="videoFile" 
+                                name="video_file" 
+                                accept="video/mp4,video/webm,video/ogg"
+                            >
+                            <span class="form-help">Upload the tutorial video. Max size: 50MB.</span>
+                            <div id="currentVideo" style="margin-top: 8px;"></div>
+                        </div>
+                    </div>
+
+                    <div id="articleFields" style="display: none;">
+                        <div class="form-group">
+                            <label for="articleUrl">Article URL</label>
+                            <input 
+                                type="url" 
+                                id="articleUrl" 
+                                name="article_url" 
+                                placeholder="https://..."
+                            >
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tutorialStatus">Status *</label>
+                        <select id="tutorialStatus" name="status" required>
+                            <option value="pending">Pending</option>
+                            <option value="approved">Approved</option>
+                            <option value="rejected">Rejected</option>
+                        </select>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" id="modalCloseBtn" onclick="tutorialAdmin.closeModal()">
+                            Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="tutorials.js"></script>
+    <script src="admin.js"></script>
 </body>
 </html>

@@ -1,156 +1,272 @@
+<?php
+// Mikamata Tutorial Module - Public Interface (Learn With Us)
+session_start();
+include("../scripts_links/header_links.php");
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact Us - MIKAMATA</title>
+    <title>Learn With Us - MIKAMATA</title>
     <link rel="stylesheet" href="contactus.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  <?php include("../scripts_links/header_links.php") ?>
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="products.css"> <!-- Re-using some styles -->
 </head>
 <body>
     <!-- Header -->
     <header class="header">
-        <div class="container">
-            <div class="logo">
-                <img src="mik/logo.png" alt="MIKAMATA Logo" style="width: 130px; height: 40px;">
-            </div>
-            <nav class="nav">
-                <a href="home.php">Home</a>
-                <a href="products.php">Products</a>
-                <a href="aboutus.php">About Us</a>
-                <a href="contactus.php" class="active">Contact Us</a>
-            </nav>
-            <div class="header-actions">
-                <input type="search" class="search-input" placeholder="Search..." />
-                <button class="login-btn">Login</button>
-            </div>
+      <div class="container">
+        <div class="logo">
+          <img src="mik/logo.png" alt="MIKAMATA Logo" style="width: 130px; height: 40px;">
         </div>
+        <nav class="nav">
+          <a href="products.php">Products</a>
+          <a href="home.php">Overview</a>
+          <a href="aboutus.php">About Us</a>
+          <a href="contactus.php" class="active">Learn With Us</a>
+        </nav>
+        <div class="header-actions">
+         
+
+          <button class="icon-btn" id="userBtn" title="User">
+              <i class="fa-regular fa-user" id="user-icon"></i>
+          </button>
+          <i class="fa-solid fa-right-from-bracket" id="logout-btn"></i>
+        </div>
+      </div>
     </header>
-
-  <main class="admin-main-content">
-    <!-- Tutorial Management -->
-    <section class="admin-section">
-      <!-- Section Header -->
-      <div class="section-header">
-        <div class="section-controls">
-          <h2 class="section-title">Tutorial Management</h2>
-          <button class="btn btn-primary" id="add-tutorial-btn">
-            <i class="fas fa-plus"></i> Add New Tutorial
-          </button>
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <h1>Share Your Craft, Inspire Others</h1>
+            <p>Join our community of local artisans and producers. Share your skills through video tutorials and help preserve traditional craftsmanship.</p>
+            <button id="scrollToUpload" class="btn-primary">
+                <i class="fas fa-upload"></i> Submit Your Tutorial
+            </button>
         </div>
-      </div>
-
-      <!-- Grid View -->
-      <div class="tutorials-grid" id="tutorials-view"></div>
-
-      <!-- Bulk Actions -->
-      <div class="bulk-actions" id="bulk-actions" style="display: none;">
-        <span class="selected-count">0 tutorials selected</span>
-        <div class="bulk-buttons">
-          <button class="btn btn-secondary" id="bulk-publish">
-            <i class="fas fa-globe"></i> Publish
-          </button>
-          <button class="btn btn-secondary" id="bulk-archive">
-            <i class="fas fa-archive"></i> Archive
-          </button>
-          <button class="btn btn-secondary" id="bulk-export">
-            <i class="fas fa-download"></i> Export
-          </button>
-          <button class="btn btn-danger" id="bulk-delete">
-            <i class="fas fa-trash"></i> Delete
-          </button>
-        </div>
-      </div>
-
-      <!-- Pagination -->
-      <div class="pagination-wrapper">
-        <div class="pagination-info" id="pagination-info"></div>
-        <div class="pagination" id="pagination-controls"></div>
-      </div>
     </section>
-  </main>
 
-  <div id="tutorial-modal" class="modal">
-    <div class="modal-content modal-large">
-      <div class="modal-header">
-        <h3 id="modal-title">Add New Tutorial</h3>
-        <button class="modal-close">&times;</button>
-      </div>
-      <div class="modal-body">
-        <form id="tutorial-form" class="tutorial-form">
-          <input type="hidden" id="tutorial-id" name="tutorial_id">
-          
-          <div class="form-section">
-            <h4>Basic Information</h4>
-            <div class="form-row">
-              <div class="form-group">
-                <label for="tutorial-title" class="form-label">Title *</label>
-                <input type="text" id="tutorial-title" name="title" class="form-input" required>
-              </div>
+    <!-- Tutorials Display Section -->
+    <section class="tutorials-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Featured Tutorials</h2>
+                <p>Learn from our community of skilled artisans and craftspeople</p>
             </div>
 
-            <div class="form-group">
-              <label for="tutorial-description" class="form-label">Description</label>
-              <textarea id="tutorial-description" name="description" class="form-textarea" rows="3"></textarea>
+            <div id="tutorialsGrid" class="tutorials-grid">
+                <!-- Tutorials will be loaded here by JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Upload Section -->
+    <section id="uploadSection" class="upload-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Submit Your Tutorial</h2>
+                <p>Share your knowledge with the community. All submissions are reviewed to ensure quality content.</p>
             </div>
 
-            <div class="form-row">
-              <div class="form-group">
-                <label for="tutorial-type" class="form-label">Type *</label>
-                <select id="tutorial-type" name="type" class="form-select" required>
-                  <option value="">Select Type</option>
-                  <option value="video">Video</option>
-                  <option value="article">Article</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          <div class="form-section">
-            <h4>Content</h4>
-
-            <!-- This will be shown for 'video' type -->
-            <div class="form-group" id="video-url-group" style="display: none;">
-              <label for="video-url" class="form-label">Video URL (e.g., YouTube, Vimeo)</label>
-              <input type="url" id="video-url" name="video_url" class="form-input" placeholder="https://youtube.com/watch?v=...">
+            <div id="successMessage" class="success-message">
+                <p>Tutorial submitted successfully! It will be reviewed by our team.</p>
             </div>
 
-            <!-- This will be shown for 'article' type -->
-            <div class="form-group" id="article-url-group" style="display: none;">
-              <label for="article-url" class="form-label">External Article URL</label>
-              <input type="url" id="article-url" name="article_url" class="form-input" placeholder="https://example.com/my-article">
-            </div>
-
-            <div class="form-group" id="content-editor-group" style="display: none;">
-              <label for="tutorial-content" class="form-label">Content (for Articles)</label>
-              <div class="content-editor">
-                <div class="editor-toolbar">
-                  <button type="button" class="editor-btn" data-command="bold"><i class="fas fa-bold"></i></button>
-                  <button type="button" class="editor-btn" data-command="italic"><i class="fas fa-italic"></i></button>
-                  <button type="button" class="editor-btn" data-command="underline"><i class="fas fa-underline"></i></button>
-                  <button type="button" class="editor-btn" data-command="insertUnorderedList"><i class="fas fa-list-ul"></i></button>
-                  <button type="button" class="editor-btn" data-command="insertOrderedList"><i class="fas fa-list-ol"></i></button>
-                  <button type="button" class="editor-btn" data-command="createLink"><i class="fas fa-link"></i></button>
+            <form id="uploadForm" class="upload-form" enctype="multipart/form-data">
+                <div class="guidelines-box">
+                    <h3><i class="fas fa-info-circle"></i> Submission Guidelines</h3>
+                    <ul>
+                        <li>Tutorials should focus on local crafts, handicrafts, or livelihood skills</li>
+                        <li>Videos should be clear, well-lit, and demonstrate the craft step-by-step</li>
+                        <li>Content must be original or you must have permission to share it</li>
+                        <li>All submissions will be reviewed by our team before publication</li>
+                        <li>Please allow 2-3 business days for review</li>
+                    </ul>
                 </div>
-                <div id="tutorial-content" class="content-area" contenteditable="true"></div>
-              </div>
-            </div>
-          </div>
 
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" id="cancel-btn">Cancel</button>
-        <button type="button" class="btn btn-danger" id="delete-tutorial-btn" style="display: none;"><i class="fas fa-trash"></i> Delete Tutorial</button>
-        <button type="submit" form="tutorial-form" class="btn btn-primary" id="save-tutorial-btn">Save Tutorial</button>
-      </div>
+                <div class="form-group">
+                    <label for="tutorialTitle">Tutorial Title *</label>
+                    <input 
+                        type="text" 
+                        id="tutorialTitle" 
+                        name="title" 
+                        required 
+                        placeholder="e.g., Traditional Basket Weaving Techniques"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="tutorialDescription">Description *</label>
+                    <textarea 
+                        id="tutorialDescription" 
+                        name="description" 
+                        required 
+                        placeholder="Describe what viewers will learn from your tutorial..."
+                    ></textarea>
+                    <span class="form-help">Provide a clear description of what your tutorial covers</span>
+                </div>
+
+                <div id="videoFields" style="display: block;">
+                    <div class="form-group">
+                        <label for="videoFile">Upload Video File *</label>
+                        <input 
+                            type="file" 
+                            id="video_file" 
+                            name="video_file" 
+                            accept="video/mp4,video/webm,video/ogg"
+                        >
+                        <span class="form-help">Upload your tutorial video. Max size: 50MB. Supported formats: MP4, WebM, OGG.</span>
+                    </div>
+                </div>
+
+                <div id="articleFields" style="display: none;">
+                    <div class="form-group">
+                        <label for="articleUrl">Article URL (Optional)</label>
+                        <input 
+                            type="url" 
+                            id="articleUrl" 
+                            name="article_url" 
+                            placeholder="https://..."
+                        >
+                        <span class="form-help">Link to your full article or blog post</span>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="document.getElementById('uploadForm').reset()">
+                        Clear Form
+                    </button>
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-paper-plane"></i> Submit for Review
+                    </button>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <!-- Tutorial View Modal -->
+    <div id="tutorialModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Tutorial</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Tutorial content will be loaded here -->
+            </div>
+        </div>
     </div>
-  </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>About Us</h3>
+                    <div class="footer-logo">
+                        <h2>MIKAMATA</h2>
+                    </div>
+                    <p>The Mithiin Kapakanan Makamatan Tagumpas Livelihood and Handicrafts MIKAMATA, is a community-based group established in 2011. The group focuses on making handmade bamboo products such as lampshades, mugs, earrings, phone holders, and furniture.</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Learn With Us</h3>
+                    <div class="contact-info">
+                        <p><i class="fas fa-envelope"></i> Mikamatahandicrafts@gmail.com</p>
+                        <p><i class="fas fa-phone"></i> +639217329592 / +639622328554</p>
+                    </div>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Index</h3>
+                    <ul class="footer-links"> 
+                        <li><a href="home.php">Home</a></li>
+                        <li><a href="aboutus.php">About Us</a></li>
+                        <li><a href="products.php">Products</a></li>
+                        <li><a href="contactus.php">Learn With Us</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; Copyright 2025 | MIKAMATA</p>
+        </div>
+    </footer>
+
+    <!-- Profile Modal -->
+    <div id="profileModal" class="modal">
+        <div class="modal-content">
+        <span class="close">&times;</span>
+        <span id="title-modal">User Information</span>
+
+        <div class="profile-info">
+            <label>First Name:</label>
+            <input type="text" id="firstName" readonly>
+
+            <label>Last Name:</label>
+            <input type="text" id="lastName" readonly>
+
+            <label>Mobile:</label>
+            <input type="text" id="mobile" readonly>
+
+            <label>Email:</label>
+            <input type="text" id="email" readonly>
+
+            <hr>
+            <h3>Change Password</h3>
+            <label>New Password:</label>
+            <input type="password" id="newPassword">
+            
+            <label>Confirm Password:</label>
+            <input type="password" id="confirmPassword">
+
+            <button id="updatePasswordBtn">Update Password</button>
+        </div>
+        </div>
+    </div>
 
     <div id="toast-container"></div>
 
-      <script src="contactus.js"></script>
+    <script src="contactus.js"></script>
+    <script>
+        // Shared script for header functionality
+        function showToast(message, type = "info") {
+            const container = $("#toast-container");
+            const toast = $("<div>").addClass(`toast ${type}`).text(message);
+            container.append(toast);
+            setTimeout(() => toast.remove(), 4000);
+        }
+
+        $('#logout-btn').click(() => {
+            $.ajax({
+                url: "../assets/php/logout.php", type: "POST", dataType: "json",
+                success: (res) => {
+                    if (res.status === "success") {
+                        sessionStorage.clear(); localStorage.clear();
+                        window.location.href = "../index.php"; 
+                    } else { showToast("⚠️ Logout failed: " + res.message); }
+                },
+                error: () => showToast("❌ Something went wrong during logout")
+            });
+        });
+
+        $('#userBtn').click(() => {
+            $.ajax({
+                url: "../assets/php/get_user_info.php", type: "POST", dataType: "json",
+                success: (res) => {
+                    if (res.status === "success") {
+                        $("#firstName").val(res.data.firstname); $("#lastName").val(res.data.lastname);
+                        $("#mobile").val(res.data.mobile); $("#email").val(res.data.email);
+                        $("#profileModal").show();
+                    } else { showToast("⚠️ " + res.message); }
+                },
+                error: () => showToast("❌ Error fetching user data.")
+            });
+        });
+
+        $("#profileModal .close").click(() => $("#profileModal").hide());
+    </script>
 </body>
 </html>

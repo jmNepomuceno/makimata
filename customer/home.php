@@ -27,7 +27,7 @@
           <a href="products.php">Products</a>
           <a href="home.php" class="active">Overview</a>
           <a href="aboutus.php" >About Us</a>
-          <a href="contactus.php">Contact Us</a>
+          <a href="contactus.php">Learn With Us</a>
       </nav>
       <div class="header-actions">
         <div class="search">
@@ -274,17 +274,17 @@
       </div>
       <div class="contacts">
         <!-- Updated section title to match React component -->
-        <h3>Contacts Us</h3>
+        <h3>Learn With Us</h3>
         <p><i class="fa-solid fa-envelope"></i> mikamatahandicrafts@gmail.com</p>
         <p><i class="fa-solid fa-phone"></i> +639217239592 / +639622328554</p>
       </div>
       <div class="index">
         <h3>Index</h3>
         <ul>
-          <li><a href="home.html">Home</a></li>
-          <li><a href="aboutus.html">About Us</a></li>
-          <li><a href="products.html">Products</a></li>
-          <li><a href="contactus.html">Contact Us</a></li>
+          <li><a href="home.php">Home</a></li>
+          <li><a href="aboutus.php">About Us</a></li>
+          <li><a href="products.php">Products</a></li>
+          <li><a href="contactus.php">Learn With Us</a></li>
         </ul>
       </div>
     </div>

@@ -20,7 +20,7 @@
           <a href="products.php">Products</a>
           <a href="home.php">Overview</a>
           <a href="aboutus.php" class="active">About Us</a>
-          <a href="contactus.php">Contact Us</a>
+          <a href="contactus.php">Learn With Us</a>
         </nav>
         <div class="header-actions">
           <input type="search" class="search-input" placeholder="Search..." />

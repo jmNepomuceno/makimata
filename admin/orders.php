@@ -18,6 +18,17 @@
     body {
       zoom: 80%;
     }
+    .spinner {
+      border: 4px solid rgba(255,255,255,0.3);
+      border-top: 4px solid #fff;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      100% { transform: rotate(360deg); }
+    }
   </style>
 </head>
 <body>
@@ -387,6 +398,22 @@
         <button class="btn btn-primary" id="edit-modal-update-status-btn">Update Status</button>
       </div>
     </div>
+  </div>
+
+  <div id="loading-overlay" style="
+    display:none;
+    position:fixed;
+    top:0; left:0;
+    width:100%; height:100%;
+    background:rgba(0,0,0,0.5);
+    z-index:9999;
+    justify-content:center;
+    align-items:center;
+    color:white;
+    font-size:1.2rem;
+  ">
+    <div class="spinner"></div>
+    <span style="margin-left:10px;">Updating order status...</span>
   </div>
 
   <script src="orders.js"></script>

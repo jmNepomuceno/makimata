@@ -1,492 +1,298 @@
+// Mikamata Tutorial Module - Public Interface JavaScript
 
-
-class TutorialManager {
+class TutorialPublic {
   constructor() {
     this.tutorials = []
-    this.filteredTutorials = []
-    this.currentPage = 1
-    this.itemsPerPage = 10
+    this.currentFilter = "all"
     this.init()
   }
 
-  _createLog(action, description, severity = "info") {
-    try {
-      const logs = JSON.parse(localStorage.getItem("mikamataActivityLogs") || "[]")
-      const newLog = {
-        id: `log-${Date.now()}`,
-        user: { name: "Admin User", avatar: "../placeholder.svg?height=32&width=32&text=A" },
-        action: action,
-        description: description,
-        severity: severity,
-        icon: "fa-book-open",
-        timestamp: new Date().toISOString(),
-        ip: "127.0.0.1",
-        details: {},
-      }
-      logs.unshift(newLog)
-      localStorage.setItem("mikamataActivityLogs", JSON.stringify(logs.slice(0, 100)))
-    } catch (error) {
-      console.error("Failed to create activity log:", error)
-    }
-  }
-
-  async init() {
-    await this.loadTutorials()
+  init() {
+    this.loadTutorials()
     this.setupEventListeners()
   }
 
-  showToast(message, type = "info") {
-    const container = $("#toast-container");
-    const toast = $("<div>").addClass(`toast ${type}`).text(message);
-    container.append(toast);
-    setTimeout(() => toast.remove(), 4000);
-}
+  setupEventListeners() {
+    // Upload form submission
+    const uploadForm = document.getElementById("uploadForm")
+    if (uploadForm) {
+      uploadForm.addEventListener("submit", (e) => this.handleUploadSubmit(e))
+    }
 
-  // async loadTutorials() {
-  //   console.log('here')
-  //   try {
-  //     // --- DATABASE INTEGRATION PLACEHOLDER ---
-  //     // const response = await fetch('/api/tutorials');
-  //     // this.tutorials = await response.json();
+    // Modal close
+    const modalClose = document.querySelector(".modal-close")
+    if (modalClose) {
+      modalClose.addEventListener("click", () => this.closeModal())
+    }
 
-  //     // For demo, use mock data
-  //     const savedTutorials = localStorage.getItem("mikamataTutorials");
-  //     this.tutorials = savedTutorials ? JSON.parse(savedTutorials) : generateMockTutorials();
-  //     this.saveTutorialsToStorage();
-  //   } catch (error) {
-  //     console.error("Error loading tutorials from localStorage:", error)
-  //     this.tutorials = generateMockTutorials()
-  //   }
-  //   this.filteredTutorials = [...this.tutorials]
-  //   this.renderTutorials()
-  // }
+    // Close modal on outside click
+    const modal = document.getElementById("tutorialModal")
+    if (modal) {
+      modal.addEventListener("click", (e) => {
+        if (e.target === modal) {
+          this.closeModal()
+        }
+      })
+    }
 
-  // saveTutorialsToStorage() {
-  //   // --- DATABASE INTEGRATION PLACEHOLDER ---
-  //   // This will be removed. Saving is done via API calls.
-  //   localStorage.setItem("mikamataTutorials", JSON.stringify(this.tutorials));
-  // }
+    // Tutorial type change
+    const typeSelect = document.getElementById("tutorialType")
+    if (typeSelect) {
+      typeSelect.addEventListener("change", (e) => this.handleTypeChange(e))
+    }
 
-  getTutorialIcon(type) {
-    return type === "video" ? "fas fa-play-circle" : "fas fa-file-alt";
+    // Scroll to upload form
+    const uploadBtn = document.getElementById("scrollToUpload")
+    if (uploadBtn) {
+      uploadBtn.addEventListener("click", () => {
+        document.getElementById("uploadSection").scrollIntoView({
+          behavior: "smooth",
+        })
+      })
+    }
   }
 
   loadTutorials() {
-    console.log('here')
     $.ajax({
-      url: "../assets/php_admin/fetch_tutorials.php", // your PHP backend
-      type: "GET",
+      url: "../assets/php_admin/fetch_tutorials.php",
+      method: "GET",
       dataType: "json",
-      success: (res) => {
-        console.log(res)
-        if (res.status === "success") {
-          this.tutorials = res.data;           // store raw tutorials
-          this.filteredTutorials = this.tutorials; // default filter
-          this.renderTutorials();              // render the fetched data
+      success: (response) => {
+        console.log(response)
+        if (response.status) {
+          this.tutorials = response.data;
+          this.renderTutorials();
         } else {
-          $("#tutorials-view").html(
-            `<p style="text-align:center; padding:2rem;">${res.message}</p>`
-          );
+          console.error("Failed to load tutorials:", response.message);
         }
       },
-      error: (xhr, status, err) => {
-        console.error("AJAX Error:", err);
-        $("#tutorials-view").html(
-          `<p style="text-align:center; padding:2rem; color:red;">Failed to load tutorials.</p>`
-        );
-      }
+      error: (xhr, status, error) => {
+        console.error("Error loading tutorials:", error);
+      },
     });
   }
 
 
   renderTutorials() {
-    const gridView = document.getElementById("tutorials-view");
-    if (!gridView) return;
+    const grid = document.getElementById("tutorialsGrid");
+    if (!grid) return;
 
-    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
-    const endIndex = startIndex + this.itemsPerPage;
-    const paginatedTutorials = this.filteredTutorials.slice(startIndex, endIndex);
-
-    if (paginatedTutorials.length === 0) {
-      gridView.innerHTML = `
-        <p style="text-align: center; padding: 2rem; grid-column: 1 / -1;">
-          No tutorials found.
-        </p>`;
-      this.renderPagination();
+    if (this.tutorials.length === 0) {
+      grid.innerHTML = `
+        <div class="empty-state">
+          <i class="fas fa-video"></i>
+          <h3>No Tutorials Yet</h3>
+          <p>Be the first to share your knowledge with the community!</p>
+        </div>
+      `;
       return;
     }
 
-    gridView.innerHTML = paginatedTutorials
-      .map((tutorial) => {
-        const link = tutorial.type === 'video' ? tutorial.video_url : tutorial.article_url;
-        const isClickable = !!link;
-        const cardTag = isClickable ? 'a' : 'div';
-        const cardHref = isClickable ? `href="${link}" target="_blank"` : '';
+    console.log(this.tutorials);
 
-        // 🟡 Status badge class based on status
-        let statusClass = '';
-        if (tutorial.status === 'approved') statusClass = 'status-approved';
-        else if (tutorial.status === 'rejected') statusClass = 'status-rejected';
-        else statusClass = 'status-pending';
+    grid.innerHTML = this.tutorials
+      .map((tutorial) => {
+        // Determine thumbnail or icon fallback
+        const iconHTML = `<i class="${tutorial.icon || "fas fa-play"} tutorial-icon"></i>`;
+        const link =
+          tutorial.type === "video"
+            ? tutorial.video_url
+            : tutorial.article_url;
 
         return `
-          <${cardTag} class="tutorial-card ${!isClickable ? 'not-clickable' : ''}" ${cardHref}>
-              <div class="tutorial-card-thumbnail">
-                  <div class="tutorial-icon">
-                    <i class="${this.getTutorialIcon(tutorial.type)}"></i>
-                  </div>
-                  <span class="type-badge ${tutorial.type}">
-                    <i class="fas ${tutorial.type === "video" ? "fa-play" : "fa-file-alt"}"></i> ${tutorial.type}
-                  </span>
+          <div class="tutorial-card" onclick="tutorialPublic.openTutorial(${tutorial.id})">
+            <div class="tutorial-thumbnail">
+              ${iconHTML}
+            </div>
+            <div class="tutorial-content">
+              <span class="tutorial-type">
+                <i class="${tutorial.icon || "fas fa-play"}"></i> ${tutorial.type}
+              </span>
+              <h3 class="tutorial-title">${this.escapeHtml(tutorial.title)}</h3>
+              <p class="tutorial-description">${this.escapeHtml(tutorial.description)}</p>
+              <div class="tutorial-meta">
+                <span><i class="fas fa-eye"></i> ${tutorial.views} views</span>
+                <span><i class="fas fa-clock"></i> ${this.formatDate(tutorial.last_updated)}</span>
+                <span class="status-badge status-${tutorial.status}">
+                  ${tutorial.status}
+                </span>
               </div>
-              <div class="tutorial-card-content">
-                  <h4 class="tutorial-title"><b>Title:</b> ${tutorial.title}</h4>
-                  <p class="tutorial-description"><i>Description:</i> ${tutorial.description}</p>
-              </div>
-              <div class="tutorial-card-footer">
-                  <span class="last-updated">
-                    Updated: ${new Date(tutorial.last_updated).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
-                  </span>
-                  <span class="status-badge ${statusClass}">
-                    ${tutorial.status.charAt(0).toUpperCase() + tutorial.status.slice(1)}
-                  </span>
-                  <div class="action-buttons">
-                      <button class="btn-icon edit-btn" title="Edit"
-                        onclick="event.preventDefault(); event.stopPropagation(); tutorialManager.openTutorialModal(${tutorial.id})">
-                        <i class="fas fa-edit"></i>
-                      </button>
-                  </div>
-              </div>
-          </${cardTag}>
+            </div>
+          </div>
         `;
       })
       .join("");
-
-    this.renderPagination();
   }
 
 
+  openTutorial(id) {
+    const tutorial = this.tutorials.find((t) => t.id === id)
+    if (!tutorial) return
 
-  renderPagination() {
-    const paginationInfo = document.getElementById("pagination-info")
-    const paginationControls = document.getElementById("pagination-controls")
-    if (!paginationInfo || !paginationControls) return
+    const modal = document.getElementById("tutorialModal")
+    const modalBody = document.querySelector(".modal-body")
 
-    const totalItems = this.filteredTutorials.length
-    const totalPages = Math.ceil(totalItems / this.itemsPerPage)
-    const startItem = totalItems > 0 ? (this.currentPage - 1) * this.itemsPerPage + 1 : 0
-    const endItem = Math.min(this.currentPage * this.itemsPerPage, totalItems)
+    let content = ""
+    console.log(tutorial.video_url)
 
-    paginationInfo.textContent = `Showing ${startItem}-${endItem} of ${totalItems} tutorials`
-
-    if (totalPages <= 1) {
-      paginationControls.innerHTML = ""
-      return
-    }
-
-    let paginationHTML = ""
-    paginationHTML += `<button class="pagination-btn" ${this.currentPage === 1 ? "disabled" : ""} data-page="${this.currentPage - 1}"><i class="fas fa-chevron-left"></i></button>`
-
-    // Simplified pagination for now
-    for (let i = 1; i <= totalPages; i++) {
-      paginationHTML += `<button class="pagination-btn ${i === this.currentPage ? "active" : ""}" data-page="${i}">${i}</button>`
-    }
-
-    paginationHTML += `<button class="pagination-btn" ${this.currentPage === totalPages ? "disabled" : ""} data-page="${this.currentPage + 1}"><i class="fas fa-chevron-right"></i></button>`
-    paginationControls.innerHTML = paginationHTML
-
-    paginationControls.querySelectorAll(".pagination-btn").forEach((btn) => {
-      btn.addEventListener("click", (e) => {
-        const page = e.currentTarget.dataset.page
-        if (page) {
-          this.currentPage = Number.parseInt(page)
-          this.renderTutorials()
-        }
-      })
-    })
-  }
-
-  filterAndRender() {
-    this.filteredTutorials = this.tutorials.filter((tutorial) => {
-      // Filtering logic can be added back here if a search bar is re-introduced.
-      // For now, it just shows all tutorials.
-      return true
-    })
-
-    this.currentPage = 1
-    this.renderTutorials()
-  }
-
-  setupEventListeners() {
-    // Modal
-    const addTutorialBtn = document.getElementById("add-tutorial-btn")
-    const tutorialModal = document.getElementById("tutorial-modal")
-    const modalClose = document.querySelector("#tutorial-modal .modal-close")
-    const tutorialForm = document.getElementById("tutorial-form")
-    const cancelBtn = document.getElementById("cancel-btn")
-    const deleteBtn = document.getElementById("delete-tutorial-btn");
-
-    addTutorialBtn?.addEventListener("click", () => {
-      this.openTutorialModal() // Open with no ID for adding
-    })
-
-    modalClose?.addEventListener("click", () => {
-      this.closeTutorialModal()
-    })
-
-    cancelBtn?.addEventListener("click", () => {
-      this.closeTutorialModal()
-    })
-
-    tutorialForm?.addEventListener("submit", (e) => {
-      e.preventDefault()
-      this.saveTutorial()
-    })
-
-    deleteBtn?.addEventListener("click", () => {
-        const tutorialId = Number.parseInt(document.getElementById("tutorial-id").value);
-        if (tutorialId) {
-            this.deleteTutorial(tutorialId);
-        }
-    })
-
-    // Show/hide fields based on tutorial type
-    document.getElementById("tutorial-type")?.addEventListener("change", (e) => {
-      this.toggleContentTypeFields(e.target.value)
-    })
-
-    // Add more event listeners for other form buttons if needed
-
-    // Bulk Actions
-    const selectAllCheckbox = document.getElementById("select-all")
-    const tableBody = document.getElementById("tutorials-table-body")
-
-    selectAllCheckbox?.addEventListener("change", (e) => {
-      tableBody.querySelectorAll(".tutorial-checkbox").forEach((checkbox) => {
-        checkbox.checked = e.target.checked
-      })
-      this.updateBulkActionsVisibility()
-    })
-
-    tableBody?.addEventListener("change", (e) => {
-      if (e.target.classList.contains("tutorial-checkbox")) {
-        this.updateBulkActionsVisibility()
-      }
-    })
-  }
-
-  openTutorialModal(tutorialId = null) {
-    console.log('here')
-    const modal = document.getElementById("tutorial-modal")
-    const modalTitle = document.getElementById("modal-title")
-    const form = document.getElementById("tutorial-form")
-    const deleteBtn = document.getElementById("delete-tutorial-btn");
-    const saveBtn = document.getElementById("save-tutorial-btn");
-
-    form.reset() // Clear previous data
-    document.getElementById("tutorial-id").value = "" // Clear hidden ID
-    // Reset any other specific fields like contenteditable div
-    document.getElementById("tutorial-content").innerHTML = ""
-    this.toggleContentTypeFields(form.querySelector("#tutorial-type").value) // Set initial state based on (empty) dropdown
-
-    if (tutorialId) {
-      // This is an edit operation
-      const tutorial = this.tutorials.find((t) => t.id === tutorialId)
-      if (tutorial) {
-        deleteBtn.style.display = "inline-block"; // Show delete button
-        saveBtn.textContent = "Update Tutorial";
-        modalTitle.textContent = "Edit Tutorial"
-        // Populate the form
-        document.getElementById("tutorial-id").value = tutorial.id
-        document.getElementById("tutorial-title").value = tutorial.title
-        document.getElementById("tutorial-description").value = tutorial.description
-        document.getElementById("tutorial-type").value = tutorial.type
-        document.getElementById("video-url").value = tutorial.videoUrl || ""
-        document.getElementById("article-url").value = tutorial.articleUrl || ""
-        // Populate other fields as they are added to the mock data
-      }
-    } else {
-      // This is an add operation
-      deleteBtn.style.display = "none"; // Hide delete button
-      saveBtn.textContent = "Save Tutorial";
-      modalTitle.textContent = "Add New Tutorial"
-    }
-
-    // This call ensures that if we are editing, the correct fields are shown.
-    this.toggleContentTypeFields(form.querySelector("#tutorial-type").value)
-    modal.style.display = "flex"
-  }
-
-  closeTutorialModal() {
-    const modal = document.getElementById("tutorial-modal")
-    modal.style.display = "none"
-  }
-
-  async deleteTutorial(tutorialId) {
-    const confirmed = await showConfirmation("Are you sure you want to delete this tutorial?", "Delete");
-    if (confirmed) {
-      $.ajax({
-        url: "../assets/php_admin/delete_tutorial.php",
-        type: "POST",
-        data: { id: tutorialId },
-        dataType: "json",
-        success: (res) => {
-          if (res.status === "success") {
-            this.showToast('Tutorial deleted successfully.', 'error');
-            this.closeTutorialModal();
-            this.loadTutorials(); // refresh DB data
-          } else {
-            this.showToast(res.message || 'Could not delete tutorial.', 'error');
-          }
-        },
-        error: (xhr, status, err) => {
-          console.error("AJAX error:", err);
-          this.showToast('Could not delete tutorial.', 'error');
-        }
-      });
-    }
-  }
-
-
-  async saveTutorial() {
-    console.log('save')
-    const form = document.getElementById("tutorial-form")
-    const tutorialId = Number.parseInt(form.querySelector("#tutorial-id").value)
-    const isNew = !tutorialId;
-
-    const tutorialData = {
-      id: tutorialId,
-      title: form.querySelector("#tutorial-title").value,
-      description: form.querySelector("#tutorial-description").value,
-      type: form.querySelector("#tutorial-type").value,
-      videoUrl: form.querySelector("#video-url").value,
-      articleUrl: form.querySelector("#article-url").value,
-      lastUpdated: new Date().toISOString().split("T")[0], // today
-    }
-
-    try {
-      // --- thumbnail generation (same logic you had) ---
-      if (tutorialData.type === 'video' && tutorialData.videoUrl) {
-        const youtubeId = this.getYouTubeVideoId(tutorialData.videoUrl);
-        tutorialData.image = youtubeId
-          ? `https://img.youtube.com/vi/${youtubeId}/mqdefault.jpg`
-          : this.getPlaceholderImage(tutorialData.videoUrl);
-      } else if (tutorialData.type === 'article' && tutorialData.articleUrl) {
-        try {
-          const response = await fetch(`https://api.microlink.io?url=${encodeURIComponent(tutorialData.articleUrl)}`);
-          const linkData = await response.json();
-          tutorialData.image = linkData.data?.image?.url || this.getPlaceholderImage(tutorialData.articleUrl);
-        } catch {
-          tutorialData.image = this.getPlaceholderImage(tutorialData.articleUrl);
-        }
+    if (tutorial.type === "video" && tutorial.video_url) {
+      // Check if it's a YouTube URL or a direct file path
+      if (tutorial.video_url.includes("youtube.com") || tutorial.video_url.includes("youtu.be")) {
+        const videoId = this.extractVideoId(tutorial.video_url)
+        content = `
+          <div class="video-container">
+            <iframe 
+              src="https://www.youtube.com/embed/${videoId}" 
+              frameborder="0" 
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+              allowfullscreen>
+            </iframe>
+          </div>
+        `
       } else {
-        tutorialData.image = this.getPlaceholderImage();
+        // Assume it's a direct file path from the server
+        content = `
+          <div class="video-container">
+            <video controls style="width: 100%; height: auto; border-radius: var(--radius);">
+              <source src="/${tutorial.video_url}" type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
+          </div>
+        `
       }
-    } catch (e) {
-      console.error("Error fetching thumbnail:", e);
-      tutorialData.image = this.getPlaceholderImage();
+      // Add title and description after the video content
+      content += `
+          <h2>${this.escapeHtml(tutorial.title)}</h2>
+          <p><strong>By:</strong> ${this.escapeHtml(tutorial.author || "Anonymous")}</p>
+          <p>${this.escapeHtml(tutorial.description)}</p>
+        `
+    } else {
+      content = `
+        <h2>${this.escapeHtml(tutorial.title)}</h2>
+        <p><strong>By:</strong> ${this.escapeHtml(tutorial.author || "Anonymous")}</p>
+        <p>${this.escapeHtml(tutorial.description)}</p>
+        ${tutorial.article_url ? `<p><a href="${tutorial.article_url}" target="_blank" class="btn-primary">Read Full Article</a></p>` : ""}
+        ${tutorial.content ? `<div class="article-content">${tutorial.content}</div>` : ""}
+      `
     }
 
-    // --- AJAX call to PHP ---
-    $.ajax({
-      url: isNew ? "../assets/php_admin/add_tutorial.php" : "../assets/php_admin/update_tutorial.php",
+    modalBody.innerHTML = content
+    modal.classList.add("active")
+  }
+
+  closeModal() {
+    const modal = document.getElementById("tutorialModal")
+    modal.classList.remove("active")
+  }
+
+  handleUploadSubmit(e) {
+    e.preventDefault();
+
+    const form = e.target;
+    const formData = new FormData();
+    formData.append("title", $("#tutorialTitle").val());
+    formData.append("description", $("#tutorialDescription").val());
+    formData.append("article_url", $("#articleUrl").val());
+    formData.append("status", "pending");
+
+    const fileInput = $("#video_file")[0];
+    if (fileInput.files.length > 0) {
+      formData.append("video_file", fileInput.files[0]);
+    } else {
+      alert("Please select a video file before submitting.");
+      return;
+    }
+
+    // ✅ Debug: log all entries
+    for (let [key, value] of formData.entries()) {
+      console.log(key, value);
+    }
+
+    const videoFile = $("#video_file")[0].files[0];
+    console.log("Video file selected:", videoFile);
+
+   $.ajax({
+      url: "../assets/php_admin/add_tutorial.php",
       type: "POST",
-      data: tutorialData,
-      dataType: "json",
-      success: (res) => {
-        console.log(res)
-        if (res.status === "success") {
-          this.showToast(`Tutorial ${isNew ? 'added' : 'updated'} successfully!`, 'success');
-          this.closeTutorialModal();
-          this.loadTutorials(); // <-- refresh from DB
+      data: formData,
+      dataType: "json", // ✅ tell jQuery to auto-parse JSON
+      contentType: false,
+      processData: false,
+      success: function (data) {
+        if (data.success) {
+          alert("Tutorial submitted successfully! It will be reviewed by our team.");
+          form.reset();
+
+          const successMessage = document.getElementById("successMessage");
+          if (successMessage) {
+            successMessage.scrollIntoView({ behavior: "smooth" });
+          }
         } else {
-          this.showToast(res.message || 'Failed to save tutorial.', 'error');
+          alert("Error: " + data.message);
         }
       },
-      error: (xhr, status, err) => {
-        console.error("AJAX error:", err);
-        this.showToast('Could not save tutorial.', 'error');
-      }
+      error: function (xhr, status, error) {
+        console.error("AJAX Error:", status, error);
+        console.log("Response text:", xhr.responseText);
+        alert("An error occurred while submitting your tutorial. Please try again.");
+      },
     });
+
   }
 
-  
-  /**
-   * Generates a consistent or random placeholder image.
-   * @param {string|null} url - An optional URL to generate a consistent placeholder.
-   * @returns {string} The URL of the placeholder image.
-   */
-  getPlaceholderImage(url = null) {
-    // Simple hash function to get a consistent random number from a string
-    const seed = url ? url.split('').reduce((acc, char) => char.charCodeAt(0) + ((acc << 5) - acc), 0) : Date.now();
-    const randomIndex = Math.abs(seed) % 5; // We have 5 placeholder images
-    return `../mik/tutorials/placeholder-${randomIndex}.jpg`;
-  }
-  /**
-   * <NEW>
-   * Parses a YouTube URL to extract the video ID.
-   * @param {string} url The YouTube URL.
-   * @returns {string|null} The video ID or null if not found.
-   */
-  getYouTubeVideoId(url) {
-    let videoId = null;
-    const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
-    const match = url.match(youtubeRegex);
 
-    if (match && match[1]) {
-        videoId = match[1];
-    }
+  showSuccessMessage(message) {
+    const successDiv = document.getElementById("successMessage")
+    successDiv.querySelector("p").textContent = message
+    successDiv.classList.add("show")
 
-    return videoId;
+    setTimeout(() => {
+      successDiv.classList.remove("show")
+    }, 5000)
   }
 
-  toggleContentTypeFields(type) {
-    const videoGroup = document.getElementById("video-url-group")
-    const articleGroup = document.getElementById("article-url-group")
-    const editorGroup = document.getElementById("content-editor-group")
+  handleTypeChange(e) {
+    const type = e.target.value
+    const videoFields = document.getElementById("videoFields")
+    const articleFields = document.getElementById("articleFields")
 
-    // Hide all content-specific groups first
-    videoGroup.style.display = "none"
-    articleGroup.style.display = "none"
-    editorGroup.style.display = "none"
-
-    // Show the relevant group(s) based on the selected type
     if (type === "video") {
-      videoGroup.style.display = "block"
-    } else if (type === "article") {
-      articleGroup.style.display = "block"
-      // Always show the manual editor for articles, can be used with or without an external URL
-      editorGroup.style.display = "block"
+      videoFields.style.display = "block"
+      articleFields.style.display = "none"
+    } else {
+      videoFields.style.display = "none"
+      articleFields.style.display = "block"
     }
   }
 
-  updateBulkActionsVisibility() {
-    const checkedBoxes = document.querySelectorAll(".tutorial-checkbox:checked")
-    const bulkActions = document.getElementById("bulk-actions")
-    const selectedCount = document.querySelector(".selected-count")
-
-    if (bulkActions && selectedCount) {
-      if (checkedBoxes.length > 0) {
-        bulkActions.style.display = "flex"
-        selectedCount.textContent = `${checkedBoxes.length} tutorials selected`
-      } else {
-        bulkActions.style.display = "none"
-      }
-    }
+  extractVideoId(url) {
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/
+    const match = url.match(regExp)
+    return match && match[2].length === 11 ? match[2] : null
   }
-}
 
-document.addEventListener("DOMContentLoaded", () => {
-  // Initialize current date
-  const currentDateEl = document.getElementById("current-date")
-  if (currentDateEl) {
-    currentDateEl.textContent = new Date().toLocaleDateString("en-US", {
-      weekday: "long",
+  getDefaultThumbnail(type) {
+    return type === "video" ? "/video-tutorial-crafts.jpg" : "/article-handicraft-guide.jpg"
+  }
+
+  formatDate(dateString) {
+    const date = new Date(dateString)
+    return date.toLocaleDateString("en-US", {
       year: "numeric",
-      month: "long",
+      month: "short",
       day: "numeric",
     })
   }
 
-  window.tutorialManager = new TutorialManager()
+  escapeHtml(text) {
+    const div = document.createElement("div")
+    div.textContent = text
+    return div.innerHTML
+  }
+}
+
+// Initialize when DOM is ready
+let tutorialPublic
+document.addEventListener("DOMContentLoaded", () => {
+  tutorialPublic = new TutorialPublic()
 })

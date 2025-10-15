@@ -15,7 +15,8 @@ try {
                 views, 
                 last_updated, 
                 icon,
-                status
+                status,
+                created_at
             FROM tutorials
             ORDER BY last_updated DESC";
 

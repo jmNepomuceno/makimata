@@ -2,15 +2,15 @@
     include("./assets/connection/connection.php");
     session_start();
 
-    // $sql = "SELECT 
-    //             *
-    //         FROM order_items";
-    // $stmt = $pdo->prepare($sql);
-    // $stmt->execute();
-    // $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $sql = "SELECT 
+                *
+            FROM users";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute();
+    $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    $stmtUpdate = $pdo->prepare("UPDATE tutorials SET status = 'pending'");
-    $stmtUpdate->execute();
+    // $stmtUpdate = $pdo->prepare("UPDATE tutorials SET status = 'pending'");
+    // $stmtUpdate->execute();
 
     // $orderId = "ORD000004";
 
@@ -24,7 +24,7 @@
     // $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     // echo "<pre>"; print_r($order); echo "</pre>";
-    // echo "<pre>"; print_r($data); echo "</pre>";
+    echo "<pre>"; print_r($data); echo "</pre>";
     // echo "<pre>"; print_r($_SESSION); echo "</pre>";
     
 ?>

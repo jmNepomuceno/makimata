@@ -21,8 +21,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 localStorage.removeItem('admin_logged_in'); // Clear the login flag
                 showToast('Logging out...', 'info');
                 setTimeout(() => {
-                    // Redirect to the login page in the same directory
-                    window.location.href = 'http://192.168.100.13:8050/'; 
+                    // Redirect to the main login page
+                    window.location.href = '../index.php'; 
                 }, 1500);
             });
         }

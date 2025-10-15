@@ -428,7 +428,7 @@
                     <a href="products.php" class="active">Products</a>
                     <a href="home.php">Overview</a>
                     <a href="aboutus.php">About Us</a>
-                    <a href="contactus.php">Contact Us</a>
+                    <a href="contactus.php">Learn With Us</a>
                 </nav>
                 <div class="header-actions">
                     <div class="search-box">
@@ -899,7 +899,7 @@
                 </div>
                 
                 <div class="footer-section">
-                    <h3>Contacts Us</h3>
+                    <h3>Learn With Us</h3>
                     <div class="contact-info">
                         <p><i class="fas fa-envelope"></i> Mikamatahandicrafts@gmail.com</p>
                         <p><i class="fas fa-phone"></i> +639217329592 / +639622328554</p>
@@ -909,10 +909,10 @@
                 <div class="footer-section">
                     <h3>Index</h3>
                     <ul class="footer-links"> 
-                        <li><a href="home.html">Home</a></li>
-                        <li><a href="aboutus.html">About Us</a></li>
-                        <li><a href="products.html">Products</a></li>
-                        <li><a href="contactus.html">Contact Us</a></li>
+                        <li><a href="home.php">Home</a></li>
+                        <li><a href="aboutus.php">About Us</a></li>
+                        <li><a href="products.php">Products</a></li>
+                        <li><a href="contactus.php">Learn With Us</a></li>
                     </ul>
                 </div>
             </div>
