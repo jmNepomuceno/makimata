@@ -7,6 +7,79 @@
     <link rel="stylesheet" href="signup.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <?php include("../scripts_links/header_links.php") ?>
+
+    <style>
+        /* === Mikamata Style === */
+        :root {
+        --mikamata-green: #44734a;
+        }
+
+        .terms {
+        font-size: 0.95rem;
+        color: #333;
+        margin-top: 1rem;
+        }
+
+        .terms a {
+        color: var(--mikamata-green);
+        font-weight: 500;
+        text-decoration: none;
+        transition: color 0.2s;
+        }
+
+        .terms a:hover {
+        color: #2f5733;
+        text-decoration: underline;
+        }
+
+        /* Modal Header */
+        #privacyModal .modal-header {
+        background-color: var(--mikamata-green);
+        color: #fff;
+        border-bottom: none;
+        }
+
+        #privacyModal .modal-title {
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        }
+
+        #privacyModal .btn-close {
+        filter: invert(1);
+        }
+
+        /* Modal Body */
+        #privacyModal .modal-body {
+        font-size: 0.95rem;
+        line-height: 1.6;
+        color: #333;
+        padding: 1.5rem;
+        background: #f9f9f9;
+        }
+
+        #privacyModal h6 {
+        color: var(--mikamata-green);
+        font-weight: 600;
+        margin-top: 1rem;
+        margin-bottom: 0.5rem;
+        }
+
+        /* Modal Footer */
+        #privacyModal .modal-footer {
+        background-color: #f1f1f1;
+        border-top: none;
+        }
+
+        #privacyModal .btn-secondary {
+        background-color: var(--mikamata-green);
+        border: none;
+        transition: background 0.2s;
+        }
+
+        #privacyModal .btn-secondary:hover {
+        background-color: #365c3d;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -99,10 +172,13 @@
                     <input type="password" id="confirmPassword" name="confirmPassword" required placeholder="Confirm password" />
                 </div>
 
-                <!-- Privacy Policy -->
+                <!-- Privacy Policy Link -->
                 <div class="terms full-width">
                     <input type="checkbox" id="privacy" name="privacy" required />
-                    <label for="privacy">I agree that my information will be used to process my account and keep it secure. <a href="#">Privacy Policy</a></label>
+                    <label for="privacy">
+                        I agree that my information will be used to process my account and keep it secure.
+                        <a href="#" data-bs-toggle="modal" data-bs-target="#privacyModal">Privacy Policy</a>
+                    </label>
                 </div>
 
                 <!-- CAPTCHA -->
@@ -143,6 +219,40 @@
                 <button id="resendOtpBtn" style="display:none;">Resend OTP</button>
             </div>
             <div id="result"></div>
+        </div>
+    </div>
+
+    <!-- Privacy Policy Modal -->
+    <div class="modal fade" id="privacyModal" tabindex="-1" aria-labelledby="privacyModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="privacyModalLabel">Privacy Policy & About Us</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+                <h6>Welcome to Mikamata!</h6>
+                <p>
+                Here, we celebrate the art of bamboo craftsmanship by offering you a one-stop hub where you can design custom bamboo creations, learn about bamboo, and shop from a vibrant marketplace — all while supporting local artisans and discovering how simple it is to bring your bamboo vision to life.
+                </p>
+
+                <h6>About Us</h6>
+                <p>
+                <strong>MIKAMATA</strong> (Mithiin Kapakanan Makamatan Tagumpas Livelihood and Handicrafts) is a community-based group established in 2011. The group focuses on making handmade bamboo products such as lampshades, mugs, earrings, phone holders, and furniture.
+                </p>
+
+                <h6>Privacy Policy</h6>
+                <p>
+                Your personal information (such as your name, email, and contact details) will be used solely for processing your account, ensuring secure access, and providing better service. We do not share your data with third parties without consent.
+                </p>
+                <p>
+                By creating an account, you agree to allow Mikamata to store and use your information responsibly in accordance with this Privacy Policy.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+            </div>
         </div>
     </div>
 

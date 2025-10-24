@@ -337,8 +337,6 @@ class OrderManager {
     }
 
 
-
-
     editOrder(orderId) {
         const modal = document.getElementById('order-edit-modal');
         const order = this.orders.find(o => o.id === orderId);
@@ -346,7 +344,39 @@ class OrderManager {
 
         // Populate modal with basic info
         document.getElementById('edit-modal-order-id').textContent = order.id;
-        document.getElementById('edit-modal-order-status').value = order.status;
+
+        const statusSelect = document.getElementById('edit-modal-order-status');
+        const currentStatus = order.status;
+
+        // Define the allowed transitions for each status
+        const allowedTransitions = {
+            pending: ['processing', 'shipped', 'completed', 'cancelled'],
+            processing: ['shipped', 'completed', 'cancelled'],
+            shipped: ['completed', 'cancelled'],
+            completed: [],
+            cancelled: []
+        };
+
+        // Generate options dynamically based on current status
+        const availableStatuses = allowedTransitions[currentStatus] || [];
+        statusSelect.innerHTML = ''; // Clear previous options
+
+        if (availableStatuses.length === 0) {
+            // No transitions allowed
+            const opt = document.createElement('option');
+            opt.value = currentStatus;
+            opt.textContent = currentStatus.charAt(0).toUpperCase() + currentStatus.slice(1);
+            statusSelect.appendChild(opt);
+            statusSelect.disabled = true;
+        } else {
+            availableStatuses.forEach(status => {
+                const opt = document.createElement('option');
+                opt.value = status;
+                opt.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+                statusSelect.appendChild(opt);
+            });
+            statusSelect.disabled = false;
+        }
 
         // Populate timeline
         const timeline = document.getElementById('edit-modal-timeline');
@@ -379,10 +409,9 @@ class OrderManager {
         // Set up update button
         const updateBtn = document.getElementById('edit-modal-update-status-btn');
         updateBtn.onclick = () => {
-            const newStatus = document.getElementById('edit-modal-order-status').value;
+            const newStatus = statusSelect.value;
             if (!newStatus) return showToast('Please select a status.', 'warning');
 
-            // Show loading overlay
             const overlay = document.getElementById('loading-overlay');
             overlay.style.display = 'flex';
 
@@ -392,7 +421,7 @@ class OrderManager {
                 dataType: 'json',
                 data: { ids: [order.id], status: newStatus },
                 success: (response) => {
-                    overlay.style.display = 'none'; // Hide overlay
+                    overlay.style.display = 'none';
 
                     if (response.status === 'success') {
                         order.status = newStatus;
@@ -406,7 +435,7 @@ class OrderManager {
                     }
                 },
                 error: (xhr, status, error) => {
-                    overlay.style.display = 'none'; // Hide overlay
+                    overlay.style.display = 'none';
                     console.error("Error updating order: " + error);
                     showToast('Error updating order.', 'error');
                 }
@@ -415,6 +444,7 @@ class OrderManager {
 
         modal.style.display = 'flex';
     }
+
 
 
 

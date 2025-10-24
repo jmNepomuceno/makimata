@@ -27,7 +27,6 @@ body {
   position: sticky;
   top: 0;
   z-index: 100;
-  animation: slideDown 0.8s ease-out;
 }
 
 @keyframes slideDown {
@@ -482,4 +481,146 @@ body {
 @keyframes fadeIn {
   from {opacity: 0; transform: translateY(-10px) scale(0.95);}
   to {opacity: 1; transform: translateY(0) scale(1);}
+}
+
+/* ** */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Header Styles */
+.header {
+  background: rgba(7, 24, 7, 0.493);
+  backdrop-filter: blur(10px);
+  padding: 1rem 0;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  border-bottom: 1px solid rgba(21, 64, 30, 0);
+
+}
+
+.header .container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo h1 {
+  color: white;
+  font-size: 1.8rem;
+  font-weight: bold;
+  letter-spacing: 2px;
+  margin: 0; /* Prevents default H1 margin from creating space above the header */
+}
+
+.nav {
+  display: flex;
+  gap: 2rem;
+}
+
+.nav a {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.nav a:hover,
+.nav a.active {
+  color: #8fbc8f;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.search-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-box input {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 25px;
+  padding: 8px 40px 8px 15px;
+  color: white;
+  width: 200px;
+  transition: all 0.3s ease;
+}
+
+.search-box input::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.search-box input:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 0.2);
+  border-color: #8fbc8f;
+}
+
+.search-box i {
+  position: absolute;
+  right: 15px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.login-btn {
+  background: #8fbc8f;
+  color: #2d5016;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 25px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.login-btn:hover {
+  background: #7aa87a;
+  transform: translateY(-2px);
+}
+
+.icon-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.icon-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.cart-count,
+.wishlist-count {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: #ff4757;
+  color: white;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  font-size: 0.7rem;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
 }

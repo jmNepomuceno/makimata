@@ -77,3 +77,12 @@
 
 2. sa customization dapat hindi fix yung choices dadagdagan pa ng other customization option
 3. sa cost estimation dapat naka break down yung price ng materials na pinili ng customer upon customization -->
+
+
+<!-- ✅1. yung privacy policy sa create account walang laman
+✅2. hindin consistent yung header design
+3. make the product more informative lalo na sa size kasi standard lang yung may preview ng size
+4. delivery date and sa scope ng delivery bakit 50 pesos lang na fix kung buong pinas
+5. pag nag bubulk orders hindi accurate total yung price
+6. yung wishlist hard coded dapat sha yung nag rereflect sa home page sa customers favorite hindi naaalis sa wishlist kapag inadd to cart na
+✅7. sa status dapat hindi na bumabalik sa previous status -->

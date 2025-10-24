@@ -2347,7 +2347,7 @@ function openBillingModal(items, source = 'cart') {
     const oldTotalEl = summaryBoxEl.querySelector('#billingSummaryTotal');
     if (oldTotalEl) oldTotalEl.remove();
 
-    console.log(items)
+    console.log(PRODUCTS)
     let summaryHTML = items.map(item => {
         const product = PRODUCTS.find(p => p.id === item.id);
         if (!product) return '';

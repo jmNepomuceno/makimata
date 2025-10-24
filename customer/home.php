@@ -30,11 +30,6 @@
           <a href="contactus.php">Learn With Us</a>
       </nav>
       <div class="header-actions">
-        <div class="search">
-          <i class="fa-solid fa-magnifying-glass"></i>
-          <input type="text" placeholder="Search">
-        </div>
-  
         <button class="icon-btn" id="userBtn" title="User">
           <i class="fa-regular fa-user" id="user-icon"></i>
         </button>
