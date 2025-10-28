@@ -2,12 +2,13 @@
 include("../connection/connection.php");
 header('Content-Type: application/json; charset=utf-8');
 date_default_timezone_set('Asia/Manila');
+session_start();
 
 try {
     $data = json_decode(file_get_contents("php://input"), true);
     if (!$data) $data = $_POST;
 
-    $user_id = $data['user_id'] ?? null;
+    $user_id = $_SESSION['user']['user_ID'];
     $product_code = $data['product_code'] ?? null;
     $name = $data['name'] ?? null;
     $attributes = $data['attributes'] ?? '';

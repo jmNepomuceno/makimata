@@ -24,8 +24,8 @@
     // $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     // echo "<pre>"; print_r($order); echo "</pre>";
-    echo "<pre>"; print_r($data); echo "</pre>";
-    // echo "<pre>"; print_r($_SESSION); echo "</pre>";
+    // echo "<pre>"; print_r($data); echo "</pre>";
+    echo "<pre>"; print_r($_SESSION); echo "</pre>";
     
 ?>
 

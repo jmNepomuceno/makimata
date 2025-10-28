@@ -1,6 +1,13 @@
 <?php 
     session_start();
     // echo "<pre>"; print_r($_SESSION); echo "</pre>";
+
+    if (!isset($_SESSION['user'])) {
+        header("Location: login.php");
+        exit();
+    }
+
+    $user_id = $_SESSION['user']['user_ID'];
 ?>
 
 <!DOCTYPE html>
@@ -982,6 +989,11 @@
             </div>
         </div>
     </div>
+
+
+    <script>
+        const userID = <?php echo json_encode($user_id); ?>;
+    </script>
 
     
     <!-- Modal -->

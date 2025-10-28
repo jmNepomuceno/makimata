@@ -446,42 +446,70 @@ function injectCustomStyles() {
 
 // Initialize app
 function init() {
-    // Make loading from localStorage robust to prevent parsing errors from stopping script execution.
+    cartItems = [];
+    wishlistItems = [];
+
+    // --- Load wishlist from localStorage (optional, keep this) ---
     try {
-        const storedCart = localStorage.getItem('cartItems');
-        if (storedCart) {
-            // Ensure cartItems is always an array.
-            const parsedCart = JSON.parse(storedCart);
-            cartItems = Array.isArray(parsedCart) ? parsedCart : [];
-        }
         const storedWishlist = localStorage.getItem('wishlistItems');
         if (storedWishlist) {
             const parsedWishlist = JSON.parse(storedWishlist);
             wishlistItems = Array.isArray(parsedWishlist) ? parsedWishlist : [];
         }
     } catch (error) {
-        console.error("Error parsing data from localStorage. Resetting state.", error);
-        cartItems = [];
+        console.error("Error parsing wishlist from localStorage. Resetting state.", error);
         wishlistItems = [];
-        localStorage.removeItem('cartItems');
         localStorage.removeItem('wishlistItems');
     }
 
-    // Check for category from URL and set it
-    const urlParams = new URLSearchParams(window.location.search);
-    const categoryFromUrl = urlParams.get('category');
-    const validCategories = ['lampshades', 'mugs', 'basket', 'kitchenware', 'furnitures', 'all'];
-    if (categoryFromUrl && validCategories.includes(categoryFromUrl)) {
-        selectedCategory = categoryFromUrl;
-    }
+    // --- Fetch cart items from database ---
+    $.ajax({
+        url: '../assets/php/get_cart_items.php', // new PHP endpoint to fetch cart
+        type: 'GET',
+        dataType: 'json',
+        success: function (res) {
+            console.log(res)
+            if (res.status === "success" && Array.isArray(res.cart)) {
+                cartItems = res.cart.map(item => ({
+                    id: item.id,
+                    name: item.name,
+                    quantity: parseInt(item.quantity),
+                    price: parseFloat(item.price),
+                    customization: item.customization,
+                    attributes: item.attributes,
+                    selected: true
+                }));
+            } else {
+                cartItems = [];
+            }
 
-    injectCustomStyles();
-    // renderProducts();
-    fetchProducts()
-    setupEventListeners();
-    updateCounts();
-    updateActiveCategoryUI(); // Update UI on initial load
+            // Continue initializing page after cart is loaded
+            continueInit();
+        },
+        error: function (err) {
+            console.error("Error fetching cart items from server:", err);
+            cartItems = [];
+            continueInit();
+        }
+    });
+
+    function continueInit() {
+        // --- Check for category from URL and set it ---
+        const urlParams = new URLSearchParams(window.location.search);
+        const categoryFromUrl = urlParams.get('category');
+        const validCategories = ['lampshades', 'mugs', 'basket', 'kitchenware', 'furnitures', 'all'];
+        if (categoryFromUrl && validCategories.includes(categoryFromUrl)) {
+            selectedCategory = categoryFromUrl;
+        }
+
+        injectCustomStyles();
+        fetchProducts();
+        setupEventListeners();
+        updateCounts();
+        updateActiveCategoryUI(); // Update UI on initial load
+    }
 }
+
 
 $(document).on("click", ".cancel-order-btn", function() {
     const orderId = $(this).data("order");
@@ -2190,7 +2218,6 @@ function addCustomizedToCart() {
         type: 'POST',
         dataType: 'json',
         data: {
-            user_id: sessionStorage.getItem('user_ID'),
             product_code: product.product_code,
             name: product.name,
             attributes: attributes,
@@ -2293,7 +2320,7 @@ function renderCartItems() {
         cartFooterEl.innerHTML = '';
         return;
     }
-
+    console.log(cartItems)
     const allSelected = cartItems.length > 0 && cartItems.every(item => item.selected);
 
     let cartHTML = `
@@ -2305,6 +2332,7 @@ function renderCartItems() {
 
     cartHTML += cartItems.map((item, index) => {
         const product = PRODUCTS.find(p => p.id === item.id);
+        console.log(PRODUCTS , item)
         if (!product) return '';
 
         let breakdown = [];
