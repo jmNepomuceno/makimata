@@ -1154,8 +1154,8 @@ function setupEventListeners() {
     // Handle Add New Address
     $(".add-address-btn").off("click").on("click", function () {
         const formContainer = $("#newAddressFormContainer");
-        
-        // If already open, toggle visibility
+
+        // Toggle visibility
         if (formContainer.is(":visible")) {
             formContainer.hide();
             return;
@@ -1164,21 +1164,43 @@ function setupEventListeners() {
         formContainer.html(`
             <div class="address-form" style="border:1px solid #ddd; padding:1rem; border-radius:8px;">
                 <h4 style="margin-bottom:0.5rem;">New Address</h4>
+
                 <div class="form-group">
                     <input type="text" id="house_no" placeholder="House No. / Street" required>
                 </div>
+
                 <div class="form-group">
-                    <input type="text" id="barangay" placeholder="Barangay" required>
+                    <label>Region</label>
+                    <select id="region" required>
+                        <option value="">Select Region</option>
+                    </select>
                 </div>
+
                 <div class="form-group">
-                    <input type="text" id="city" placeholder="City" required>
+                    <label>Province</label>
+                    <select id="province" required disabled>
+                        <option value="">Select Province</option>
+                    </select>
                 </div>
+
                 <div class="form-group">
-                    <input type="text" id="province" placeholder="Province" required>
+                    <label>City / Municipality</label>
+                    <select id="city" required disabled>
+                        <option value="">Select City</option>
+                    </select>
                 </div>
+
+                <div class="form-group">
+                    <label>Barangay</label>
+                    <select id="barangay" required disabled>
+                        <option value="">Select Barangay</option>
+                    </select>
+                </div>
+
                 <div class="form-group">
                     <input type="text" id="mobile_number" placeholder="Mobile Number" required maxlength="11">
                 </div>
+
                 <div style="margin-top:1rem; display:flex; gap:0.5rem;">
                     <button class="btn-secondary" id="cancelAddAddress">Cancel</button>
                     <button class="btn-primary" id="saveNewAddress">Save Address</button>
@@ -1188,6 +1210,92 @@ function setupEventListeners() {
 
         formContainer.slideDown(200);
 
+        // Load regions initially
+        $.ajax({
+            url: "../assets/php/get_regions.php",
+            type: "GET",
+            dataType: "json",
+            success: function (regions) {
+                const regionSelect = $("#region");
+                regions.forEach(r => {
+                    regionSelect.append(`<option value="${r.region_code}">${r.region_description}</option>`);
+                });
+            }
+        });
+
+        // --- Cascading dropdowns ---
+        $("#region").on("change", function () {
+            const regionCode = $(this).val();
+            $("#province").prop("disabled", true).html('<option value="">Select Province</option>');
+            $("#city").prop("disabled", true).html('<option value="">Select City</option>');
+            $("#barangay").prop("disabled", true).html('<option value="">Select Barangay</option>');
+
+            if (!regionCode) return;
+
+            $.ajax({
+                url: "../assets/php/get_provinces.php",
+                type: "GET",
+                data: { region_code: regionCode },
+                dataType: "json",
+                success: function (provinces) {
+                    const provinceSelect = $("#province");
+                    provinces.forEach(p => {
+                        provinceSelect.append(`<option value="${p.province_code}">${p.province_description}</option>`);
+                    });
+                    provinceSelect.prop("disabled", false);
+                }
+            });
+        });
+
+        $("#province").on("change", function () {
+            const provinceCode = $(this).val();
+            $("#city").prop("disabled", true).html('<option value="">Select City</option>');
+            $("#barangay").prop("disabled", true).html('<option value="">Select Barangay</option>');
+
+            if (!provinceCode) return;
+
+            $.ajax({
+                url: "../assets/php/get_cities.php",
+                type: "GET",
+                data: { province_code: provinceCode },
+                dataType: "json",
+                success: function (cities) {
+                    const citySelect = $("#city");
+                    cities.forEach(c => {
+                        citySelect.append(`<option value="${c.municipality_code}">${c.municipality_description}</option>`);
+                    });
+                    citySelect.prop("disabled", false);
+                }
+            });
+        });
+
+        $("#city").on("change", function () {
+            const cityCode = $(this).val();
+            $("#barangay").prop("disabled", true).html('<option value="">Select Barangay</option>');
+            console.log(cityCode)
+
+            if (!cityCode) return;
+            $.ajax({
+                url: "../assets/php/get_barangays.php",
+                type: "GET",
+                data: { municipality_code: cityCode },
+                dataType: "json",
+                success: function (barangays) {
+                    console.log("Barangays response:", barangays); // 👈 check what’s coming from PHP
+                    const barangaySelect = $("#barangay");
+                    barangaySelect.html('<option value="">Select Barangay</option>');
+                    if (!barangays || !Array.isArray(barangays) || barangays.length === 0) {
+                        console.warn("⚠️ No barangays found for this city_code");
+                        return;
+                    }
+                    barangays.forEach(b => {
+                        barangaySelect.append(`<option value="${b.barangay_code}">${b.barangay_description}</option>`);
+                    });
+                    barangaySelect.prop("disabled", false);
+                }
+            });
+        });
+
         // Cancel button
         $("#cancelAddAddress").on("click", function () {
             formContainer.slideUp(200);
@@ -1196,18 +1304,19 @@ function setupEventListeners() {
         // Save button
         $("#saveNewAddress").on("click", function () {
             const house_no = $("#house_no").val().trim();
-            const barangay = $("#barangay").val().trim();
-            const city = $("#city").val().trim();
-            const province = $("#province").val().trim();
+            const region = $("#region option:selected").text();
+            const province = $("#province option:selected").text();
+            const city = $("#city option:selected").text();
+            const barangay = $("#barangay option:selected").text();
             const mobile_number = $("#mobile_number").val().trim();
 
-            if (!house_no || !barangay || !city || !province || !mobile_number) {
+            if (!house_no || !region || !province || !city || !barangay || !mobile_number) {
                 alert("Please fill out all fields.");
                 return;
             }
 
-            const data = { house_no, barangay, city, province, mobile_number };
-            console.log(data);
+            const data = { house_no, region, province, city, barangay, mobile_number };
+            console.log("Submitting:", data);
 
             $.ajax({
                 url: "../assets/php/add_user_address.php",
@@ -1221,9 +1330,7 @@ function setupEventListeners() {
                         alert("Address added successfully!");
                         formContainer.slideUp(200);
 
-                        // ✅ Option 2: Just append the newest address
-                        const newAddr = res.data; // assuming PHP returns { status: 'success', data: { id, full_name, house_no, barangay, city, province, mobile_number } }
-
+                        const newAddr = res.data;
                         const newAddressHtml = `
                             <div class="address-card ${newAddr.is_default ? 'selected' : ''}">
                                 <div class="address-card-header">
@@ -1241,11 +1348,7 @@ function setupEventListeners() {
                             </div>
                         `;
 
-                        // ✅ Append before "Add New Address" button
                         $(".billing-form-container .add-address-btn").before(newAddressHtml);
-
-                        // ✅ Optionally clear the input fields
-                        $("#house_no, #barangay, #city, #province, #mobile_number").val("");
                     } else {
                         alert(res.message || "Failed to add address.");
                     }
@@ -1256,38 +1359,69 @@ function setupEventListeners() {
                 }
             });
         });
-
     });
+
 
     const addrContainer = $('.billing-form-container');
 
     // 1) click on address-card -> select it
     addrContainer.off('click', '.address-card').on('click', '.address-card', function (e) {
-        // If the click originated from the remove button, ignore selection here
+        // Ignore clicks on the remove button
         if ($(e.target).closest('.remove-address-btn').length) return;
 
-        // remove selected class from siblings and add to clicked
+        // --- Update selected visual ---
         addrContainer.find('.address-card').removeClass('selected');
         $(this).addClass('selected');
 
-        // store selected id
+        // --- Store selected address ID ---
         const selectedId = $(this).data('id');
         sessionStorage.setItem('selectedAddressID', selectedId);
-        // console.log('Selected Address ID:', selectedId);
 
-        // OPTIONAL: set as default in DB (uncomment if you want server-side default change)
-        /*
-        $.post('../assets/php/set_default_address.php', { id: selectedId }, function(res) {
-        if (res.status === 'success') {
-            console.log('Default address updated on server.');
-            // refresh list to reflect is_default flags if needed:
-            // fetchAndRenderAddresses();
-        } else {
-            console.warn('Failed to set default:', res.message);
-        }
-        }, 'json');
-        */
+        // --- Get selected province text ---
+        const province = $(this).data('province'); // e.g., "BATAAN"
+        console.log("Selected province:", province);
+
+        // --- Fetch region & delivery fee dynamically ---
+        $.ajax({
+            url: "../assets/php/get_region_and_fee.php",
+            type: "GET",
+            data: { province: province },
+            dataType: "json",
+            success: function (res) {
+                console.log(res);
+
+                if (res.status === "success" && res.data) {
+                    // Clean the peso symbol and convert to float
+                    const feeString = res.data.shipping_price_range || "₱0";
+                    const deliveryFee = parseFloat(feeString.replace(/[₱,\s]/g, "")) || 0;
+                    console.log("New delivery fee (numeric):", deliveryFee);
+
+                    // --- Update the shipping fee text in billing summary ---
+                    const summaryBox = $('#billingSummaryTotal');
+                    const subtotalText = summaryBox.find('.summary-line:first span:last').text().replace(/[₱,\s]/g, '');
+                    const subtotal = parseFloat(subtotalText) || 0;
+
+                    // Update shipping fee display
+                    summaryBox.find('.summary-line:nth-child(2) span:last').text(`₱${deliveryFee.toFixed(2)}`);
+
+                    // Compute new total
+                    const newTotal = subtotal + deliveryFee;
+                    summaryBox.find('.total-line span:last').text(`₱${newTotal.toFixed(2)}`);
+
+                    // Optional: Update info text to reflect province name
+                    summaryBox.find('.small-text').text(`${province} Shipping Rate (${feeString})`);
+                } else {
+                    console.warn("Failed to fetch region/fee:", res.message);
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error("Error fetching delivery fee:", error);
+            }
+        });
     });
+
+
+
 
     addrContainer.off('click', '.remove-address-btn').on('click', '.remove-address-btn', function (e) {
         e.stopPropagation(); // prevent bubbling to the .address-card click handler
@@ -1574,6 +1708,7 @@ function addToCart(productId, customization = null) {
         customization: customization,
         quantity: customization?.quantity || 1
     });
+    
 }
 
 function removeFromCart(productId, customizationIndex = 0) {
@@ -1819,26 +1954,22 @@ function updateCustomizationView(updateImage = true) {
     if (!currentCustomizingProduct) return;
 
     // --- Base price setup ---
-    let price = currentCustomizingProduct.price;
+    let basePrice = currentCustomizingProduct.price;
     const sizeInput = document.querySelector('input[name="size"]:checked');
     const finishInput = document.querySelector('input[name="finish"]:checked');
     
     const size = sizeInput ? sizeInput.value : null;
     const finish = finishInput ? finishInput.value : null;
-
-    const quantity = parseInt(document.getElementById('quantity').value);
+    const quantity = parseInt(document.getElementById('quantity').value) || 1;
 
     // --- Price adjustment for size ---
-    if (size === 'large') price *= 1.1; // +10%
-    if (size === 'small') price *= 0.8; // -20%
+    if (size === 'large') basePrice *= 1.1; // +10%
+    if (size === 'small') basePrice *= 0.8; // -20%
 
     // --- Price adjustment for finish ---
-    if (finish === 'dark' || finish === 'premium') price += 40;
-    
+    if (finish === 'dark' || finish === 'premium') basePrice += 40;
 
-    let finalPrice = price * quantity;
-
-    // --- NEW: get all customization extras ---
+    // --- Get all customization extras ---
     const {
         extraCost,
         engravingText,
@@ -1849,18 +1980,24 @@ function updateCustomizationView(updateImage = true) {
         attributes
     } = getCustomizationExtras();
 
-    
+    // ✅ Correct placement — extras are added per item before multiplying
+    let perItemPrice = basePrice + extraCost;
+    let finalPrice = perItemPrice * quantity;
+
     // --- 🆕 Update engraving text preview ---
     const engravingInput = document.getElementById('engravingText');
     if (engravingInput) {
         const engravingPreview = document.getElementById('engravePreview');
-        engravingPreview.textContent = engravingInput.value.trim() || '';
+        if (engravingPreview) {
+            engravingPreview.textContent = engravingInput.value.trim() || '';
+        }
     }
 
-    finalPrice += extraCost;
-
     // --- Update price display ---
-    document.getElementById('estimatedPrice').textContent = `₱${finalPrice.toFixed(2)}`;
+    const priceEl = document.getElementById('estimatedPrice');
+    if (priceEl) {
+        priceEl.textContent = `₱${finalPrice.toFixed(2)}`;
+    }
 
     // --- Update attributes summary (if exists) ---
     const attrEl = document.getElementById('attributes-summary');
@@ -1873,7 +2010,6 @@ function updateCustomizationView(updateImage = true) {
         const imageKey = finish;
         if (currentCustomizingProduct.images && currentCustomizingProduct.images[imageKey]) {
             const newImageSrc = currentCustomizingProduct.images[imageKey];
-            console.log('here')
             document.getElementById('customizationImage').src = newImageSrc;
 
             const thumbnailToSelect = document.querySelector(`#thumbnailGallery img[src="${newImageSrc}"]`);
@@ -1891,7 +2027,7 @@ function updateCustomizationView(updateImage = true) {
     const areOptionsSelected = size && finish;
     const isOutOfStock = currentCustomizingProduct.stock <= 0;
 
-    addToCartBtn.disabled = !areOptionsSelected || isOutOfStock;
+    if (addToCartBtn) addToCartBtn.disabled = !areOptionsSelected || isOutOfStock;
     if (buyNowBtn) buyNowBtn.disabled = !areOptionsSelected || isOutOfStock;
 
     // --- Show warning message if needed ---
@@ -1911,7 +2047,7 @@ function updateCustomizationView(updateImage = true) {
     let tooltip = "Please select a size and finish to proceed.";
     if (isOutOfStock) tooltip = "This item is out of stock.";
 
-    addToCartBtn.title = (!areOptionsSelected || isOutOfStock) ? tooltip : '';
+    if (addToCartBtn) addToCartBtn.title = (!areOptionsSelected || isOutOfStock) ? tooltip : '';
     if (buyNowBtn) buyNowBtn.title = (!areOptionsSelected || isOutOfStock) ? tooltip : '';
 }
 
@@ -1967,9 +2103,8 @@ function addCustomizedToCart() {
     const selectedSizeInput = document.querySelector('input[name="size"]:checked');
     const selectedFinishInput = document.querySelector('input[name="finish"]:checked');
 
-    // Guard clause to prevent missing selections
     if (!selectedSizeInput || !selectedFinishInput) {
-        console.error("Add to cart button was clicked without selections.");
+        console.error("Add to cart clicked without size or finish selected.");
         return;
     }
 
@@ -1985,37 +2120,31 @@ function addCustomizedToCart() {
     // --- Quantity ---
     const quantityToAdd = parseInt(document.getElementById('quantity').value || 1);
 
-    // --- Fetch universal customizations ---
-    const { engravingText, giftPackaging, messageCard, specialHandling, deliveryPreference, extraCost, attributes: extraAttributes } = getCustomizationExtras();
+    // --- Extra customization info ---
+    const {
+        engravingText, giftPackaging, messageCard,
+        specialHandling, deliveryPreference,
+        extraCost, attributes: extraAttributes
+    } = getCustomizationExtras();
 
-    // --- Base price computation ---
+    // --- Compute base + final price ---
     let basePrice = product.price;
-
-    // Adjust for size
     if (selectedSizeInput.value === 'large') basePrice *= 1.1;
     if (selectedSizeInput.value === 'small') basePrice *= 0.8;
-
-    // Adjust for finish
     if (['dark', 'premium'].includes(selectedFinishInput.value)) basePrice += 40;
-
-    // Add extra costs
     basePrice += extraCost;
-
     const finalPrice = basePrice * quantityToAdd;
 
-    // Determine the image currently shown in the customization preview
+    // --- Determine image shown ---
     const currentImage = document.getElementById('customizationImage')?.src || product.image;
-
-    // Default engraving position (you can tweak this later dynamically if needed)
-    const engravingPosition = { bottom: '10px', left: '50%' };
 
     const customizationDetails = {
         size: selectedSizeInput.value,
         sizeLabel,
         finish: selectedFinishInput.value,
         engraving: engravingText || null,
-        engravingPosition,
-        imageWithFinish: currentImage, // ✅ store the preview image
+        engravingPosition: { bottom: '10px', left: '50%' },
+        imageWithFinish: currentImage,
         giftPackaging,
         messageCard: messageCard || null,
         specialHandling,
@@ -2023,19 +2152,18 @@ function addCustomizedToCart() {
         extraCost
     };
 
-    // --- Merge base attributes + extras ---
+    // --- Combine attributes for readability ---
     const attributes = [
         `Size: ${sizeLabel}`,
         `Finish: ${selectedFinishInput.value}`,
         extraAttributes
     ].filter(Boolean).join(' | ');
-    console.log(attributes)
 
-    // --- Check if item already exists in cart (same customizations) ---
-    const existingItem = cartItems.find(item => {
-        if (item.id !== product.id || !item.customization) return false;
-        return JSON.stringify(item.customization) === JSON.stringify(customizationDetails);
-    });
+    // --- Update local cart (for UI only) ---
+    const existingItem = cartItems.find(item =>
+        item.id === product.id &&
+        JSON.stringify(item.customization) === JSON.stringify(customizationDetails)
+    );
 
     if (existingItem) {
         existingItem.quantity += quantityToAdd;
@@ -2044,7 +2172,7 @@ function addCustomizedToCart() {
             id: product.id,
             name: product.name,
             quantity: quantityToAdd,
-            price: finalPrice, // ✅ Include price with extras
+            price: finalPrice,
             customization: customizationDetails,
             attributes,
             selected: true
@@ -2054,13 +2182,39 @@ function addCustomizedToCart() {
     updateCounts();
     saveState();
     closeModals();
+    showSuccessNotification({ product, customization: customizationDetails, quantity: quantityToAdd });
 
-    showSuccessNotification({
-        product,
-        customization: customizationDetails,
-        quantity: quantityToAdd
+    // --- Send to backend ---
+    $.ajax({
+        url: '../assets/php/add_to_cart.php',
+        type: 'POST',
+        dataType: 'json',
+        data: {
+            user_id: sessionStorage.getItem('user_ID'),
+            product_code: product.product_code,
+            name: product.name,
+            attributes: attributes,
+            customization_json: JSON.stringify(customizationDetails),
+            quantity: quantityToAdd,
+            base_price: product.price,
+            extra_cost: extraCost,
+            final_price: finalPrice
+        },
+        success: res => {
+            console.log("✅ add_to_cart.php response:", res);
+            if (res.status === "success") {
+                console.log("Cart updated successfully!");
+            } else {
+                console.warn("⚠️ add_to_cart returned warning:", res.message);
+            }
+        },
+        error: err => {
+            console.error("❌ AJAX error:", err);
+        }
     });
 }
+
+
 
 
 function buyNow() {
@@ -2330,7 +2484,7 @@ function handleCheckout() {
     }
     openBillingModal(itemsToCheckout, 'cart');
 }
-
+    
 function openBillingModal(items, source = 'cart') {
     closeModals();
 
@@ -2347,7 +2501,6 @@ function openBillingModal(items, source = 'cart') {
     const oldTotalEl = summaryBoxEl.querySelector('#billingSummaryTotal');
     if (oldTotalEl) oldTotalEl.remove();
 
-    console.log(PRODUCTS)
     let summaryHTML = items.map(item => {
         const product = PRODUCTS.find(p => p.id === item.id);
         if (!product) return '';
@@ -2360,45 +2513,36 @@ function openBillingModal(items, source = 'cart') {
             if (item.customization.size === 'large') itemPrice *= 1.1;
             if (item.customization.size === 'small') itemPrice *= 0.8;
             if (item.customization.finish === 'dark' || item.customization.finish === 'premium') itemPrice += 40;
-
-            // ✅ Add extraCost if exists
             if (item.customization.extraCost) itemPrice += item.customization.extraCost;
 
-            // ✅ Add ₱50 if engraving text exists
             if (item.customization.engraving && item.customization.engraving.trim() !== '') {
                 itemPrice += 50;
                 customizationDetails.push(`Engraving: "${item.customization.engraving}" (+₱50)`);
             }
 
-            // ✅ Build readable customization details
             if (item.customization.sizeLabel) customizationDetails.push(`Size: ${item.customization.sizeLabel}`);
             if (item.customization.finish) {
                 const finishDisplayName = FINISH_DISPLAY_NAMES[item.customization.finish] || item.customization.finish;
                 customizationDetails.push(`Finish: ${finishDisplayName}`);
             }
 
-            // 💌 Message Card (optional text)
             if (item.customization.messageCard && item.customization.messageCard.trim() !== '') {
                 customizationDetails.push(`Message Card: "${item.customization.messageCard}"`);
             }
 
-            // 🎁 Gift Packaging
             if (item.customization.giftPackaging && item.customization.giftPackaging !== 'none') {
                 customizationDetails.push(`Gift Packaging: ${item.customization.giftPackaging}`);
             }
 
-            // ♻️ Special Handling
             if (item.customization.specialHandling && item.customization.specialHandling !== 'none') {
                 customizationDetails.push(`Handling: ${item.customization.specialHandling}`);
             }
 
-            // 🚚 Delivery Preference
             if (item.customization.deliveryPreference && item.customization.deliveryPreference !== 'standard') {
                 customizationDetails.push(`Delivery: ${item.customization.deliveryPreference}`);
             }
         }
 
-        console.log(customizationDetails)
         const customizationDetailsHTML = customizationDetails.length > 0 
             ? `<div class="summary-customization-details">${customizationDetails.join(' | ')}</div>`
             : '';
@@ -2428,7 +2572,35 @@ function openBillingModal(items, source = 'cart') {
     summaryItemsEl.innerHTML = summaryHTML;
 
     const subtotal = total;
-    const shippingFee = 50.00;
+    let shippingFee = 150.00; // default
+    let shippingInfoText = "Standard Rate (₱150)";
+
+    // 🚚 Fetch user's region dynamically
+    $.ajax({
+        url: '../assets/php/get_regions.php',
+        type: 'GET',
+        dataType: 'json',
+        async: false, // wait before rendering
+        success: function(response) {
+            if (response.status === 'success' && response.data) {
+                const region = parseInt(response.data.region_code);
+                const regionPriceMap = {
+                    1: 200,  2: 220,  3: 150,  4: 160,  5: 200,
+                    6: 250,  7: 250,  8: 260,  9: 280, 10: 280,
+                    11: 300, 12: 300, 13: 120, 14: 230, 15: 240,
+                    16: 320, 17: 180
+                };
+                if (regionPriceMap[region]) {
+                    shippingFee = regionPriceMap[region];
+                    shippingInfoText = `Region ${region} Shipping Rate (₱${shippingFee})`;
+                }
+            }
+        },
+        error: function() {
+            console.warn("Failed to fetch user region, using default ₱150.");
+        }
+    });
+
     const finalTotal = subtotal + shippingFee;
 
     const summaryTotalEl = document.createElement('div');
@@ -2436,6 +2608,9 @@ function openBillingModal(items, source = 'cart') {
     summaryTotalEl.innerHTML = `
         <div class="summary-line"><span>Subtotal</span><span>₱${subtotal.toFixed(2)}</span></div>
         <div class="summary-line"><span>Shipping Fee</span><span>₱${shippingFee.toFixed(2)}</span></div>
+        <div class="summary-line small-text" style="font-size: 0.85rem; color: gray;">
+            ${shippingInfoText}
+        </div>
         <div class="summary-line total-line"><span>Total</span><span>₱${finalTotal.toFixed(2)}</span></div>
     `;
     summaryBoxEl.appendChild(summaryTotalEl);
@@ -2466,11 +2641,10 @@ function openBillingModal(items, source = 'cart') {
                         <input type="radio" id="payment_cod" name="payment_method" value="cod" checked>
                         <label for="payment_cod">Cash on Delivery</label>
                     </div>
-                    <div class="payment-option" >
+                    <div class="payment-option">
                         <input type="radio" id="payment_ewallet" name="payment_method" value="ewallet">
                         <label for="payment_ewallet">E-Wallets / Card</label>
                         <div class="payment-icons">
-                            
                             <img src="mik/icons/gcash.png" alt="GCash" title="GCash">
                             <img src="mik/icons/maya.png" alt="Maya">
                         </div>
@@ -2480,40 +2654,31 @@ function openBillingModal(items, source = 'cart') {
         `;
     }
 
-    // Add event listener to handle selection style for payment options
+    // Payment option selector
     const paymentOptions = document.querySelectorAll('#paymentOptionsContainer .payment-option');
     paymentOptions.forEach(option => {
         option.addEventListener('click', () => {
-            // Remove 'selected' class from all options
             paymentOptions.forEach(opt => opt.classList.remove('selected'));
-            // Add 'selected' class to the clicked option
             option.classList.add('selected');
-            // Also check the radio button inside
             option.querySelector('input[type="radio"]').checked = true;
         });
     });
 
-    // --- NEW: Make the summary column sticky ---
+    // Sticky summary
     try {
         const summaryContainer = document.getElementById('billingSummaryItems').parentElement;
-
-        // Add a class to the summary container for styling
-        if (summaryContainer) summaryContainer.classList.add('order-summary-box');
-        if (summaryContainer) summaryContainer.classList.add('billing-summary-sticky-container');
+        if (summaryContainer) summaryContainer.classList.add('order-summary-box', 'billing-summary-sticky-container');
     } catch (e) {
         console.error("Error applying sticky styles to billing summary:", e);
     }
 
-    // --- Hide the redundant footer total section ---
+    // Hide footer total
     const footerCosts = document.querySelector('#billingModal .modal-footer .billing-costs');
-    if (footerCosts) {
-        footerCosts.style.display = 'none';
-    }
+    if (footerCosts) footerCosts.style.display = 'none';
 
-    // --- Dynamically create and set up the cancel/back button ---
+    // Back button
     const actionsContainer = document.querySelector('#billingModal .modal-actions');
     if (actionsContainer) {
-        // Remove any existing back button to prevent duplicates on reopen
         const existingBackBtn = actionsContainer.querySelector('#cancelBilling');
         if (existingBackBtn) existingBackBtn.remove();
         
@@ -2527,7 +2692,7 @@ function openBillingModal(items, source = 'cart') {
                 closeModals();
                 openCustomization(currentCustomizingProduct.id);
             });
-        } else { // Default to 'cart'
+        } else {
             backButton.textContent = 'Back to Cart';
             backButton.addEventListener('click', () => {
                 closeModals();
@@ -2537,23 +2702,17 @@ function openBillingModal(items, source = 'cart') {
         actionsContainer.prepend(backButton);
     }
 
-    // ajax
-    // fetch user address and contact number
+    // --- Fetch user address ---
     $.ajax({
         url: '../assets/php/fetch_user_address_number.php',
         type: 'GET',
         dataType: 'json',
         success: function(response) {
-            console.log("fetch_user_address_number response:", response);
-
             if (response.status === 'success' && response.data) {
                 const addr = response.data;
                 const addressContainer = $('.billing-form-container');
-
-                // Remove any old default address card
                 addressContainer.find('.address-card.default-address').remove();
 
-                // Build default address card dynamically
                 const html = `
                     <div class="address-card default-address selected" 
                         data-id="${escapeHtml(addr.id)}"
@@ -2579,31 +2738,21 @@ function openBillingModal(items, source = 'cart') {
                         </div>
                     </div>
                 `;
-
-                // Add before the "Add New Address" button
                 addressContainer.find('.add-address-btn').before(html);
-            } else {
-                console.warn("No default address found:", response.message);
             }
-        },
-        error: function(xhr, status, error) {
-            console.error("Error fetching default address:", error);
         }
     });
 
-
+    // --- Fetch all addresses ---
     $.ajax({
         url: '../assets/php/fetch_user_addresses.php',
         type: 'GET',
         dataType: 'json',
         success: function (response) {
-            console.log(response);
-
             if (response.status === 'success') {
                 const addresses = response.data;
                 const addressContainer = $('.billing-form-container');
                 let html = '';
-
                 addresses.forEach(addr => {
                     html += `
                         <div class="address-card ${addr.is_default ? 'selected' : ''}"
@@ -2613,20 +2762,14 @@ function openBillingModal(items, source = 'cart') {
                             data-province="${escapeHtml(addr.province)}"
                             data-house_no="${escapeHtml(addr.house_no)}"
                             data-mobile="${escapeHtml(addr.mobile_number)}">
-                            
                             <div class="address-card-header">
                                 <strong>${escapeHtml(addr.full_name)}</strong>
                                 <button class="remove-address-btn" data-id="${addr.id}" title="Remove Address">Remove</button>
                             </div>
-                            
                             <div class="address-line">
                                 <i class="fas fa-map-marker-alt"></i>
-                                <span>
-                                    ${escapeHtml(addr.barangay)}, ${escapeHtml(addr.city)}, ${escapeHtml(addr.province)}<br>
-                                    ${escapeHtml(addr.house_no)}
-                                </span>
+                                <span>${escapeHtml(addr.barangay)}, ${escapeHtml(addr.city)}, ${escapeHtml(addr.province)}<br>${escapeHtml(addr.house_no)}</span>
                             </div>
-                            
                             <div class="address-line">
                                 <i class="fas fa-phone-alt"></i>
                                 <span>${escapeHtml(addr.mobile_number)}</span>
@@ -2634,20 +2777,12 @@ function openBillingModal(items, source = 'cart') {
                         </div>
                     `;
                 });
-
-                // ✅ Insert address cards before the "Add Address" button
                 addressContainer.find('.add-address-btn').before(html);
-            } else {
-                console.warn(response.message || "No addresses found.");
             }
-        },
-        error: function (xhr, status, error) {
-            console.error("❌ Error fetching addresses:", error);
         }
     });
-
-
 }
+
 
 // Utility functions
 function handlePlaceOrder() {

@@ -9,75 +9,98 @@
     <?php include("../scripts_links/header_links.php") ?>
 
     <style>
-        /* === Mikamata Style === */
-        :root {
-        --mikamata-green: #44734a;
+        /* Modal Overlay */
+        .custom-modal {
+            display: none; 
+            position: fixed;
+            z-index: 1050;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
         }
 
-        .terms {
-        font-size: 0.95rem;
-        color: #333;
-        margin-top: 1rem;
+        /* Modal Box */
+        .custom-modal-content {
+            background-color: #fff;
+            margin: auto;
+            border-radius: 8px;
+            max-width: 800px;
+            width: 90%;
+            overflow: hidden;
+            animation: fadeIn 0.25s ease;
         }
 
-        .terms a {
-        color: var(--mikamata-green);
-        font-weight: 500;
-        text-decoration: none;
-        transition: color 0.2s;
-        }
-
-        .terms a:hover {
-        color: #2f5733;
-        text-decoration: underline;
-        }
-
-        /* Modal Header */
+        /* Header */
         #privacyModal .modal-header {
-        background-color: var(--mikamata-green);
-        color: #fff;
-        border-bottom: none;
+            background-color: var(--mikamata-green, #4a7a4c);
+            color: #fff;
+            border-bottom: none;
+            padding: 1rem;
         }
 
+        /* Title */
         #privacyModal .modal-title {
-        font-weight: 600;
-        letter-spacing: 0.5px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
         }
 
+        /* Close Button */
         #privacyModal .btn-close {
-        filter: invert(1);
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.25rem;
+            cursor: pointer;
         }
 
-        /* Modal Body */
+        /* Body */
         #privacyModal .modal-body {
-        font-size: 0.95rem;
-        line-height: 1.6;
-        color: #333;
-        padding: 1.5rem;
-        background: #f9f9f9;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: #333;
+            padding: 1.5rem;
+            background: #f9f9f9;
+            max-height: 70vh;
+            overflow-y: auto;
         }
 
         #privacyModal h6 {
-        color: var(--mikamata-green);
-        font-weight: 600;
-        margin-top: 1rem;
-        margin-bottom: 0.5rem;
+            color: var(--mikamata-green, #4a7a4c);
+            font-weight: 600;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
         }
 
-        /* Modal Footer */
+        /* Footer */
         #privacyModal .modal-footer {
-        background-color: #f1f1f1;
-        border-top: none;
+            background-color: #f1f1f1;
+            border-top: none;
+            padding: 1rem;
+            text-align: right;
         }
 
         #privacyModal .btn-secondary {
-        background-color: var(--mikamata-green);
-        border: none;
-        transition: background 0.2s;
+            background-color: var(--mikamata-green, #4a7a4c);
+            border: none;
+            color: #fff;
+            padding: 0.5rem 1.25rem;
+            border-radius: 4px;
+            transition: background 0.2s;
         }
 
         #privacyModal .btn-secondary:hover {
-        background-color: #365c3d;
+            background-color: #365c3d;
+        }
+
+        /* Animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
         }
     </style>
 </head>
@@ -177,7 +200,7 @@
                     <input type="checkbox" id="privacy" name="privacy" required />
                     <label for="privacy">
                         I agree that my information will be used to process my account and keep it secure.
-                        <a href="#" data-bs-toggle="modal" data-bs-target="#privacyModal">Privacy Policy</a>
+                        <a href="#" data-bs-toggle="modal" id="openPrivacyModal">Privacy Policy</a>
                     </label>
                 </div>
 
@@ -222,40 +245,37 @@
         </div>
     </div>
 
-    <!-- Privacy Policy Modal -->
-    <div class="modal fade" id="privacyModal" tabindex="-1" aria-labelledby="privacyModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content">
+    <!-- Modal -->
+    <div id="privacyModal" class="custom-modal">
+        <div class="custom-modal-content modal-lg">
             <div class="modal-header">
-                <h5 class="modal-title" id="privacyModalLabel">Privacy Policy & About Us</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <h5 class="modal-title">Privacy Policy & About Us</h5>
+                <button type="button" class="btn-close" id="closePrivacyModal" aria-label="Close"></button>
             </div>
-            <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+            <div class="modal-body">
                 <h6>Welcome to Mikamata!</h6>
                 <p>
-                Here, we celebrate the art of bamboo craftsmanship by offering you a one-stop hub where you can design custom bamboo creations, learn about bamboo, and shop from a vibrant marketplace — all while supporting local artisans and discovering how simple it is to bring your bamboo vision to life.
+                    Here, we celebrate the art of bamboo craftsmanship by offering you a one-stop hub where you can design custom bamboo creations, learn about bamboo, and shop from a vibrant marketplace — all while supporting local artisans and discovering how simple it is to bring your bamboo vision to life.
                 </p>
 
                 <h6>About Us</h6>
                 <p>
-                <strong>MIKAMATA</strong> (Mithiin Kapakanan Makamatan Tagumpas Livelihood and Handicrafts) is a community-based group established in 2011. The group focuses on making handmade bamboo products such as lampshades, mugs, earrings, phone holders, and furniture.
+                    <strong>MIKAMATA</strong> (Mithiin Kapakanan Makamatan Tagumpas Livelihood and Handicrafts) is a community-based group established in 2011. The group focuses on making handmade bamboo products such as lampshades, mugs, earrings, phone holders, and furniture.
                 </p>
 
                 <h6>Privacy Policy</h6>
                 <p>
-                Your personal information (such as your name, email, and contact details) will be used solely for processing your account, ensuring secure access, and providing better service. We do not share your data with third parties without consent.
+                    Your personal information (such as your name, email, and contact details) will be used solely for processing your account, ensuring secure access, and providing better service. We do not share your data with third parties without consent.
                 </p>
                 <p>
-                By creating an account, you agree to allow Mikamata to store and use your information responsibly in accordance with this Privacy Policy.
+                    By creating an account, you agree to allow Mikamata to store and use your information responsibly in accordance with this Privacy Policy.
                 </p>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            </div>
+                <button type="button" class="btn btn-secondary" id="closePrivacyFooter">Close</button>
             </div>
         </div>
     </div>
-
 
     <div id="loadingOverlay">
         <div class="spinner"></div>
@@ -268,5 +288,30 @@
 
     <script src="../assets/js/signup.js"></script>
     <script src="../assets/js/load_locations.js"></script>
+
+    <script>
+        const privacyModal = document.getElementById('privacyModal');
+        const openPrivacyModal = document.getElementById('openPrivacyModal');
+        const closePrivacyModal = document.getElementById('closePrivacyModal');
+        const closePrivacyFooter = document.getElementById('closePrivacyFooter');
+
+        // Open
+        openPrivacyModal.addEventListener('click', e => {
+            e.preventDefault();
+            privacyModal.style.display = 'flex';
+        });
+
+        // Close (header or footer)
+        [closePrivacyModal, closePrivacyFooter].forEach(btn => {
+            btn.addEventListener('click', () => privacyModal.style.display = 'none');
+        });
+
+        // Close when clicking outside
+        privacyModal.addEventListener('click', e => {
+            if (e.target === privacyModal) {
+                privacyModal.style.display = 'none';
+            }
+        });
+    </script>
 </body>
 </html>

@@ -257,11 +257,14 @@ class OrderManager {
         const totalItems = order.items.reduce((sum, item) => sum + parseInt(item.qty), 0);
         $('#modal-item-count').text(totalItems);
 
-        itemsList.empty(); // Clear old content
+        itemsList.empty();
+
+        let subtotal = 0;
 
         order.items.forEach(item => {
-            const price = parseFloat(item.price) / item.qty;
-            const total = price * parseInt(item.qty);
+            const pricePerItem = parseFloat(item.price) / item.qty;
+            const total = pricePerItem * parseInt(item.qty);
+            subtotal += total;
 
             // Extract engraving text from attributes
             let engravingText = '';
@@ -270,7 +273,6 @@ class OrderManager {
                 engravingText = match ? match[1] : '';
             }
 
-            // Split attributes
             const attrList = item.attributes
                 ? item.attributes.split('|').map(attr => {
                     const trimmed = attr.trim();
@@ -281,7 +283,6 @@ class OrderManager {
                 }).join('')
                 : '<div class="attr-item text-muted">No customization</div>';
 
-            // Build preview image with optional engraving overlay
             const previewHTML = `
                 <div class="item-preview" style="position:relative; width:400px; height:400px; margin-bottom:10px;">
                     <img src="${item.image}" alt="${item.name}" style="width:100%; height:100%; object-fit:contain; border-radius:10px;">
@@ -306,14 +307,13 @@ class OrderManager {
                 </div>
             `;
 
-            // Final item markup
             const itemHTML = `
                 <div class="order-item">
                     <div class="item-info">
                         <div class="item-name fw-bold">${item.name}</div>
                         ${previewHTML}
                         <div class="item-attrs">${attrList}</div>
-                        <div class="item-price">₱${price.toFixed(2)} × ${item.qty}</div>
+                        <div class="item-price">₱${pricePerItem.toFixed(2)} × ${item.qty}</div>
                     </div>
                     <div class="item-total fw-semibold">₱${total.toFixed(2)}</div>
                 </div>
@@ -322,9 +322,16 @@ class OrderManager {
             itemsList.append(itemHTML);
         });
 
-        // Totals
-        const shippingCost = 50;
-        const subtotal = order.items.reduce((sum, item) => sum + (parseFloat(item.price / item.qty) * parseInt(item.qty)), 0);
+        // ✅ Use actual shipping fee (from backend)
+        console.log(order)
+        let shippingCost = 0;
+        if (order.shippingFee) {
+            // Handle cases like '₱160' or 'P120'
+            shippingCost = parseFloat(order.shippingFee.replace(/[^\d.]/g, '')) || 0;
+        } else if (order.shipping_price_range) {
+            shippingCost = parseFloat(order.shipping_price_range.replace(/[^\d.]/g, '')) || 0;
+        }
+
         const grandTotal = subtotal + shippingCost;
 
         $('#modal-totals-summary').html(`
@@ -335,6 +342,7 @@ class OrderManager {
 
         $(modal).fadeIn(150);
     }
+
 
 
     editOrder(orderId) {

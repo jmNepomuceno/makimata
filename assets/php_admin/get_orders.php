@@ -44,8 +44,23 @@ try {
         $stmtHist->execute([':order_code' => $order_code]);
         $history = $stmtHist->fetchAll(PDO::FETCH_ASSOC);
 
+        // --- Fetch shipping fee from provinces table ---
+        $sqlProv = "
+            SELECT shipping_price_range 
+            FROM provinces 
+            WHERE province_description = :province
+            LIMIT 1
+        ";
+        $stmtProv = $pdo->prepare($sqlProv);
+        $stmtProv->execute([':province' => $row['province']]);
+        $provData = $stmtProv->fetch(PDO::FETCH_ASSOC);
+        $shippingFee = $provData ? $provData['shipping_price_range'] : '₱0';
+
         // --- Format shipping address ---
-        $shippingAddress = trim($row['house_no'] . ' ' . $row['barangay'] . ', ' . $row['city'] . ', ' . $row['province']);
+        $shippingAddress = trim(
+            $row['house_no'] . ' ' . $row['barangay'] . ', ' . 
+            $row['city'] . ', ' . $row['province']
+        );
 
         // --- Final order object ---
         $orders[] = [
@@ -57,7 +72,6 @@ try {
             ],
             "date" => $row['created_at'],
             "items" => array_map(function($item) {
-                // Decode styling JSON if exists
                 if (!empty($item['styling'])) {
                     $item['styling'] = json_decode($item['styling'], true);
                 }
@@ -71,6 +85,7 @@ try {
                 "carrier" => $row['tracking_carrier']
             ] : null,
             "shippingAddress" => $shippingAddress,
+            "shippingFee" => $shippingFee, // ✅ added shipping fee here
             "history" => $history
         ];
     }
