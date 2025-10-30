@@ -97,6 +97,20 @@
             background-color: #365c3d;
         }
 
+        .password-rules {
+            font-size: 0.9em;
+            margin-top: 5px;
+            color: #ccc;
+        }
+
+        .password-rules .valid {
+            color: green;
+        }
+        .password-rules .invalid {
+            color: red;
+        }
+
+
         /* Animation */
         @keyframes fadeIn {
             from { opacity: 0; transform: scale(0.9); }
@@ -188,6 +202,17 @@
                 <div class="form-group">
                     <label for="password"><i class="fa-solid fa-lock"></i> Password</label>
                     <input type="password" id="password" name="password" required placeholder="Password" />
+                </div>
+
+                <div id="passwordRequirements" class="password-rules">
+                    <p>Password must contain:</p>
+                    <ul>
+                        <li id="reqLength" class="invalid">At least 8 characters</li>
+                        <li id="reqUpper" class="invalid">An uppercase letter (A–Z)</li>
+                        <li id="reqLower" class="invalid">A lowercase letter (a–z)</li>
+                        <li id="reqNumber" class="invalid">A number (0–9)</li>
+                        <li id="reqSpecial" class="invalid">A special character (!@#$%^&*)</li>
+                    </ul>
                 </div>
 
                 <div class="form-group">

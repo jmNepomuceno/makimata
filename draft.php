@@ -4,7 +4,7 @@
 
     $sql = "SELECT 
                 *
-            FROM provinces LIMIT 1";
+            FROM products LIMIT 1";
     $stmt = $pdo->prepare($sql);
     $stmt->execute();
     $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -95,14 +95,14 @@
 
 3. working na po yung sms kaya if ma iimplement mas okqy
 
-4. alisin nalang yung gift packaging and special handling sa delivery preference naman alisin nalang ying scheduled date
-5. aalisin din po yung e wallet sa payment
+✅4. alisin nalang yung gift packaging and special handling sa delivery preference naman alisin nalang ying scheduled date
+✅5. aalisin din po yung e wallet sa payment
 
-6. sa tutorial hindi pa rin nag peplay yung vid kahit naka edit na yung sa line 157 sa contact.js
+✅6. sa tutorial hindi pa rin nag peplay yung vid kahit naka edit na yung sa line 157 sa contact.js
 
 ✅7. sa cost etimation po is dapat papa naka breakdown po yung sa pricing from the size finish engraving dapat nakalagay sa footer kasama yung estimated price
-8. sa billing invoice hindi accurate yung total
+✅8. sa billing invoice hindi accurate yung total
 
-9. sa wishlist hindi naalis yung nasa wishlist kahit inadd to cart na
-10. tas lastly po sa password creation dapat may password requirements 
+✅9. sa wishlist hindi naalis yung nasa wishlist kahit inadd to cart na
+✅10. tas lastly po sa password creation dapat may password requirements 
 -->

@@ -736,26 +736,8 @@
                             </div>
 
                             <div class="option-group">
-                                <label class="option-label">Gift Packaging</label>
-                                <select id="giftPackaging" class="form-control" name="giftPackaging">
-                                    <option value="none" selected>None</option>
-                                    <option value="basic">Basic Wrap (+₱50)</option>
-                                    <option value="premium">Premium Wrap (+₱100)</option>
-                                </select>
-                            </div>
-
-                            <div class="option-group">
                                 <label class="option-label">Custom Message Card</label>
                                 <textarea id="messageCard" class="form-control" rows="2" placeholder="Enter message (optional, +₱20)" name="messageCard"></textarea>
-                            </div>
-
-                            <div class="option-group">
-                                <label class="option-label">Special Handling / Care</label>
-                                <select id="specialHandling" class="form-control" name="specialHandling">
-                                    <option value="none" selected>None</option>
-                                    <option value="fragile">Fragile Handling (+₱10)</option>
-                                    <option value="eco">Eco-friendly Wrap (+₱15)</option>
-                                </select>
                             </div>
 
                             <div class="option-group">
@@ -855,16 +837,7 @@
                                         <span>Cash on Delivery</span>
                                     </div>
                                 </label>
-                                <label class="payment-option">
-                                    <input type="radio" name="payment" value="ewallet">
-                                    <div class="payment-tile">
-                                        <span>E-Wallets / Card</span>
-                                        <div class="payment-logos">
-                                            <img src="./mik/gcash.png" alt="GCash">
-                                            <img src="./mik/maya.png" alt="Maya">
-                                        </div>
-                                    </div>
-                                </label>
+                               
                             </div>
                         </div>
                     </div>

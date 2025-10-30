@@ -464,11 +464,11 @@ function init() {
 
     // --- Fetch cart items from database ---
     $.ajax({
-        url: '../assets/php/get_cart_items.php', // new PHP endpoint to fetch cart
+        url: '../assets/php/get_cart_items.php',
         type: 'GET',
         dataType: 'json',
         success: function (res) {
-            console.log(res)
+            console.log(res);
             if (res.status === "success" && Array.isArray(res.cart)) {
                 cartItems = res.cart.map(item => ({
                     id: item.id,
@@ -483,18 +483,57 @@ function init() {
                 cartItems = [];
             }
 
+            // --- Cleanup: Remove any wishlist items already in the cart ---
+            cleanupWishlist();
+
             // Continue initializing page after cart is loaded
             continueInit();
         },
         error: function (err) {
             console.error("Error fetching cart items from server:", err);
             cartItems = [];
+
+            // Still clean up wishlist if cart fetch fails
+            cleanupWishlist();
             continueInit();
         }
     });
 
+    function cleanupWishlist() {
+        if (!Array.isArray(wishlistItems) || wishlistItems.length === 0) return;
+
+        // Build a Set of cart IDs as strings to avoid number/string mismatch
+        const cartIdSet = new Set(cartItems.map(i => String(i.id)));
+        const originalLength = wishlistItems.length;
+
+        // Acceptable wishlist item shapes:
+        // - primitive ID: 3
+        // - object with id: { id: 3, ... }
+        // - object with productId or itemId: { productId: 3 }
+        wishlistItems = wishlistItems.filter(w => {
+            // extract a candidate id whether w is a primitive or object
+            let wid;
+            if (w && typeof w === 'object') {
+                // try common property names
+                wid = w.id ?? w.productId ?? w.itemId ?? w._id;
+            } else {
+                wid = w; // primitive (number or string)
+            }
+            return !cartIdSet.has(String(wid));
+        });
+
+        // persist only if changed
+        if (wishlistItems.length !== originalLength) {
+            localStorage.setItem('wishlistItems', JSON.stringify(wishlistItems));
+        }
+
+        // refresh UI counts immediately
+        updateCounts();
+    }
+    
+
+
     function continueInit() {
-        // --- Check for category from URL and set it ---
         const urlParams = new URLSearchParams(window.location.search);
         const categoryFromUrl = urlParams.get('category');
         const validCategories = ['lampshades', 'mugs', 'basket', 'kitchenware', 'furnitures', 'all'];
@@ -506,9 +545,23 @@ function init() {
         fetchProducts();
         setupEventListeners();
         updateCounts();
-        updateActiveCategoryUI(); // Update UI on initial load
+        updateActiveCategoryUI();
     }
 }
+
+function removeFromWishlistById(id) {
+    const sid = String(id);
+    const originalLength = wishlistItems.length;
+    wishlistItems = wishlistItems.filter(w => {
+        let wid = (w && typeof w === 'object') ? (w.id ?? w.productId ?? w.itemId ?? w._id) : w;
+        return String(wid) !== sid;
+    });
+    if (wishlistItems.length !== originalLength) {
+        localStorage.setItem('wishlistItems', JSON.stringify(wishlistItems));
+        updateCounts();
+    }
+}
+
 
 
 $(document).on("click", ".cancel-order-btn", function() {
@@ -1739,14 +1792,63 @@ function addToCart(productId, customization = null) {
     
 }
 
-function removeFromCart(productId, customizationIndex = 0) {
-    cartItems = cartItems.filter((item, index) => 
-        !(item.id === productId && index === customizationIndex)
-    );
-    updateCounts();
-    saveState();
-    renderCartItems();
+function removeFromCart(cartItemId) {
+    if (!cartItemId) return;
+
+    $.ajax({
+        url: '../assets/php/remove_from_cart.php',
+        method: 'POST',
+        data: { cart_item_id: cartItemId },
+        success: function (response) {
+            try {
+                const res = JSON.parse(response);
+                if (res.success) {
+                    // Reload or re-render the cart UI
+                    updateCounts(); saveState(); renderCartItems();
+                } else {
+                    console.error(res.message || "Failed to remove item.");
+                }
+            } catch (err) {
+                console.error("Invalid JSON response:", response);
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error("AJAX error:", error);
+        }
+    });
 }
+
+function removeFromCart(cartItemId) {
+    if (!cartItemId) return;
+
+    $.ajax({
+        url: '../assets/php/remove_from_cart.php',
+        method: "POST",
+        contentType: "application/json",
+        data: JSON.stringify({ product_ID: cartItemId }),
+        success: function (response) {
+            if (response.status === "success") {
+                console.log(response.message);
+
+                // 🟩 Remove the item from local cartItems array
+                cartItems = cartItems.filter(item => item.id !== parseInt(cartItemId));
+
+                // 🟩 Update local storage and UI
+                updateCounts();
+                saveState();
+                renderCartItems();
+            } else {
+                console.error("Remove failed:", response.message);
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error("AJAX error:", error);
+        }
+    });
+}
+
+
+
 
 function updateCartQuantity(productId, quantity, customizationIndex = 0) {
     // Prevent quantity from going below 1.
@@ -2001,18 +2103,15 @@ function updateCustomizationView(updateImage = true) {
     const {
         extraCost,
         engravingText,
-        giftPackaging,
         messageCard,
-        specialHandling,
         deliveryPreference,
         attributes
     } = getCustomizationExtras();
 
-    // ✅ Correct placement — extras are added per item before multiplying
     let perItemPrice = basePrice + extraCost;
     let finalPrice = perItemPrice * quantity;
 
-    // --- 🆕 Update engraving text preview ---
+    // --- Update engraving text preview ---
     const engravingInput = document.getElementById('engravingText');
     if (engravingInput) {
         const engravingPreview = document.getElementById('engravePreview');
@@ -2027,7 +2126,7 @@ function updateCustomizationView(updateImage = true) {
         priceEl.textContent = `₱${finalPrice.toFixed(2)}`;
     }
 
-    // --- Update attributes summary (if exists) ---
+    // --- Update attributes summary ---
     const attrEl = document.getElementById('attributes-summary');
     if (attrEl) {
         attrEl.textContent = attributes || 'No customizations';
@@ -2078,6 +2177,7 @@ function updateCustomizationView(updateImage = true) {
     if (addToCartBtn) addToCartBtn.title = (!areOptionsSelected || isOutOfStock) ? tooltip : '';
     if (buyNowBtn) buyNowBtn.title = (!areOptionsSelected || isOutOfStock) ? tooltip : '';
 }
+
 
 
 function setActiveThumbnail(thumbnailElement) {
@@ -2150,9 +2250,11 @@ function addCustomizedToCart() {
 
     // --- Extra customization info ---
     const {
-        engravingText, giftPackaging, messageCard,
-        specialHandling, deliveryPreference,
-        extraCost, attributes: extraAttributes
+        engravingText,
+        messageCard,
+        deliveryPreference,
+        extraCost,
+        attributes: extraAttributes
     } = getCustomizationExtras();
 
     // --- Compute base + final price ---
@@ -2173,9 +2275,7 @@ function addCustomizedToCart() {
         engraving: engravingText || null,
         engravingPosition: { bottom: '10px', left: '50%' },
         imageWithFinish: currentImage,
-        giftPackaging,
         messageCard: messageCard || null,
-        specialHandling,
         deliveryPreference,
         extraCost
     };
@@ -2205,6 +2305,7 @@ function addCustomizedToCart() {
             attributes,
             selected: true
         });
+        removeFromWishlistById(product.id);
     }
 
     updateCounts();
@@ -2239,6 +2340,7 @@ function addCustomizedToCart() {
         }
     });
 }
+
 
 
 
@@ -2923,11 +3025,29 @@ function handlePlaceOrder() {
             if (response.status === "success") {
                 showToast("✅ Order placed successfully!", "success");
 
-                // ✅ Logic to remove checked-out items from cart
-                const itemsToKeep = cartItems.filter(item => !item.selected);
-                cartItems = itemsToKeep;
+                // 🟩 Collect IDs of selected items to remove from DB
+                const selectedIds = cartItems
+                    .filter(item => item.selected)
+                    .map(item => item.id);
 
-                // ✅ If the cart is now empty, uncheck the "Select All" box
+                if (selectedIds.length > 0) {
+                    $.ajax({
+                        url: "../assets/php/clear_ordered_cart_items.php",
+                        type: "POST",
+                        contentType: "application/json",
+                        data: JSON.stringify({ product_IDs: selectedIds }),
+                        success: function (res) {
+                            console.log("🧹 Cart cleanup:", res);
+                        },
+                        error: function (xhr, status, error) {
+                            console.error("Cart cleanup error:", error);
+                        }
+                    });
+                }
+
+                // 🟩 Update local cartItems and UI
+                cartItems = cartItems.filter(item => !item.selected);
+
                 if (document.getElementById('selectAllCheckbox')) {
                     document.getElementById('selectAllCheckbox').checked = false;
                 }
@@ -2935,7 +3055,6 @@ function handlePlaceOrder() {
                 updateCounts();
                 saveState();
                 closeModals();
-
             } else {
                 alert("Error: " + (response.message || "Unknown error occurred."));
             }

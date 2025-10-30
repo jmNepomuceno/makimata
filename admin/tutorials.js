@@ -205,12 +205,22 @@ class TutorialAdmin {
 
     // Hide file input and show current video if available
     videoFileInput.style.display = "none"
+    console.log(tutorial.video_url) // assets/upload/tutorials/vid_68ec5598d2ed8.mp4
     if (tutorial.video_url) {
-      currentVideoDiv.innerHTML = `<a href="${tutorial.video_url}" target="_blank">View Uploaded Video</a>`
-      currentVideoDiv.style.display = "block"
+      // Remove leading "admin/" from the path if it exists
+      const fixedPath = tutorial.video_url.replace(/^admin\//, "").replace(/^\.?\//, "");
+
+      // Build dynamic absolute URL
+      const baseURL = `${window.location.origin}/`;
+      const fullVideoURL = baseURL + fixedPath;
+
+      currentVideoDiv.innerHTML = `<a href="${fullVideoURL}" target="_blank">View Uploaded Video</a>`;
+      currentVideoDiv.style.display = "block";
+
+      console.log("Full video URL:", fullVideoURL);
     } else {
-      currentVideoDiv.innerHTML = "No video uploaded."
-      currentVideoDiv.style.display = "block"
+      currentVideoDiv.innerHTML = "No video uploaded.";
+      currentVideoDiv.style.display = "block";
     }
 
     // Show uploader info

@@ -28,8 +28,22 @@ $(document).ready(function () {
 
         let password = $("#password").val();
         let confirmPassword = $("#confirmPassword").val();
+
+        // Check password strength
+        const validPassword =
+            password.length >= 8 &&
+            /[A-Z]/.test(password) &&
+            /[a-z]/.test(password) &&
+            /\d/.test(password) &&
+            /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+        if (!validPassword) {
+            alert("❌ Password must be at least 8 characters long and include uppercase, lowercase, number, and special character.");
+            return;
+        }
+
         if (password !== confirmPassword) {
-            alert("Passwords do not match!");
+            alert("⚠️ Passwords do not match!");
             return;
         }
 
@@ -47,23 +61,22 @@ $(document).ready(function () {
             type: "POST",
             data: $.param(formData),
             dataType: "json",
-            success: function(response) {
+            success: function (response) {
                 console.log("AJAX Response:", response);
 
-                if(response.status === "pending") {
+                if (response.status === "pending") {
                     showToast("✅ Account created! OTP sent to your email.", "success");
-                    $("#hiddenEmail").val(response.email); // store email in hidden input
+                    $("#hiddenEmail").val(response.email);
                     showOtpModal(response.email);
                 } else {
                     showToast("⚠️ " + response.message, "error");
                 }
             },
-            error: function(xhr,status,error){
-                console.error("AJAX Error:",xhr.responseText,status,error);
-                showToast("⚠️ Something went wrong. Check console for details.","error");
+            error: function (xhr, status, error) {
+                console.error("AJAX Error:", xhr.responseText, status, error);
+                showToast("⚠️ Something went wrong. Check console for details.", "error");
             },
-            complete: function() {
-                // Hide loader after everything is done
+            complete: function () {
                 $("#loadingOverlay").fadeOut();
             }
         });
@@ -172,6 +185,26 @@ $(document).ready(function () {
         startOtpTimer();
         // TODO: Call your resend OTP AJAX here
     });
+
+    // Password live validation
+    $("#password").on("input", function () {
+        const password = $(this).val();
+
+        // Check conditions
+        const lengthOK = password.length >= 8;
+        const upperOK = /[A-Z]/.test(password);
+        const lowerOK = /[a-z]/.test(password);
+        const numberOK = /\d/.test(password);
+        const specialOK = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+        // Update UI
+        $("#reqLength").toggleClass("valid", lengthOK).toggleClass("invalid", !lengthOK);
+        $("#reqUpper").toggleClass("valid", upperOK).toggleClass("invalid", !upperOK);
+        $("#reqLower").toggleClass("valid", lowerOK).toggleClass("invalid", !lowerOK);
+        $("#reqNumber").toggleClass("valid", numberOK).toggleClass("invalid", !numberOK);
+        $("#reqSpecial").toggleClass("valid", specialOK).toggleClass("invalid", !specialOK);
+    });
+
 
 
 
