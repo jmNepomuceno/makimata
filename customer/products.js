@@ -2228,7 +2228,6 @@ function addCustomizedToCart() {
             final_price: finalPrice
         },
         success: res => {
-            console.log("✅ add_to_cart.php response:", res);
             if (res.status === "success") {
                 console.log("Cart updated successfully!");
             } else {
@@ -2529,65 +2528,99 @@ function openBillingModal(items, source = 'cart') {
     const oldTotalEl = summaryBoxEl.querySelector('#billingSummaryTotal');
     if (oldTotalEl) oldTotalEl.remove();
 
+    // Build summary HTML with detailed breakdown matching renderCartItems()
     let summaryHTML = items.map(item => {
+        // product lookup by product_code as id (ensure PRODUCTS uses product_code as id)
         const product = PRODUCTS.find(p => p.id === item.id);
         if (!product) return '';
 
-        let itemPrice = product.price;
-        let customizationDetails = [];
+        // base price from product
+        const basePrice = parseFloat(product.price || 0);
 
-        // ✅ Apply existing customization logic
-        if (item.customization) {
-            if (item.customization.size === 'large') itemPrice *= 1.1;
-            if (item.customization.size === 'small') itemPrice *= 0.8;
-            if (item.customization.finish === 'dark' || item.customization.finish === 'premium') itemPrice += 40;
-            if (item.customization.extraCost) itemPrice += item.customization.extraCost;
+        // We'll compute unitPrice from base + adjustments, but avoid double-counting engraving:
+        // extraCost is taken from customization.extraCost or item.extra_cost (DB)
+        const extraCost = parseFloat(item.customization?.extraCost ?? item.extra_cost ?? 0) || 0;
+        const engravingText = item.customization?.engraving ?? null;
 
-            if (item.customization.engraving && item.customization.engraving.trim() !== '') {
-                itemPrice += 50;
-                customizationDetails.push(`Engraving: "${item.customization.engraving}" (+₱50)`);
-            }
+        // Start with base price
+        let unitPrice = basePrice;
+        const breakdownLines = [];
+        breakdownLines.push(`<div><strong>Base Price:</strong> ₱${basePrice.toFixed(2)}</div>`);
 
-            if (item.customization.sizeLabel) customizationDetails.push(`Size: ${item.customization.sizeLabel}`);
-            if (item.customization.finish) {
-                const finishDisplayName = FINISH_DISPLAY_NAMES[item.customization.finish] || item.customization.finish;
-                customizationDetails.push(`Finish: ${finishDisplayName}`);
-            }
+        // Size adjustments
+        if (item.customization?.size === 'large') {
+            const added = basePrice * 0.10;
+            unitPrice += added;
+            breakdownLines.push(`<div>Size (Large +10%): +₱${added.toFixed(2)}</div>`);
+        } else if (item.customization?.size === 'small') {
+            const reduced = basePrice * 0.20;
+            unitPrice -= reduced;
+            breakdownLines.push(`<div>Size (Small -20%): -₱${reduced.toFixed(2)}</div>`);
+        }
 
-            if (item.customization.messageCard && item.customization.messageCard.trim() !== '') {
-                customizationDetails.push(`Message Card: "${item.customization.messageCard}"`);
-            }
+        // Finish adjustments
+        if (item.customization?.finish === 'dark' || item.customization?.finish === 'premium') {
+            unitPrice += 40;
+            breakdownLines.push(`<div>Finish (${item.customization.finish}): +₱40.00</div>`);
+        }
 
-            if (item.customization.giftPackaging && item.customization.giftPackaging !== 'none') {
-                customizationDetails.push(`Gift Packaging: ${item.customization.giftPackaging}`);
-            }
+        // Extra customization cost (from customization.extraCost or item.extra_cost)
+        if (extraCost > 0) {
+            unitPrice += extraCost;
+            breakdownLines.push(`<div>Extra Customization: +₱${extraCost.toFixed(2)}</div>`);
+        }
 
-            if (item.customization.specialHandling && item.customization.specialHandling !== 'none') {
-                customizationDetails.push(`Handling: ${item.customization.specialHandling}`);
-            }
-
-            if (item.customization.deliveryPreference && item.customization.deliveryPreference !== 'standard') {
-                customizationDetails.push(`Delivery: ${item.customization.deliveryPreference}`);
+        // Engraving: only add flat +₱50 if engraving exists AND extraCost is zero.
+        // (If extraCost > 0 we assume it already includes engraving or other extras.)
+        if (engravingText && engravingText.trim() !== '') {
+            if (extraCost === 0) {
+                unitPrice += 50;
+                breakdownLines.push(`<div>Engraving (+₱50.00): "${escapeHtml(engravingText)}"</div>`);
+            } else {
+                // Show engraving text but don't add price again (avoid double-counting)
+                breakdownLines.push(`<div>Engraving: "${escapeHtml(engravingText)}"</div>`);
             }
         }
 
-        const customizationDetailsHTML = customizationDetails.length > 0 
-            ? `<div class="summary-customization-details">${customizationDetails.join(' | ')}</div>`
-            : '';
+        // Other readable customizations
+        if (item.customization?.messageCard && item.customization.messageCard.trim() !== '') {
+            breakdownLines.push(`<div>Message Card: "${escapeHtml(item.customization.messageCard)}"</div>`);
+        }
+        if (item.customization?.giftPackaging && item.customization.giftPackaging !== 'none') {
+            breakdownLines.push(`<div>Gift Packaging: ${escapeHtml(item.customization.giftPackaging)}</div>`);
+        }
+        if (item.customization?.specialHandling && item.customization.specialHandling !== 'none') {
+            breakdownLines.push(`<div>Handling: ${escapeHtml(item.customization.specialHandling)}</div>`);
+        }
+        if (item.customization?.deliveryPreference && item.customization.deliveryPreference !== 'standard') {
+            breakdownLines.push(`<div>Delivery Preference: ${escapeHtml(item.customization.deliveryPreference)}</div>`);
+        }
 
-        const subtotal = itemPrice * item.quantity;
+        // Now compute subtotal for this item (unitPrice * quantity)
+        const quantity = parseInt(item.quantity || 1, 10);
+        const subtotal = unitPrice * quantity;
         total += subtotal;
 
+        const attrText = item.attributes ? `<div class="summary-attr"><small>${escapeHtml(item.attributes)}</small></div>` : '';
+
+        const breakdownHTML = `
+            <div class="price-breakdown" style="font-size:13px; color:#555; margin-top:5px;">
+                ${breakdownLines.join('')}
+                <div><strong>Subtotal:</strong> ₱${unitPrice.toFixed(2)} × ${quantity}</div>
+                <div><strong>Total:</strong> ₱${subtotal.toFixed(2)}</div>
+            </div>
+        `;
+
         return `
-            <div class="summary-item" data-id="${product.id}" data-productCode="${product.product_code}" 
+            <div class="summary-item" data-id="${escapeHtml(String(item.id))}" data-productCode="${escapeHtml(product.product_code || '')}"
                 style="display: flex; align-items: center; gap: 15px; padding: 1rem 0; border-bottom: 1px solid #f1f3f5;">
-                <img src="${product.image}" alt="${product.name}" 
+                <img src="${escapeHtml(product.image || '')}" alt="${escapeHtml(product.name || '')}"
                     style="width: 70px; height: 70px; border-radius: 6px; object-fit: cover;">
-                <div class="item-info" 
-                    style="display: flex; justify-content: space-between; flex-grow: 1; align-items: flex-start;">
+                <div class="item-info" style="display: flex; justify-content: space-between; flex-grow: 1; align-items: flex-start;">
                     <div>
-                        <strong style="font-size: 1.05rem; font-weight: 600;">${product.name}</strong> (x${item.quantity})
-                        ${customizationDetailsHTML}
+                        <strong style="font-size: 1.05rem; font-weight: 600;">${escapeHtml(product.name || item.name || 'Item')}</strong> (x${quantity})
+                        ${attrText}
+                        ${breakdownHTML}
                     </div>
                     <p style="font-size: 1rem; font-weight: 600; white-space: nowrap; margin-left: 1rem;">
                         ₱${subtotal.toFixed(2)}
@@ -2600,15 +2633,15 @@ function openBillingModal(items, source = 'cart') {
     summaryItemsEl.innerHTML = summaryHTML;
 
     const subtotal = total;
-    let shippingFee = 150.00; // default
-    let shippingInfoText = "Standard Rate (₱150)";
+    let shippingFee = 0; // default
+    let shippingInfoText = "Standard Rate (0)";
 
-    // 🚚 Fetch user's region dynamically
+    // 🚚 Fetch user's region dynamically (synchronous fetch preserved for your UI flow)
     $.ajax({
         url: '../assets/php/get_regions.php',
         type: 'GET',
         dataType: 'json',
-        async: false, // wait before rendering
+        async: false, // wait before rendering totals (you were using this)
         success: function(response) {
             if (response.status === 'success' && response.data) {
                 const region = parseInt(response.data.region_code);
@@ -2645,13 +2678,13 @@ function openBillingModal(items, source = 'cart') {
 
     billingModal.style.display = 'block';
 
-    // --- Render Billing Form Sections ---
+    // --- Render Billing Form Sections (unchanged) ---
     const billingFormEl = document.getElementById('billingForm');
     if (billingFormEl) {
         billingFormEl.innerHTML = `
             <div class="billing-form-section">
                 <h5>Delivery Address</h5>
-                <div class="address-card selected">
+                <div class="address-card">
                     <div class="address-card-header">
                         <strong>Juan Dela Cruz</strong>
                         <button class="remove-address" title="Remove Address">&times;</button>
@@ -2692,7 +2725,7 @@ function openBillingModal(items, source = 'cart') {
         });
     });
 
-    // Sticky summary
+    // Sticky summary (unchanged)
     try {
         const summaryContainer = document.getElementById('billingSummaryItems').parentElement;
         if (summaryContainer) summaryContainer.classList.add('order-summary-box', 'billing-summary-sticky-container');
@@ -2700,11 +2733,11 @@ function openBillingModal(items, source = 'cart') {
         console.error("Error applying sticky styles to billing summary:", e);
     }
 
-    // Hide footer total
+    // Hide footer total (unchanged)
     const footerCosts = document.querySelector('#billingModal .modal-footer .billing-costs');
     if (footerCosts) footerCosts.style.display = 'none';
 
-    // Back button
+    // Back button (unchanged)
     const actionsContainer = document.querySelector('#billingModal .modal-actions');
     if (actionsContainer) {
         const existingBackBtn = actionsContainer.querySelector('#cancelBilling');
@@ -2716,21 +2749,15 @@ function openBillingModal(items, source = 'cart') {
         
         if (source === 'customization' && currentCustomizingProduct) {
             backButton.textContent = 'Back to Customization';
-            backButton.addEventListener('click', () => {
-                closeModals();
-                openCustomization(currentCustomizingProduct.id);
-            });
+            backButton.addEventListener('click', () => { closeModals(); openCustomization(currentCustomizingProduct.id); });
         } else {
             backButton.textContent = 'Back to Cart';
-            backButton.addEventListener('click', () => {
-                closeModals();
-                openModal('cart');
-            });
+            backButton.addEventListener('click', () => { closeModals(); openModal('cart'); });
         }
         actionsContainer.prepend(backButton);
     }
 
-    // --- Fetch user address ---
+    // --- Fetch user address (unchanged) ---
     $.ajax({
         url: '../assets/php/fetch_user_address_number.php',
         type: 'GET',
@@ -2742,7 +2769,7 @@ function openBillingModal(items, source = 'cart') {
                 addressContainer.find('.address-card.default-address').remove();
 
                 const html = `
-                    <div class="address-card default-address selected" 
+                    <div class="address-card default-address" 
                         data-id="${escapeHtml(addr.id)}"
                         data-barangay="${escapeHtml(addr.barangay)}"
                         data-city="${escapeHtml(addr.city)}"
@@ -2771,7 +2798,7 @@ function openBillingModal(items, source = 'cart') {
         }
     });
 
-    // --- Fetch all addresses ---
+    // --- Fetch all addresses (unchanged) ---
     $.ajax({
         url: '../assets/php/fetch_user_addresses.php',
         type: 'GET',
@@ -2783,7 +2810,7 @@ function openBillingModal(items, source = 'cart') {
                 let html = '';
                 addresses.forEach(addr => {
                     html += `
-                        <div class="address-card ${addr.is_default ? 'selected' : ''}"
+                        <div class="address-card"
                             data-id="${escapeHtml(addr.id)}"
                             data-barangay="${escapeHtml(addr.barangay)}"
                             data-city="${escapeHtml(addr.city)}"
@@ -2811,6 +2838,18 @@ function openBillingModal(items, source = 'cart') {
     });
 }
 
+// helper escapeHtml used in template building
+function escapeHtml(str) {
+    if (str === null || typeof str === 'undefined') return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+}
+
+
 
 // Utility functions
 function handlePlaceOrder() {
@@ -2820,7 +2859,7 @@ function handlePlaceOrder() {
         orderItems.push({
             product_code: $(this).data('productcode'),
             name: $(this).find('.item-name, strong').first().text().trim(),
-            attributes: $(this).find('.item-attributes, .summary-customization-details').text().trim(),
+            attributes: $(this).find('.item-attributes, .summary-customization-details, .summary-attr').text().trim(),
             qty: $(this).find('.item-qty').text().trim() || $(this).text().match(/\(x\d+\)/)?.[0] || "",
             price: $(this).find('.summary-item-price, p').last().text().trim()
         });
