@@ -4,7 +4,7 @@
 
     $sql = "SELECT 
                 *
-            FROM products LIMIT 1";
+            FROM products order by product_ID desc LIMIT 1";
     $stmt = $pdo->prepare($sql);
     $stmt->execute();
     $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -91,7 +91,7 @@
 
 <!--  -->
 <!-- 
-1. sa order 1 item lang yung nag rereflect sa admin side kahit more than yung plinace order ko
+✅ working sa end ko 1. sa order 1 item lang yung nag rereflect sa admin side kahit more than yung plinace order ko
 
 3. working na po yung sms kaya if ma iimplement mas okqy
 
@@ -106,3 +106,24 @@
 ✅9. sa wishlist hindi naalis yung nasa wishlist kahit inadd to cart na
 ✅10. tas lastly po sa password creation dapat may password requirements 
 -->
+
+<!-- System Revisions
+1.	Customization module- size and and updating mag eedit ako ng mga 5 images na nakalagay yung large image preview at yun nalang ang ipapakita sa checking -----, ✅ alisin nalang yung gift packaging and special handling and sa shipping preference tanggalin nalang din yung scheduled date (pwede rin sha lagyan ng delivery rate nalang) kasi lugi naman if 50 pa rin yung price kahit malayo na yung lugar
+
+✅2.	Cost estimation – incomplete missing attributes, hindi nag tototal ng maayos yung price ng products pag pinindot yung buy now (halimbawa yung coffee na option hindi nag babago yung price pag pinindot yung premium) in short, di accurate yung price pag pinindot yung buy now ----- dapat ma show yung breakdown ng price every customization ---- pag nag proceed na sa buy now hindi accurate yung price nan aka show sa proceed to check out 
+
+✅3.	Products module in admin side – hindi nag uupdate yung inventory and kung mag update man 1 item lang yung na rereceive kahit more than 1 item ang inorder ni customer
+
+✅4.	Tutorial module – hindi makapag upload ng file na medyo Malaki ang size kahit mapakita lang na nakakapg upload ng 50 mb’ , and dapat na peplay yung inupload na video
+
+✅5.	Billing invoice – hindi rin accurate yung amount and price ng order ni customer
+
+✅6.	Feedback module – admin view only (automatic na dapat yung review at walang choice ang admin na accept or reject) at nag rereflect sa every product yung review if ever na may review na yung products na yon
+
+7.	Sms – implement lang since approve naman na yung sender’s name
+
+✅8.	Delivery – buyer must confirm received bago pindutin ng admin ang completed order 
+
+✅9.	Featured items – new products, customers favorite (dapat may database siya na connected kung ano yung nakalagy sa wishlist ng customer) and same for best sellers
+
+✅10.	Sign up module – dapat may option na I show yung password and may requirements na 8 characters long -->

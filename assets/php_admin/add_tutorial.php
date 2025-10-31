@@ -72,10 +72,10 @@ try {
             ]);
             exit;
         }
-
+        $order_code = $_POST['order_code'] ?? null;
         // ✅ Insert into database
-        $sql = "INSERT INTO tutorials (title, description, type, video_url, article_url, last_updated, status)
-                VALUES (:title, :description, :type, :video_url, :article_url, :last_updated, :status)";
+        $sql = "INSERT INTO tutorials (title, description, type, video_url, article_url, last_updated, status, order_code)
+                VALUES (:title, :description, :type, :video_url, :article_url, :last_updated, :status, :order_code)";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
             ':title' => $title,
@@ -84,7 +84,8 @@ try {
             ':video_url' => $video_url,
             ':article_url' => $article_url,
             ':last_updated' => $last_updated,
-            ':status' => $status
+            ':status' => $status,
+            ':order_code' => $order_code
         ]);
 
         echo json_encode([

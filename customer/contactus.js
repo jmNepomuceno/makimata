@@ -188,12 +188,16 @@ class TutorialPublic {
   handleUploadSubmit(e) {
     e.preventDefault();
 
-    const form = e.target;
-    const formData = new FormData();
-    formData.append("title", $("#tutorialTitle").val());
-    formData.append("description", $("#tutorialDescription").val());
-    formData.append("article_url", $("#articleUrl").val());
-    formData.append("status", "pending");
+  const form = e.target;
+  const formData = new FormData(form);
+
+  formData.append("title", $("#tutorialTitle").val());
+  formData.append("description", $("#tutorialDescription").val());
+  formData.append("article_url", $("#articleUrl").val());
+  formData.append("status", "pending");
+
+  // ✅ Add related product (order_code)
+  formData.append("order_code", $("#tutorialProduct").val());
 
     const fileInput = $("#video_file")[0];
     if (fileInput.files.length > 0) {
@@ -205,7 +209,7 @@ class TutorialPublic {
 
     // ✅ Debug: log all entries
     for (let [key, value] of formData.entries()) {
-      console.log(key, value);
+      // console.log(key, value);
     }
 
     const videoFile = $("#video_file")[0].files[0];

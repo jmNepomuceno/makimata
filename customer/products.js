@@ -1,6 +1,6 @@
 
 let PRODUCTS = []
-
+let TUTORIALS = []
 const FINISH_DISPLAY_NAMES = {
     natural: 'Burly',
     dark: 'Coffee',
@@ -549,6 +549,27 @@ function init() {
     }
 }
 
+function fetchWishlist(callback) {
+    $.ajax({
+        url: '../assets/php/wishlist_handler.php',
+        type: 'GET',
+        dataType: 'json',
+        success: function (res) {
+            if (res.status === "success" && Array.isArray(res.wishlist)) {
+                wishlistItems = res.wishlist.map(item => parseInt(item.product_id));
+            } else {
+                wishlistItems = [];
+            }
+            if (typeof callback === 'function') callback();
+        },
+        error: function (err) {
+            console.error("Error fetching wishlist:", err);
+            wishlistItems = [];
+            if (typeof callback === 'function') callback();
+        }
+    });
+}
+
 function removeFromWishlistById(id) {
     const sid = String(id);
     const originalLength = wishlistItems.length;
@@ -835,7 +856,8 @@ function fetchOrders(filters = {}) {
                     const orderNumber = index + 1;
 
                     // Timeline (same as before) ...
-                    const timelineSteps = ['pending','processing','shipped','completed'];
+                    const timelineSteps = ['pending','processing','shipped','delivered','completed'];
+
                     let timelineHtml = '<div class="order-timeline">';
                     timelineSteps.forEach(step => {
                         let stepClass = '';
@@ -920,6 +942,13 @@ function fetchOrders(filters = {}) {
                         cancelBtn = `<button class="cancel-order-btn" data-order="${order.id}">Cancel Order</button>`;
                     }
 
+                    // Accept Delivery button if shipped
+                    let acceptBtn = '';
+                    if (order.status === "shipped") {
+                        acceptBtn = `<button id="accept-delivery-btn" class="accept-delivery-btn" data-order="${order.id}">Accept Delivery</button>`;
+                    }
+
+
                     modalBody.append(`
                         <div class="orders-list">
                             <h4>Order #${orderNumber}</h4>
@@ -932,6 +961,7 @@ function fetchOrders(filters = {}) {
                             ${itemsHtml}
                             ${timelineHtml}
                             ${cancelBtn}
+                            ${acceptBtn}
                             <hr>
                         </div>
                     `);
@@ -945,6 +975,31 @@ function fetchOrders(filters = {}) {
         }
     });
 }
+
+// Handle "Accept Delivery" button
+$(document).on("click", ".accept-delivery-btn", function() {
+    const orderId = $(this).data("order");
+    if (!confirm("Confirm that you have received your order?")) return;
+    console.log(orderId)
+    $.ajax({
+        url: "../assets/php/update_order_status.php",
+        type: "POST",
+        dataType: "json",
+        data: { orderId: orderId, status: "delivered" },
+        success: function(response) {
+            if (response.status === "success") {
+                alert("Order marked as delivered. Thank you!");
+                fetchOrders(); // refresh orders
+            } else {
+                alert("Error: " + response.message);
+            }
+        },
+        error: function() {
+            alert("Something went wrong while updating the status.");
+        }
+    });
+});
+
 
 // Event listeners
 function setupEventListeners() {
@@ -1584,56 +1639,6 @@ function getFilteredProducts() {
         return matchesCategory && matchesSearch;
     });
 }
-
-// function renderProducts() {
-//     $.ajax({
-//         url: "../assets/php/fetch_products.php",
-//         type: "POST", // or "GET" if you prefer
-//         dataType: "json",
-//         success: function (response) {
-//             console.log(response)
-//             PRODUCTS = response.data
-//             if (response.status === "success") {
-//                 const products = response.data;
-
-//                 if (!products || products.length === 0) {
-//                     productsGrid.innerHTML = '<div class="no-products">No products found matching your criteria.</div>';
-//                     return;
-//                 }
-
-//                 productsGrid.innerHTML = products.map(product => `
-//                     <div class="product-card" data-id="${product.id}" data-productCode="${product.product_code}">
-//                         <div class="product-image">
-//                             <img src="${product.image}" alt="${product.name}" onclick="openCustomization(${product.id})">
-//                             <div class="product-actions">
-//                                 <button class="action-btn cart-btn" onclick="openCustomization(${product.id})" title="Customize">
-//                                     <i class="fas fa-shopping-cart"></i>
-//                                 </button>
-//                                 <button class="action-btn review-btn ${wishlistItems.includes(product.id) ? 'active' : ''}" 
-//                                         onclick="toggleWishlist(event, ${product.id})" title="Add to Wishlist">
-//                                     <i class="fas fa-heart"></i>
-//                                 </button>
-//                             </div>
-//                         </div>
-//                         <div class="product-info">
-//                             <h3>${product.name}</h3>
-//                             <p class="price">₱${parseFloat(product.price).toFixed(2)}</p>
-//                             <div class="product-buttons">
-//                                 <button class="btn-add-cart" onclick="openCustomization(${product.id})">Add to Cart</button>
-//                             </div>
-//                         </div>
-//                     </div>
-//                 `).join('');
-//             } else {
-//                 productsGrid.innerHTML = `<div class="no-products">Error: ${response.message}</div>`;
-//             }
-//         },
-//         error: function () {
-//             productsGrid.innerHTML = '<div class="no-products">Something went wrong. Please try again.</div>';
-//         }
-//     });
-// }
-
 let currentPage = 1;
 const itemsPerPage = 12; // adjust as needed
 
@@ -1684,38 +1689,55 @@ function paginateAndRender(products) {
   renderPagination(products);
 }
 
-function renderProducts(products = PRODUCTS) {
+function renderProducts(products = PRODUCTS, tutorials = TUTORIALS) {
   const productsGrid = document.querySelector("#productsGrid");
+
   if (!products || products.length === 0) {
     productsGrid.innerHTML = '<div class="no-products">No products found matching your criteria.</div>';
     return;
   }
 
-  productsGrid.innerHTML = products.map(product => `
-    <div class="product-card" data-id="${product.id}" data-productCode="${product.product_code}">
-        <div class="product-image">
-            <img src="${product.image}" alt="${product.name}" onclick="openCustomization(${product.id})">
-            <div class="product-actions">
-                <button class="action-btn cart-btn" onclick="openCustomization(${product.id})" title="Customize">
-                    <i class="fas fa-shopping-cart"></i>
-                </button>
-                <button class="action-btn review-btn ${wishlistItems.includes(product.id) ? 'active' : ''}" 
-                        onclick="toggleWishlist(event, ${product.id})" title="Add to Wishlist">
-                    <i class="fas fa-heart"></i>
-                </button>
-            </div>
-        </div>
-        <div class="product-info">
-            <h3>${product.name}</h3>
-            <p class="price">₱${parseFloat(product.price).toFixed(2)}</p>
-            <div class="product-buttons">
-                <button class="btn-add-cart" onclick="openCustomization(${product.id})">Add to Cart</button>
-            </div>
-        </div>
-    </div>
-  `).join('');
-}
+  productsGrid.innerHTML = products.map(product => {
+    // 🔍 Find matching tutorial(s) by product_code
+    const relatedTutorials = tutorials.filter(t => t.order_code === product.product_code);
 
+
+    // 🎬 If at least one tutorial exists, add a button
+    const tutorialBtn = relatedTutorials.length > 0
+      ? `
+        <button class="action-btn tutorial-btn" 
+                onclick="openTutorials('${product.product_code}')" 
+                title="View Tutorials">
+            <i class="fas fa-play-circle"></i>
+        </button>
+      `
+      : '';
+    return `
+      <div class="product-card" data-id="${product.id}" data-productCode="${product.product_code}">
+          <div class="product-image">
+              <img src="${product.image}" alt="${product.name}" onclick="openCustomization(${product.id})">
+              <div class="product-actions">
+                  ${tutorialBtn}
+                  <button class="action-btn cart-btn" onclick="openCustomization(${product.id})" title="Customize">
+                      <i class="fas fa-shopping-cart"></i>
+                  </button>
+                  <button class="action-btn review-btn ${wishlistItems.includes(product.id) ? 'active' : ''}" 
+                          onclick="toggleWishlist(event, ${product.id})" title="Add to Wishlist">
+                      <i class="fas fa-heart"></i>
+                  </button>
+              </div>
+          </div>
+          <div class="product-info">
+              <h3>${product.name}</h3>
+              <p class="price">₱${parseFloat(product.price).toFixed(2)}</p>
+              <div class="product-buttons">
+                  <button class="btn-add-cart" onclick="openCustomization(${product.id})">Add to Cart</button>
+              </div>
+          </div>
+      </div>
+    `;
+  }).join('');
+}
 
 
 function fetchProducts() {
@@ -1725,11 +1747,14 @@ function fetchProducts() {
         dataType: "json",
         success: function (response) {
             if (response.status === "success") {
-                PRODUCTS = response.data;
-                console.log(PRODUCTS)
-                renderProducts(PRODUCTS);
-                paginateAndRender(PRODUCTS);
+                PRODUCTS = response.products || [];
+                TUTORIALS = response.tutorials || [];
 
+                console.log("✅ PRODUCTS:", PRODUCTS);
+                console.log("🎬 TUTORIALS:", TUTORIALS);
+
+                renderProducts(PRODUCTS, TUTORIALS);
+                paginateAndRender(PRODUCTS);
             } else {
                 productsGrid.innerHTML = `<div class="no-products">Error: ${response.message}</div>`;
             }
@@ -1739,6 +1764,60 @@ function fetchProducts() {
         }
     });
 }
+
+function openTutorials(productCode) {
+  const modal = document.getElementById("tutorialModal");
+  const list = document.getElementById("tutorialList");
+
+  modal.style.display = "block";
+
+  // Filter tutorials by order_code matching the product_code
+  const tutorials = TUTORIALS.filter(t => t.order_code === productCode);
+
+  if (!tutorials.length) {
+    list.innerHTML = "<p>No tutorials available for this product.</p>";
+    return;
+  }
+
+  // Build HTML
+  list.innerHTML = tutorials.map(tutorial => `
+    <div class="tutorial-item">
+      <h3>${tutorial.title}</h3>
+      <p>${tutorial.description || 'No description provided.'}</p>
+      ${tutorial.type === 'video' && tutorial.video_url
+        ? `<video controls preload="metadata">
+             <source src="../${tutorial.video_url}" type="video/mp4">
+             Your browser does not support the video tag.
+           </video>`
+        : tutorial.article_url
+          ? `<a href="../${tutorial.article_url}" target="_blank">Read Article</a>`
+          : `<p>No media available.</p>`}
+    </div>
+  `).join('');
+}
+
+function closeTutorials() {
+  document.getElementById("tutorialModal").style.display = "none";
+}
+
+window.onclick = function (e) {
+  const modal = document.getElementById("tutorialModal");
+  if (e.target === modal) closeTutorials();
+};
+
+
+function closeTutorials() {
+  document.getElementById("tutorialModal").style.display = "none";
+}
+
+// Close when clicking outside modal
+window.onclick = function (e) {
+  const modal = document.getElementById("tutorialModal");
+  if (e.target === modal) closeTutorials();
+};
+
+
+
 
 // --- Filter buttons logic ---
 document.querySelectorAll(".category-btn").forEach(btn => {
@@ -1892,30 +1971,50 @@ function toggleWishlist(event, productId) {
     if (!product) return;
 
     const index = wishlistItems.indexOf(productId);
-    if (index > -1) {
-        wishlistItems.splice(index, 1);
-        // No animation on removal for simplicity, the UI will just update.
-    } else {
-        wishlistItems.push(productId);
+    const action = index > -1 ? 'remove' : 'add';
 
-        // Animate when adding. This only happens from the product grid.
-        const card = event.target.closest('.product-card');
-        if (card) {
-            const img = card.querySelector('.product-image img');
-            if (img) {
-                animateToWishlist(img);
+    $.ajax({
+        url: "../assets/php/wishlist_handler.php",
+        type: "POST",
+        data: { 
+            action: action,
+            product_id: productId 
+        },
+        dataType: "json",
+        success: function (response) {
+            if (response.status === "success") {
+                if (action === "remove") {
+                    wishlistItems.splice(index, 1);
+                } else {
+                    wishlistItems.push(productId);
+
+                    // Animate only when adding from product grid
+                    const card = event.target.closest('.product-card');
+                    if (card) {
+                        const img = card.querySelector('.product-image img');
+                        if (img) animateToWishlist(img);
+                    }
+                }
+
+                updateCounts();
+                saveState();
+                renderProducts();
+
+                // Refresh wishlist modal if open
+                const wishlistModal = document.getElementById('wishlistModal');
+                if (wishlistModal && wishlistModal.style.display === 'block') {
+                    renderWishlistItems();
+                }
+            } else {
+                console.warn("Wishlist update failed:", response.message);
             }
+        },
+        error: function (xhr, status, error) {
+            console.error("AJAX wishlist error:", error);
         }
-    }
-    updateCounts();
-    saveState();
-    renderProducts(); // This updates the heart icons on the main page
-    
-    // If the wishlist modal is open, re-render it too
-    if (document.getElementById('wishlistModal').style.display === 'block') {
-        renderWishlistItems();
-    }
+    });
 }
+
 
 // Customization functionality
 function openCustomization(productId) {

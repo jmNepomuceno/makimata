@@ -84,14 +84,14 @@
     <div class="container">
       <h2>Our Products</h2>
       <div class="product-filters">
-        <button class="filter-btn active">WHAT'S NEW</button>
-        <button class="filter-btn">BEST SELLERS</button>
-        <button class="filter-btn">CUSTOMER FAVORITES</button>
+        <button class="filter-btn active" data-filter="new">WHAT'S NEW</button>
+        <button class="filter-btn" data-filter="bestsellers">BEST SELLERS</button>
+        <button class="filter-btn" data-filter="favorites">CUSTOMER FAVORITES</button>
       </div>
       
       <div class="grid">
         <!-- Updated featured product to match React component with proper pricing -->
-        <article class="card" data-product-id="1">
+        <!-- <article class="card" data-product-id="1">
           <div class="card-media">
             <img src="mik/b6.png" alt="Sulu-Light Lampshade">
           </div>
@@ -99,78 +99,9 @@
             <p class="title">Sulu-Light Lampshade</p>
             <p class="price">₱150.00</p>
           </div>
-        </article>
+        </article> -->
 
         <!-- Updated all product cards to match React component exactly -->
-        <article class="card" data-product-id="2">
-          <div class="card-media">
-            <img src="mik/p2.png" alt="Ilaw - Kawayan">
-          </div>
-          <div class="card-meta">
-            <p class="title">Ilaw - Kawayan</p>
-            <p class="price">₱100.00</p>
-          </div>
-        </article>
-
-        <article class="card" data-product-id="3">
-          <div class="card-media">
-            <img src="mik/p1.png" alt="HabitHook Rack">
-          </div>
-          <div class="card-meta">
-            <p class="title">HabitHook Rack</p>
-            <p class="price">₱100.00</p>
-          </div>
-        </article>
-
-        <article class="card" data-product-id="4">
-          <div class="card-media">
-            <img src="mik/p3.png" alt="Tadyaw">
-          </div>
-          <div class="card-meta">
-            <p class="title">Tadyaw</p>
-            <p class="price">₱100.00</p>
-          </div>
-        </article>
-
-        <article class="card" data-product-id="5">
-          <div class="card-media">
-            <img src="mik/p4.png" alt="Pugad Holder">
-          </div>
-          <div class="card-meta">
-            <p class="title">Pugad Holder</p>
-            <p class="price">₱100.00</p>
-          </div>
-        </article>
-
-        <article class="card" data-product-id="6">
-          <div class="card-media">
-            <img src="mik/p5.png" alt="Kape - Kawayan">
-          </div>
-          <div class="card-meta">
-            <p class="title">Kape - Kawayan</p>
-            <p class="price">₱100.00</p>
-          </div>
-        </article>
-
-        <article class="card" data-product-id="7">
-          <div class="card-media">
-            <img src="mik/p6.png" alt="Dayang - Dulo">
-          </div>
-          <div class="card-meta">
-            <p class="title">Dayang - Dulo</p>
-            <p class="price">₱100.00</p>
-          </div>
-        </article>
-
-        <article class="card" data-product-id="8">
-          <div class="card-media">
-            <img src="mik/p9.png" alt="Dayang - Dulo">
-          </div>
-          <div class="card-meta">
-            <p class="title">Dayang - Dulo</p>
-            <p class="price">₱100.00</p>
-          </div>
-        </article>
       </div>
       <div style="text-align: center; margin-top: 2rem;">
         <a href="products.php" class="btn cta">View All Products <i class="fa-solid fa-arrow-right"></i></a>

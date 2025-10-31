@@ -356,11 +356,12 @@ class OrderManager {
         const statusSelect = document.getElementById('edit-modal-order-status');
         const currentStatus = order.status;
 
-        // Define the allowed transitions for each status
+        // Define allowed transitions (admin CANNOT set 'delivered')
         const allowedTransitions = {
-            pending: ['processing', 'shipped', 'completed', 'cancelled'],
-            processing: ['shipped', 'completed', 'cancelled'],
-            shipped: ['completed', 'cancelled'],
+            pending: ['processing', 'shipped', 'cancelled'],
+            processing: ['shipped', 'cancelled'],
+            shipped: ['cancelled'], // removed 'delivered'
+            delivered: ['completed'], // only if user already delivered
             completed: [],
             cancelled: []
         };
@@ -370,7 +371,6 @@ class OrderManager {
         statusSelect.innerHTML = ''; // Clear previous options
 
         if (availableStatuses.length === 0) {
-            // No transitions allowed
             const opt = document.createElement('option');
             opt.value = currentStatus;
             opt.textContent = currentStatus.charAt(0).toUpperCase() + currentStatus.slice(1);
@@ -386,9 +386,9 @@ class OrderManager {
             statusSelect.disabled = false;
         }
 
-        // Populate timeline
+        // Populate timeline (includes 'delivered' for visibility)
         const timeline = document.getElementById('edit-modal-timeline');
-        const allStatuses = ['pending', 'processing', 'shipped', 'completed', 'cancelled'];
+        const allStatuses = ['pending', 'processing', 'shipped', 'delivered', 'completed', 'cancelled'];
 
         timeline.innerHTML = allStatuses.map(status => {
             const historyEntry = order.history.find(h => h.status === status);
@@ -398,6 +398,7 @@ class OrderManager {
                 pending: 'fa-clock',
                 processing: 'fa-cog',
                 shipped: 'fa-truck',
+                delivered: 'fa-box',
                 completed: 'fa-check-circle',
                 cancelled: 'fa-times-circle'
             };
@@ -414,11 +415,17 @@ class OrderManager {
             `;
         }).join('');
 
-        // Set up update button
+        // Update button behavior
         const updateBtn = document.getElementById('edit-modal-update-status-btn');
         updateBtn.onclick = () => {
             const newStatus = statusSelect.value;
             if (!newStatus) return showToast('Please select a status.', 'warning');
+
+            // Prevent admin from manually setting to 'delivered'
+            if (newStatus === 'delivered') {
+                showToast('You cannot manually mark this order as delivered. Please wait for the user to confirm delivery.', 'warning');
+                return;
+            }
 
             const overlay = document.getElementById('loading-overlay');
             overlay.style.display = 'flex';
@@ -452,6 +459,8 @@ class OrderManager {
 
         modal.style.display = 'flex';
     }
+
+
 
 
 

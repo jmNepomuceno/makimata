@@ -66,13 +66,7 @@ class ProductManager {
       success: (response) => {
         console.table(response);
 
-        if (response.status === "success") {
-          this.products = response.data;
-        } else {
-          console.warn("Error loading products:", response.message);
-          this.products = [];
-        }
-
+        this.products = response.products;
         this.filteredProducts = [...this.products];
         this.renderProducts();
         this.updateProductStats();

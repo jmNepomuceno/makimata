@@ -533,6 +533,19 @@
         </div>
     </div>
 
+    <!-- Tutorial Modal -->
+    <!-- Tutorial Modal -->
+    <div id="tutorialModal" class="tutorial-modal">
+        <div class="tutorial-modal-content">
+            <span class="tutorial-close-btn" onclick="closeTutorials()">&times;</span>
+            <h2 class="tutorial-title">Tutorials</h2>
+            <div id="tutorialList" class="tutorial-list"></div>
+        </div>
+    </div>
+
+
+
+
     <div class="modal" id="orderStatusModal">
         <div class="modal-content orderStatusModal-content">
             <div class="modal-header">

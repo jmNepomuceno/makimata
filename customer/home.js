@@ -285,46 +285,6 @@ const PRODUCTS = [
       });
     }
 
-    // cartBtn.addEventListener('click', () => {
-    //   renderCartItems();
-    //   cartModal.style.display = 'block';
-    // });
-
-    // wishlistBtn.addEventListener('click', () => {
-    //   renderWishlistItems();
-    //   wishlistModal.style.display = 'block';
-    // });
-
-    // userBtn.addEventListener('click', () => {
-    //   fetchOrders();
-    //   orderStatusModal.style.display = 'block';
-    // });
-
-    // closeCartBtn.addEventListener('click', () => {
-    //   cartModal.style.display = 'none';
-    // });
-
-    // closeWishlistBtn.addEventListener('click', () => {
-    //   wishlistModal.style.display = 'none';
-    // });
-
-    // closeOrderStatus.addEventListener('click', () => {
-    //   orderStatusModal.style.display = 'none';
-    // });
-
-  //   submodulesBtn.addEventListener('click', () => {
-  //       submodulesModal.style.display = 'block';
-  //   });
-
-  //   closeSubmodules.addEventListener('click', () => {
-  //       submodulesModal.style.display = 'none';
-  //   });
-
-  //   viewOrderStatusBtn.addEventListener('click', () => {
-  //     submodulesModal.style.display = 'none'; // close modules modal
-  //     fetchOrders();
-  //     orderStatusModal.style.display = 'block';
-  // });
 
     // Optional: click outside modal to close
     window.addEventListener('click', (e) => {
@@ -395,83 +355,89 @@ const PRODUCTS = [
         });
     }
 
-    function loadFeaturedProducts() {
+    function loadFeaturedProducts(filter = "new") {
+      console.log("Loading filter:", filter);
+
       const grid = document.querySelector(".featured .grid");
       if (!grid) return;
 
+      grid.innerHTML = `<p style="grid-column: 1 / -1; text-align:center; padding:2rem;">Loading...</p>`;
+
       $.ajax({
-          url: "../assets/php/fetch_new_products.php", // adjust path
-          type: "GET",
-          dataType: "json",
-          success: function(response) {
-              if (response.status !== "success") {
-                  grid.innerHTML = `<p style="grid-column: 1 / -1; text-align:center; padding:2rem;">Failed to load products.</p>`;
-                  return;
-              }
-
-              const products = response.data;
-              grid.innerHTML = "";
-
-              if (products.length === 0) {
-                  grid.innerHTML = `<p style="grid-column: 1 / -1; text-align:center; padding:2rem;">No products available.</p>`;
-                  return;
-              }
-
-              products.forEach(product => {
-                  const cardHTML = `
-                      <article class="card" data-product-id="${product.id}">
-                          <div class="card-media">
-                              <img src="${product.image}" alt="${product.name}">
-                          </div>
-                          <div class="card-meta">
-                              <p class="title">${product.name}</p>
-                              <p class="price">₱${parseFloat(product.price).toFixed(2)}</p>
-                          </div>
-                      </article>
-                  `;
-                  grid.insertAdjacentHTML("beforeend", cardHTML);
-              });
-          },
-          error: function(xhr, status, error) {
-              console.error("AJAX Error:", error);
-              grid.innerHTML = `<p style="grid-column: 1 / -1; text-align:center; padding:2rem;">Error fetching products.</p>`;
+        url: "../assets/php/fetch_new_products.php", // ✅ single PHP endpoint
+        type: "GET",
+        data: { filter }, // pass filter param (?filter=new / bestsellers / favorites)
+        dataType: "json",
+        success: function (response) {
+          if (response.status !== "success") {
+            grid.innerHTML = `<p style="grid-column: 1 / -1; text-align:center; padding:2rem;">Failed to load products.</p>`;
+            return;
           }
+
+          const products = response.data;
+          grid.innerHTML = "";
+
+          if (!products || products.length === 0) {
+            grid.innerHTML = `<p style="grid-column: 1 / -1; text-align:center; padding:2rem;">No products available.</p>`;
+            return;
+          }
+
+          products.forEach(product => {
+            const cardHTML = `
+              <article class="card" data-product-id="${product.id}">
+                <div class="card-media">
+                  <img src="${product.image}" alt="${product.name}">
+                </div>
+                <div class="card-meta">
+                  <p class="title">${product.name}</p>
+                  <p class="price">₱${parseFloat(product.price).toFixed(2)}</p>
+                </div>
+              </article>
+            `;
+            grid.insertAdjacentHTML("beforeend", cardHTML);
+          });
+        },
+        error: function (xhr, status, error) {
+          console.error("AJAX Error:", error);
+          grid.innerHTML = `<p style="grid-column: 1 / -1; text-align:center; padding:2rem;">Error fetching products.</p>`;
+        }
       });
-  }
+    }
+
+    document.querySelectorAll(".filter-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+
+        const label = btn.textContent.trim().toLowerCase();
+        let filter = "new";
+        if (label.includes("best")) filter = "bestsellers";
+        else if (label.includes("favorite")) filter = "favorites";
+
+        loadFeaturedProducts(filter);
+      });
+    });
+
+
+
 
 
     document.addEventListener('DOMContentLoaded', () => {
-      loadFeaturedProducts()
-        // const categoryFilters = document.querySelector('.category-filters');
-        // const productsGrid = document.getElementById('productsGrid');
+        const buttons = document.querySelectorAll(".filter-btn");
 
-        // loadCartAndWishlist();
-        // // updateCounts();
+        buttons.forEach(btn => {
+          btn.addEventListener("click", () => {
+            buttons.forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
 
-        // const initialCategory = categoryFilters?.querySelector('.category-btn.active')?.dataset.category || 'lampshades';
-        // displayProducts(initialCategory);
+            const filterType = btn.getAttribute("data-filter");
+            loadFeaturedProducts(filterType);
+          });
+        });
 
-        // if (categoryFilters) {
-        //     categoryFilters.addEventListener('click', (event) => {
-        //         const button = event.target.closest('.category-btn');
-        //         if (!button) return;
+        // Load default (WHAT’S NEW)
+        loadFeaturedProducts("new");
 
-        //         categoryFilters.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
-        //         button.classList.add('active');
-        //         displayProducts(button.dataset.category);
-        //     });
-        // }
-
-        // if (productsGrid) {
-        //     productsGrid.addEventListener('click', (event) => {
-        //         const card = event.target.closest('.product-card');
-        //         if (!card) return;
-        //         const productId = parseInt(card.dataset.productId);
-
-        //         if (event.target.closest('.cart-btn')) addToCart(productId);
-        //         if (event.target.closest('.wishlist-btn')) toggleWishlist(productId);
-        //     });
-        // }
 
         function showToast(message, type = "info") {
           const container = $("#toast-container");

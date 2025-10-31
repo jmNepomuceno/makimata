@@ -5,50 +5,58 @@ header('Content-Type: application/json; charset=utf-8');
 session_start();
 
 try {
-    $sql = "SELECT 
-                product_ID AS id, 
-                product_code,
-                name, 
-                description, 
-                price, 
-                stock, 
-                category, 
-                image, 
-                images,
-                stock_status,
-                styling
-            FROM products";
-    $stmt = $pdo->prepare($sql);
+    // 🟢 Fetch products
+    $sqlProducts = "SELECT 
+                        product_ID AS id, 
+                        product_code,
+                        name, 
+                        description, 
+                        price, 
+                        stock, 
+                        category, 
+                        image, 
+                        images,
+                        stock_status,
+                        styling
+                    FROM products";
+    $stmt = $pdo->prepare($sqlProducts);
     $stmt->execute();
     $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // Decode JSON column "images" into array
+    // 🟢 Decode JSON columns
     foreach ($products as &$product) {
-        if (!empty($product['images'])) {
-            $decoded = json_decode($product['images'], true);
-            $product['images'] = $decoded ?: [];
-        } else {
-            $product['images'] = [];
-        }
+        $product['images'] = !empty($product['images']) ? (json_decode($product['images'], true) ?: []) : [];
+        $product['styling'] = !empty($product['styling']) ? (json_decode($product['styling'], true) ?: []) : [];
     }
 
-    foreach ($products as &$product) {
-        if (!empty($product['styling'])) {
-            $decoded = json_decode($product['styling'], true);
-            $product['styling'] = $decoded ?: [];
-        } else {
-            $product['styling'] = [];
-        }
-    }
+    // 🟣 Fetch tutorials
+    $sqlTutorials = "SELECT 
+                        id, 
+                        title, 
+                        description, 
+                        type, 
+                        video_url, 
+                        article_url, 
+                        views, 
+                        last_updated, 
+                        icon, 
+                        created_at, 
+                        status, 
+                        order_code
+                     FROM tutorials";
+    $stmtTut = $pdo->prepare($sqlTutorials);
+    $stmtTut->execute();
+    $tutorials = $stmtTut->fetchAll(PDO::FETCH_ASSOC);
 
     echo json_encode([
         "status" => "success",
-        "data" => $products
+        "products" => $products,
+        "tutorials" => $tutorials
     ]);
 
 } catch (Exception $e) {
     echo json_encode([
-        "status" => "error", 
+        "status" => "error",
         "message" => $e->getMessage()
     ]);
 }

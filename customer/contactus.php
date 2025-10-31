@@ -1,7 +1,13 @@
 <?php
 // Mikamata Tutorial Module - Public Interface (Learn With Us)
+include("../assets/connection/connection.php");
 session_start();
 include("../scripts_links/header_links.php");
+
+
+$sql = "SELECT product_code, name FROM products ORDER BY product_ID ASC";
+$stmt = $pdo->query($sql);
+$products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -95,6 +101,19 @@ include("../scripts_links/header_links.php");
                         required 
                         placeholder="e.g., Traditional Basket Weaving Techniques"
                     >
+                </div>
+
+                <div class="form-group">
+                    <label for="tutorialProduct">Select Related Product *</label>
+                    <select id="tutorialProduct" name="order_code" required>
+                        <option value="">-- Select a Product --</option>
+                        <?php foreach ($products as $product): ?>
+                            <option value="<?= htmlspecialchars($product['product_code']) ?>">
+                                <?= htmlspecialchars($product['name']) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                    <span class="form-help">Choose which product this tutorial is related to</span>
                 </div>
 
                 <div class="form-group">

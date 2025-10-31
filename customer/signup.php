@@ -110,6 +110,30 @@
             color: red;
         }
 
+        .password-field {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-field input {
+    width: 100%;
+    padding-right: 40px;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 10px;
+    cursor: pointer;
+    color: #888;
+    transition: color 0.2s ease;
+}
+
+.toggle-password:hover {
+    color: #333;
+}
+
+
 
         /* Animation */
         @keyframes fadeIn {
@@ -199,9 +223,12 @@
                 </div>
 
                 <!-- Password -->
-                <div class="form-group">
+                <div class="form-group password-wrapper">
                     <label for="password"><i class="fa-solid fa-lock"></i> Password</label>
-                    <input type="password" id="password" name="password" required placeholder="Password" />
+                    <div class="password-field">
+                        <input type="password" id="password" name="password" required placeholder="Password" />
+                        <i class="fa-solid fa-eye toggle-password" data-target="password"></i>
+                    </div>
                 </div>
 
                 <div id="passwordRequirements" class="password-rules">
@@ -215,10 +242,14 @@
                     </ul>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group password-wrapper">
                     <label for="confirmPassword"><i class="fa-solid fa-lock"></i> Confirm Password</label>
-                    <input type="password" id="confirmPassword" name="confirmPassword" required placeholder="Confirm password" />
+                    <div class="password-field">
+                        <input type="password" id="confirmPassword" name="confirmPassword" required placeholder="Confirm password" />
+                        <i class="fa-solid fa-eye toggle-password" data-target="confirmPassword"></i>
+                    </div>
                 </div>
+
 
                 <!-- Privacy Policy Link -->
                 <div class="terms full-width">
